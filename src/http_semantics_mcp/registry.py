@@ -75,6 +75,14 @@ class Registry(object):
 # -- declarations ---------------------------------------------------------
 
 TOOL_DESCRIPTIONS = {
+    "cache_evaluate": (
+        "Decide whether a stored response may be reused without revalidating. "
+        "Applies the RFC 9111 age and freshness arithmetic (Date, Age, "
+        "Cache-Control, Expires, Last-Modified) and returns action "
+        "serve|revalidate|miss, the age and freshness lifetime in whole "
+        "seconds, and the rule IDs with their clause references. now is an "
+        "argument: the cache never reads a clock."
+    ),
     "cors_evaluate": (
         "Judge one HTTP response against the Fetch Standard CORS check. "
         "Returns decision allow|block, the violated rule IDs with their clause "
@@ -129,7 +137,40 @@ _CORS_REQUEST_PROPERTIES = {
     "is_preflight": {"type": "boolean", "description": "is this the preflight response?"},
 }
 
+_STORED = {
+    "type": "object",
+    "properties": {
+        "stored_at": {
+            "type": "string",
+            "description": "instant the response was stored (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
+        },
+        "age": {
+            "type": ["string", "integer"],
+            "description": "Age as recorded at store time; wins over a response Age header",
+        },
+        "headers": _HEADERS,
+    },
+    "required": ["stored_at"],
+    "additionalProperties": False,
+}
+
+_CACHE_DIRECTIVES = {
+    "now": {
+        "type": "string",
+        "description": "evaluation instant (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
+    },
+    "request_headers": _HEADERS,
+    "response_headers": _HEADERS,
+    "stored": _STORED,
+}
+
 INPUT_SCHEMAS = {
+    "cache_evaluate": {
+        "type": "object",
+        "properties": dict(_CACHE_DIRECTIVES),
+        "required": ["now", "stored"],
+        "additionalProperties": False,
+    },
     "cors_evaluate": {
         "type": "object",
         "properties": dict(_CORS_REQUEST_PROPERTIES),

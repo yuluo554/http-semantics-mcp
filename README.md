@@ -2,12 +2,12 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: M2 (CORS).** The server starts, completes the MCP handshake and
-reports **two tools** — `cors_evaluate` and `cors_simulate_fetch`. Both are
-judged against 34 frozen golden cases (24 + 10) and produce byte-identical
-output. Cache, conditional-request and Vary tools land in M3–M4; schema
-generation and the determinism sweep in M5; the public release is M6. See
-[`plan/05-里程碑.md`](plan/05-里程碑.md).
+**Status: M3 (cache).** The server starts, completes the MCP handshake and
+reports **three tools** — `cache_evaluate`, `cors_evaluate` and
+`cors_simulate_fetch`. All three are judged against frozen golden cases
+(18 + 24 + 10) and produce byte-identical output. Conditional-request and Vary
+tools land in M4; schema generation and the determinism sweep in M5; the public
+release is M6. See [`plan/05-里程碑.md`](plan/05-里程碑.md).
 
 ---
 
@@ -33,13 +33,32 @@ it.
 | --- | --- | --- |
 | `cors_evaluate` | Will the browser let this response through? | M2 ✅ |
 | `cors_simulate_fetch` | What happens across redirects, hop by hop? | M2 ✅ |
-| `cache_evaluate` | Can this stored response be served without revalidating? | M3 |
+| `cache_evaluate` | Can this stored response be served without revalidating? | M3 ✅ |
 | `conditional_evaluate` | Which conditional-request rule decides the status? | M4 |
 | `vary_match` | Does this cached entry match the incoming request? | M4 |
 
 `tools/list` returns exactly the tools that are implemented. A stub descriptor
-would tell a client a capability exists that does not, which is why the two
+would tell a client a capability exists that does not, which is why the
 remaining milestones add tools rather than plans.
+
+### A cache verdict by hand
+
+Ask whether a stored response is still fresh, and what the numbers are:
+
+```bash
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"cache_evaluate","arguments":{"now":"2026-01-01T00:00:30Z","response_headers":{"Cache-Control":"max-age=60","Date":"Thu, 01 Jan 2026 00:00:00 GMT"},"stored":{"stored_at":"2026-01-01T00:00:10Z","age":"10"}}}}' \
+  | python -m http_semantics_mcp
+```
+
+```json
+{"action":"serve","current_age":30,"freshness_lifetime":60,"is_fresh":true,"must_revalidate":false,"reasons":[],"stale_while_revalidate_window":0}
+```
+
+`now` is an argument, not a clock read: the same call always returns the same
+bytes, on any machine, at any time.
 
 ### What it is not
 

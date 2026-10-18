@@ -14,6 +14,7 @@ place where a caller mistake becomes a payload.
 
 from . import canonical
 from .judgement import errors as judgement_errors
+from .judgement.cache import evaluate_cache
 from .judgement.cors import evaluate_cors
 from .judgement.fetch_sim import evaluate_fetch
 from .rules import CATALOG
@@ -24,6 +25,7 @@ __all__ = ["FUNCTIONS", "handlers", "render"]
 # logic; the registry is the single place that declares the client-visible
 # descriptors.
 FUNCTIONS = {
+    "cache_evaluate": evaluate_cache,
     "cors_evaluate": evaluate_cors,
     "cors_simulate_fetch": evaluate_fetch,
 }

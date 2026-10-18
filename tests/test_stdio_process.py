@@ -58,6 +58,7 @@ def test_server_starts_and_answers_the_handshake():
     assert init["protocolVersion"] == "2025-06-18"
     assert init["serverInfo"]["name"] == "http-semantics-mcp"
     assert [tool["name"] for tool in messages[1]["result"]["tools"]] == [
+        "cache_evaluate",
         "cors_evaluate",
         "cors_simulate_fetch",
     ]

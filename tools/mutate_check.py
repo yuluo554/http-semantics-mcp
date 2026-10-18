@@ -162,6 +162,51 @@ CASES = [
         "    for name in []:",
         ["-m", "pytest", "-q", "tests/test_registry.py"],
     ),
+    (
+        "the cache treats a boundary entry as fresh",
+        os.path.join("src", "http_semantics_mcp", "judgement", "cache.py"),
+        "    is_fresh = current_age < freshness_lifetime",
+        "    is_fresh = current_age <= freshness_lifetime",
+        ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
+    ),
+    (
+        "no-store stops short-circuiting the freshness arithmetic",
+        os.path.join("src", "http_semantics_mcp", "judgement", "cache.py"),
+        '    if "no-store" in directives:',
+        "    if False:",
+        ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
+    ),
+    (
+        "the stale-while-revalidate window drops its inclusive edge",
+        os.path.join("src", "http_semantics_mcp", "judgement", "cache.py"),
+        "    elif swr_window > 0 and current_age - freshness_lifetime <= swr_window:",
+        "    elif swr_window > 0 and current_age - freshness_lifetime < swr_window:",
+        ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
+    ),
+    (
+        "an invalid Age is silently treated as zero",
+        os.path.join("src", "http_semantics_mcp", "judgement", "cache.py"),
+        "        if age_value is None:\n"
+        "            findings.append(_finding(catalog, CACHE_INVALID_AGE, age=age_raw))\n"
+        "            age_value = 0",
+        "        if age_value is None:\n"
+        "            age_value = 0",
+        ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
+    ),
+    (
+        "the time parser stops checking the HTTP-date weekday",
+        os.path.join("src", "http_semantics_mcp", "judgement", "timeparse.py"),
+        "        if _weekday_name(days) != weekday:",
+        "        if False:",
+        ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
+    ),
+    (
+        "fractional seconds round up instead of truncating",
+        os.path.join("src", "http_semantics_mcp", "judgement", "timeparse.py"),
+        "        return ISO_FORM, days * _SECONDS_PER_DAY + hour * 3600 + minute * 60 + min(second, 59)",
+        "        return ISO_FORM, days * _SECONDS_PER_DAY + hour * 3600 + minute * 60 + min(second, 59) + (1 if iso.group(7) else 0)",
+        ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
+    ),
 ]
 
 

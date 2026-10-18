@@ -16,7 +16,7 @@ def _tool(name, description="does a thing"):
 
 def test_build_registry_declares_the_shipped_tools():
     registry = build_registry()
-    assert registry.names() == ["cors_evaluate", "cors_simulate_fetch"]
+    assert registry.names() == ["cache_evaluate", "cors_evaluate", "cors_simulate_fetch"]
     assert [descriptor["name"] for descriptor in registry.descriptors()] == registry.names()
 
 
@@ -51,6 +51,12 @@ def _minimal_arguments(name):
         "origin": "https://app.example.com",
         "response": {"status": 200, "headers": {"Access-Control-Allow-Origin": "https://app.example.com"}},
     }
+    if name == "cache_evaluate":
+        return {
+            "now": "2026-01-01T00:00:00Z",
+            "response_headers": {"Cache-Control": "max-age=60"},
+            "stored": {"stored_at": "2026-01-01T00:00:00Z"},
+        }
     if name == "cors_evaluate":
         return dict(common, is_preflight=False)
     return dict(common, mode="cors", redirects=[])
