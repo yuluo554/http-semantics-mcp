@@ -1,0 +1,150 @@
+{
+  "description": "Decide whether a stored response may be reused without revalidating. Applies the RFC 9111 age and freshness arithmetic (Date, Age, Cache-Control, Expires, Last-Modified) and returns action serve|revalidate|miss, the age and freshness lifetime in whole seconds, and the rule IDs with their clause references. now is an argument: the cache never reads a clock.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "now": {
+        "description": "evaluation instant (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
+        "type": "string"
+      },
+      "request_headers": {
+        "additionalProperties": {
+          "description": "one value, or an array for a repeated header",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "description": "header name -> value",
+        "type": "object"
+      },
+      "response_headers": {
+        "additionalProperties": {
+          "description": "one value, or an array for a repeated header",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "description": "header name -> value",
+        "type": "object"
+      },
+      "stored": {
+        "additionalProperties": false,
+        "properties": {
+          "age": {
+            "description": "Age as recorded at store time; wins over a response Age header",
+            "type": [
+              "string",
+              "integer"
+            ]
+          },
+          "headers": {
+            "additionalProperties": {
+              "description": "one value, or an array for a repeated header",
+              "items": {
+                "type": "string"
+              },
+              "type": [
+                "string",
+                "array"
+              ]
+            },
+            "description": "header name -> value",
+            "type": "object"
+          },
+          "stored_at": {
+            "description": "instant the response was stored (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stored_at"
+        ],
+        "type": "object"
+      }
+    },
+    "required": [
+      "now",
+      "stored"
+    ],
+    "type": "object"
+  },
+  "name": "cache_evaluate",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "action": {
+        "enum": [
+          "serve",
+          "revalidate",
+          "miss"
+        ],
+        "type": "string"
+      },
+      "current_age": {
+        "description": "RFC 9111 section 4.2.3 age, whole seconds",
+        "type": "integer"
+      },
+      "freshness_lifetime": {
+        "description": "whole seconds",
+        "type": "integer"
+      },
+      "is_fresh": {
+        "type": "boolean"
+      },
+      "must_revalidate": {
+        "type": "boolean"
+      },
+      "reasons": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "description": "rule id from the generated catalogue",
+              "type": "string"
+            },
+            "detail": {
+              "description": "fixed template rendered with this case's values",
+              "type": "string"
+            },
+            "spec_ref": {
+              "description": "clause references, sorted; the first is the primary basis",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "code",
+            "detail",
+            "spec_ref"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "stale_while_revalidate_window": {
+        "description": "whole seconds; 0 when undeclared",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "action",
+      "current_age",
+      "freshness_lifetime",
+      "is_fresh",
+      "must_revalidate",
+      "reasons",
+      "stale_while_revalidate_window"
+    ],
+    "type": "object"
+  }
+}

@@ -24,7 +24,10 @@ python -m pytest
 | `test_vary_golden.py` | T5: 9 vary golden cases byte-for-byte, the per-field policy table (proved by swapping a catalog row), absent-vs-empty, one repeat notice in source order, `Vary: *` short circuit |
 | `test_gen_codes.py` | `codes.json` regeneration, mirror equality, table↔catalog set equality, the generated rule module, drift localisation |
 | `test_golden.py` | golden completeness, exact output key sets, sorting, both-direction coverage, drift and orphan detection |
-| `test_wpt_ledger.py` | WPT index shape, ledger partition (`converted + unmappable == total`), case references |
+| `test_wpt_ledger.py` | WPT index shape, ledger partition (`converted + unmappable == total`), case references, and the M5 reconciliation: every `mapped=true` row re-runs its golden cases against production |
+| `test_schema_parity.py` | the published `outputSchema` per tool equals §4.10 and each case's real key set (both directions) plus value shape; `required` == the always-present fields; mirror drift and orphan detection |
+| `test_determinism.py` | five tools × every golden case: same input → same sha256, no machine-specific path, no date the caller did not supply |
+| `test_stdio_end_to_end.py` | a real client over real pipes: handshake → `tools/list` → one successful call per tool (checked against the server's own `outputSchema`) → unknown tool `-32602`; cross-process rerun determinism |
 | `test_coverage_matrix.py` | every named boundary shape from plan/04 §四 exists; redirect event order; cache arithmetic notes |
 | `test_mirrors.py` | package/top-level mirror equality, including missing and diverged cases |
 | `test_readme_gate.py` | README commands/flags/extras/file references against the real parser and the real tree |

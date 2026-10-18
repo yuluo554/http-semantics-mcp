@@ -24,6 +24,7 @@ __all__ = [
     "read_preflight_cache_key",
     "read_vary_normalization",
     "read_notes",
+    "read_output_fields",
     "VARY_COLUMNS",
 ]
 
@@ -223,6 +224,31 @@ def read_notes(text):
     return notes
 
 
+def read_output_fields(text):
+    """Return ``{tool: sorted(keys)}`` from section 4.10.
+
+    This is the schema contract: the key set of ``outputSchema.properties`` must
+    equal the set declared here, for every tool. A row with no backticked keys,
+    or two rows for one tool, is a malformed contract rather than an empty one.
+    """
+    section = read_section(text, "4.10")
+    fields = {}
+    for cells in _table_rows(section, 2, "section 4.10"):
+        tool = _bare(cells[0])
+        keys = [_bare(token) for token in _BACKTICK.findall(cells[1])]
+        keys = [key for key in keys if key]
+        if not tool:
+            raise SpecTableError("section 4.10: a row has no tool name")
+        if not keys:
+            raise SpecTableError("section 4.10: " + tool + " has no output keys")
+        if tool in fields:
+            raise SpecTableError("section 4.10: duplicate tool " + tool)
+        if len(keys) != len(set(keys)):
+            raise SpecTableError("section 4.10: " + tool + " repeats an output key")
+        fields[tool] = sorted(keys)
+    return fields
+
+
 def unverified_refs(text):
     """Return the spec refs used in 4.1 but not checked off in 4.2."""
     verified = read_spec_refs(text)
@@ -258,4 +284,5 @@ def read_contract(root):
         "preflight_cache_key": read_preflight_cache_key(text),
         "vary_normalization": read_vary_normalization(text),
         "notes": read_notes(text),
+        "output_fields": read_output_fields(text),
     }

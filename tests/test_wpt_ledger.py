@@ -21,6 +21,9 @@ if TOOLS not in sys.path:
 
 import golden_coverage  # noqa: E402
 
+from http_semantics_mcp import canonical  # noqa: E402
+from http_semantics_mcp.registry import build_registry  # noqa: E402
+
 INDEX = os.path.join("data", "wpt", "cors-index.json")
 LEDGER = os.path.join("data", "wpt-mapping.json")
 
@@ -99,6 +102,44 @@ def test_mapped_rows_point_at_real_golden_cases():
 def test_no_duplicate_case_reference_within_one_row():
     for row in _load(LEDGER)["records"]:
         assert len(row["case_ids"]) == len(set(row["case_ids"])), row["wpt_path"]
+
+
+def test_mapped_rows_reconcile_with_the_production_output():
+    """The ledger is not just a list of names: every mapped row is executed.
+
+    For each ``mapped=true`` row, the golden cases it points at are run through
+    the production handler and compared byte for byte with the frozen
+    expectation (``data/README.md`` section 3.4, final bullet). The row count is
+    asserted against the ledger's own ``converted`` counter, and the case count
+    is asserted to be non-zero, so a ledger that mapped nothing cannot pass.
+    """
+    ledger = _load(LEDGER)
+    golden = {case_id: (tool, case) for tool, case_id, case in golden_coverage.iter_cases(ROOT)}
+
+    reconciled_rows = 0
+    reconciled_cases = 0
+    for row in ledger["records"]:
+        if not row["mapped"]:
+            assert row["reason"] in REASONS, row["wpt_path"]
+            continue
+        for case_id in row["case_ids"]:
+            tool, case = golden[case_id]
+            result = build_registry().get(tool).handler(case["input"])
+            actual = json.loads(result["content"][0]["text"])
+            assert canonical.dumps(actual) == canonical.dumps(case["expected"]), (
+                row["wpt_path"] + " -> " + case_id
+            )
+            reconciled_cases += 1
+        reconciled_rows += 1
+
+    assert reconciled_rows == ledger["converted"] == 15
+    assert reconciled_cases >= reconciled_rows
+    sys.stdout.write(
+        "WPT: {0}/{1} mapped row(s) reconcile with the production output "
+        "({2} golden case reference(s))\n".format(
+            reconciled_rows, ledger["converted"], reconciled_cases
+        )
+    )
 
 
 def test_ledger_does_not_ship_wpt_source_text():

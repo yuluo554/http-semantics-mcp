@@ -74,7 +74,7 @@
 - 索引：`data/wpt/cors-index.json` 固定 `wpt_commit`、`fetched_at`（数据日）、`directory`、`total` 与逐文件 `path` / `type` / `blob_sha` / `size`。
 - 映射：`data/wpt-mapping.json` 固定 `wpt_commit`、`fetched_at`、`total`、`converted`、`unmappable`，并满足集合划分 `converted + unmappable == total`。
 - **`total` 是索引里的文件条目数**（含 `cors/resources/` 下的后端脚本）；目录条目不计数。
-- `mapped=true` 的条目必须指向已存在的 golden `case_id`；M5 再逐条核对判定一致。
+- `mapped=true` 的条目必须指向已存在的 golden `case_id`；M5 已逐条实跑对账（`tests/test_wpt_ledger.py::test_mapped_rows_reconcile_with_the_production_output`，15/15 行与冻结 `expected` 逐字节一致）。
 - WPT 测浏览器行为，本题做规范推导；两者不一致时以规范为准，差异写进对应 golden 的 `notes`，**不修改期望值去迁就浏览器**。
 
 > 本题**没有**需要联网核对的法规文号或官方统计口径；因此不设"权威数据源待核对"条目。**不得为了凑格式编造数据源。**

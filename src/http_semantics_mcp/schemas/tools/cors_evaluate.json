@@ -1,0 +1,166 @@
+{
+  "description": "Judge one HTTP response against the Fetch Standard CORS check. Returns decision allow|block, the violated rule IDs with their clause references, the headers that are missing, and what to send instead. No network: url is parsed for scheme/host/port only.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "credentials": {
+        "description": "credentials mode of the request",
+        "enum": [
+          "omit",
+          "include"
+        ],
+        "type": "string"
+      },
+      "is_preflight": {
+        "description": "is this the preflight response?",
+        "type": "boolean"
+      },
+      "method": {
+        "description": "HTTP request method",
+        "type": "string"
+      },
+      "origin": {
+        "description": "request Origin; omit or null for a same-origin request",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "request_headers": {
+        "additionalProperties": {
+          "description": "one value, or an array for a repeated header",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "description": "header name -> value",
+        "type": "object"
+      },
+      "response": {
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "additionalProperties": {
+              "description": "one value, or an array for a repeated header",
+              "items": {
+                "type": "string"
+              },
+              "type": [
+                "string",
+                "array"
+              ]
+            },
+            "description": "header name -> value",
+            "type": "object"
+          },
+          "status": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "url": {
+        "description": "target URL; only its origin is used",
+        "type": "string"
+      }
+    },
+    "required": [
+      "method",
+      "url",
+      "response",
+      "is_preflight"
+    ],
+    "type": "object"
+  },
+  "name": "cors_evaluate",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "decision": {
+        "enum": [
+          "allow",
+          "block"
+        ],
+        "type": "string"
+      },
+      "missing_headers": {
+        "description": "lowercase header names, ASCII-sorted",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "notes": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_credentials_null_origin": {
+            "type": "boolean"
+          },
+          "max_age_capped_by_client": {
+            "type": "boolean"
+          },
+          "wildcard_with_credentials": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "allow_credentials_null_origin",
+          "max_age_capped_by_client",
+          "wildcard_with_credentials"
+        ],
+        "type": "object"
+      },
+      "recommended_headers": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "lowercase header name -> value to send instead",
+        "type": "object"
+      },
+      "violations": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "description": "rule id from the generated catalogue",
+              "type": "string"
+            },
+            "detail": {
+              "description": "fixed template rendered with this case's values",
+              "type": "string"
+            },
+            "spec_ref": {
+              "description": "clause references, sorted; the first is the primary basis",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "code",
+            "detail",
+            "spec_ref"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "decision",
+      "missing_headers",
+      "notes",
+      "recommended_headers",
+      "violations"
+    ],
+    "type": "object"
+  }
+}

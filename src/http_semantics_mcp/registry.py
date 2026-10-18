@@ -1,22 +1,40 @@
 """Tool registry: the single place where tools are declared.
 
 M2 registered the two CORS tools, M3 added ``cache_evaluate`` and M4 the
-remaining two; M5 replaces the inlined ``inputSchema`` objects with generated
-ones. Until then the schemas are hand-written but honest: they list exactly the
-fields the handlers read, and every field the handlers require is in
-``required``.
+remaining two. M5 moves the client-visible contract out of this module: each
+tool is now described by one JSON Schema file under
+``src/http_semantics_mcp/schemas/tools/<tool>.json`` (decision D50, route A).
+That file is the **only editable source** for the descriptor -- name,
+description, ``inputSchema`` and ``outputSchema`` -- and the top-level
+``schemas/tools/`` copy is a byte-identical mirror written by
+``tools/gen_schemas.py``.
 
-Each tool descriptor is a plain dict with the exact keys the MCP schema
-requires (``name``, ``description``, ``inputSchema``) plus an optional
-``outputSchema``. The handler is stored separately so that ``tools/list`` can
-never accidentally serialise a callable.
+The registry reads the package JSON here, one file per registered handler, and
+stores the handler separately so that ``tools/list`` can never accidentally
+serialise a callable.
 """
 
 import copy
+import json
+import os
 
 from .toolface import handlers
 
-__all__ = ["Tool", "Registry", "build_registry", "TOOL_DESCRIPTIONS", "INPUT_SCHEMAS"]
+__all__ = ["Tool", "Registry", "build_registry", "descriptor_names"]
+
+# The in-package schema directory is the source of truth (decision D24). A
+# plain path relative to this module works for a source checkout and for an
+# installed distribution alike: ``pip install`` unpacks package data onto disk,
+# so ``__file__`` is a real path, and the distribution never ships as a zip.
+_SCHEMA_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schemas", "tools")
+
+REQUIRED_DESCRIPTOR_KEYS = ("name", "description", "inputSchema", "outputSchema")
+
+_DESCRIPTOR_CACHE = {}
+
+
+class DescriptorError(Exception):
+    """A tool descriptor is missing or does not carry the MCP contract."""
 
 
 class Tool(object):
@@ -73,206 +91,50 @@ class Registry(object):
         return len(self._tools)
 
 
-# -- declarations ---------------------------------------------------------
+# -- descriptors ----------------------------------------------------------
 
-TOOL_DESCRIPTIONS = {
-    "cache_evaluate": (
-        "Decide whether a stored response may be reused without revalidating. "
-        "Applies the RFC 9111 age and freshness arithmetic (Date, Age, "
-        "Cache-Control, Expires, Last-Modified) and returns action "
-        "serve|revalidate|miss, the age and freshness lifetime in whole "
-        "seconds, and the rule IDs with their clause references. now is an "
-        "argument: the cache never reads a clock."
-    ),
-    "conditional_evaluate": (
-        "Judge one request's preconditions and report the status they decide. "
-        "Evaluates If-Match, If-Unmodified-Since, If-None-Match and "
-        "If-Modified-Since in the RFC 9110 section 13.2.2 precedence order, "
-        "stopping at the first applicable one, and returns status 200|304|412, "
-        "which rule decided it, and the rule IDs with their clause references."
-    ),
-    "cors_evaluate": (
-        "Judge one HTTP response against the Fetch Standard CORS check. "
-        "Returns decision allow|block, the violated rule IDs with their clause "
-        "references, the headers that are missing, and what to send instead. "
-        "No network: url is parsed for scheme/host/port only."
-    ),
-    "cors_simulate_fetch": (
-        "Walk a redirect chain hop by hop and judge each hop with the CORS "
-        "check. Reports the ordered redirect events (origin_set_to_null, "
-        "credentials_dropped), the visible response headers, and the effective "
-        "Access-Control-Max-Age."
-    ),
-    "vary_match": (
-        "Decide whether a stored response can be reused for an incoming "
-        "request, per RFC 9111 section 4.1. Compares the fields named by the "
-        "stored Vary value under that field's normalisation policy and returns "
-        "match hit|miss, the fields that differ, the normalised Vary members, "
-        "and the rule IDs with their clause references."
-    ),
-}
 
-_HEADER_VALUES = {
-    "type": ["string", "array"],
-    "items": {"type": "string"},
-    "description": "one value, or an array for a repeated header",
-}
+def descriptor_names():
+    """Return the tool names carried by the in-package schema directory."""
+    return sorted(
+        name[: -len(".json")]
+        for name in os.listdir(_SCHEMA_DIRECTORY)
+        if name.endswith(".json")
+    )
 
-_HEADERS = {
-    "type": "object",
-    "additionalProperties": _HEADER_VALUES,
-    "description": "header name -> value",
-}
 
-_RESPONSE = {
-    "type": "object",
-    "properties": {"status": {"type": "integer"}, "headers": _HEADERS},
-    "required": ["status"],
-    "additionalProperties": False,
-}
+def _read_descriptor(name):
+    """Load and validate one tool descriptor from the package schema file.
 
-_CREDENTIALS = {
-    "type": "string",
-    "enum": ["omit", "include"],
-    "description": "credentials mode of the request",
-}
+    A missing or malformed descriptor is a hard error rather than an empty
+    contract: a client asking ``tools/list`` must never be told a tool exists
+    without the schema that defines it, nor silently get a tool with no schema.
+    """
+    cached = _DESCRIPTOR_CACHE.get(name)
+    if cached is not None:
+        return cached
 
-_ORIGIN = {
-    "type": ["string", "null"],
-    "description": "request Origin; omit or null for a same-origin request",
-}
+    path = os.path.join(_SCHEMA_DIRECTORY, name + ".json")
+    if not os.path.isfile(path):
+        raise DescriptorError("missing descriptor for " + name + ": " + path)
+    with open(path, "r", encoding="utf-8") as handle:
+        payload = json.loads(handle.read())
 
-_CORS_REQUEST_PROPERTIES = {
-    "method": {"type": "string", "description": "HTTP request method"},
-    "url": {"type": "string", "description": "target URL; only its origin is used"},
-    "origin": _ORIGIN,
-    "credentials": _CREDENTIALS,
-    "request_headers": _HEADERS,
-    "response": _RESPONSE,
-    "is_preflight": {"type": "boolean", "description": "is this the preflight response?"},
-}
+    if not isinstance(payload, dict):
+        raise DescriptorError("descriptor for " + name + " must be a JSON object")
+    missing = [key for key in REQUIRED_DESCRIPTOR_KEYS if key not in payload]
+    if missing:
+        raise DescriptorError("descriptor for " + name + " lacks " + ", ".join(missing))
+    if payload["name"] != name:
+        raise DescriptorError("descriptor name " + str(payload["name"]) + " != " + name)
+    if not isinstance(payload["description"], str) or not payload["description"].strip():
+        raise DescriptorError("descriptor for " + name + " has no description")
+    for key in ("inputSchema", "outputSchema"):
+        if not isinstance(payload[key], dict):
+            raise DescriptorError("descriptor for " + name + " has a non-object " + key)
 
-_STORED = {
-    "type": "object",
-    "properties": {
-        "stored_at": {
-            "type": "string",
-            "description": "instant the response was stored (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
-        },
-        "age": {
-            "type": ["string", "integer"],
-            "description": "Age as recorded at store time; wins over a response Age header",
-        },
-        "headers": _HEADERS,
-    },
-    "required": ["stored_at"],
-    "additionalProperties": False,
-}
-
-_CACHE_DIRECTIVES = {
-    "now": {
-        "type": "string",
-        "description": "evaluation instant (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
-    },
-    "request_headers": _HEADERS,
-    "response_headers": _HEADERS,
-    "stored": _STORED,
-}
-
-# The current representation, as the server knows it. Both fields are optional:
-# a resource with no entity tag cannot satisfy ``If-Match`` at all, which is a
-# verdict rather than a caller mistake.
-_RESOURCE = {
-    "type": "object",
-    "properties": {
-        "etag": {
-            "type": ["string", "null"],
-            "description": "current entity tag, quotes (and any W/ marker) included",
-        },
-        "last_modified": {
-            "type": ["string", "null"],
-            "description": "current Last-Modified (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
-        },
-    },
-    "additionalProperties": False,
-}
-
-_CACHED_ENTRY = {
-    "type": "object",
-    "properties": {
-        "vary": {
-            "type": ["string", "array"],
-            "items": {"type": "string"},
-            "description": "the stored response's Vary field value",
-        },
-        "request_headers_at_store": _HEADERS,
-    },
-    "additionalProperties": False,
-}
-
-INPUT_SCHEMAS = {
-    "cache_evaluate": {
-        "type": "object",
-        "properties": dict(_CACHE_DIRECTIVES),
-        "required": ["now", "stored"],
-        "additionalProperties": False,
-    },
-    "conditional_evaluate": {
-        "type": "object",
-        "properties": {
-            "method": {"type": "string", "description": "HTTP request method"},
-            "request_headers": _HEADERS,
-            "resource": _RESOURCE,
-        },
-        "required": ["method", "request_headers", "resource"],
-        "additionalProperties": False,
-    },
-    "cors_evaluate": {
-        "type": "object",
-        "properties": dict(_CORS_REQUEST_PROPERTIES),
-        "required": ["method", "url", "response", "is_preflight"],
-        "additionalProperties": False,
-    },
-    "cors_simulate_fetch": {
-        "type": "object",
-        "properties": dict(
-            _CORS_REQUEST_PROPERTIES,
-            mode={
-                "type": "string",
-                "enum": ["cors", "no-cors", "same-origin"],
-                "description": "fetch mode; defaults to cors",
-            },
-            redirects={
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "url": {"type": "string"},
-                        "status": {"type": "integer", "enum": [301, 302, 303, 307, 308]},
-                        "headers": _HEADERS,
-                    },
-                    "required": ["url", "status"],
-                    "additionalProperties": False,
-                },
-            },
-        ),
-        "required": ["method", "url", "response"],
-        "additionalProperties": False,
-    },
-    "vary_match": {
-        "type": "object",
-        "properties": {
-            "cached": _CACHED_ENTRY,
-            "incoming": {
-                "type": "object",
-                "properties": {"request_headers": _HEADERS},
-                "additionalProperties": False,
-            },
-        },
-        "required": ["cached", "incoming"],
-        "additionalProperties": False,
-    },
-}
+    _DESCRIPTOR_CACHE[name] = payload
+    return payload
 
 
 def build_registry():
@@ -280,11 +142,13 @@ def build_registry():
     available = handlers()
     registry = Registry()
     for name in sorted(available):
+        descriptor = _read_descriptor(name)
         registry.register(
             Tool(
                 name=name,
-                description=TOOL_DESCRIPTIONS[name],
-                input_schema=INPUT_SCHEMAS[name],
+                description=descriptor["description"],
+                input_schema=descriptor["inputSchema"],
+                output_schema=descriptor["outputSchema"],
                 handler=available[name],
             )
         )

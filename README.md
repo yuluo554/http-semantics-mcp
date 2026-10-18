@@ -2,12 +2,16 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: M4 (conditional requests and Vary).** The server starts, completes
-the MCP handshake and reports **five tools** — `cache_evaluate`,
+**Status: M5 (schema, contract gate and determinism sweep).** The server starts,
+completes the MCP handshake and reports **five tools** — `cache_evaluate`,
 `conditional_evaluate`, `cors_evaluate`, `cors_simulate_fetch` and
-`vary_match`. All five are judged against frozen golden cases
-(18 + 19 + 24 + 10 + 9) and produce byte-identical output. Schema generation
-and the determinism sweep land in M5; the public release is M6. See
+`vary_match`. Each one now ships a JSON Schema descriptor (input **and** output)
+under `src/http_semantics_mcp/schemas/tools/`, mirrored byte-identically to
+`schemas/tools/`. All five are judged against frozen golden cases
+(18 + 19 + 24 + 10 + 9) and produce byte-identical output; a contract gate
+proves the published output schema equals each tool's real key set and value
+shapes across every case, and a determinism gate proves same-input /
+same-sha256 across all of them. The public release is M6. See
 [`plan/05-里程碑.md`](plan/05-里程碑.md).
 
 ---
@@ -199,6 +203,9 @@ python -m pytest
 python tools/run_gates.py
 python tools/mutate_check.py
 python tools/smoke_stdio.py
+python tools/gen_codes.py --check
+python tools/gen_golden.py --check
+python tools/gen_schemas.py --check
 python scripts/check_release.py --pre-tag
 ```
 
@@ -211,6 +218,10 @@ python scripts/check_release.py --pre-tag
 - `tools/smoke_stdio.py` starts the server as a real subprocess and asserts on
   the raw bytes: every stdout line is JSON, no `\r`, response count matches
   request count.
+- `tools/gen_codes.py --check`, `tools/gen_golden.py --check` and
+  `tools/gen_schemas.py --check` recompute the generated artefacts (rule
+  catalogue, golden cases, schema mirror) and compare bytes, so a hand edit
+  that drifts from its source is caught rather than committed.
 - `scripts/check_release.py --pre-tag` is the release-terminal gate. It is
   **not** wired into CI on purpose: before a tag exists, several of its checks
   must be red, and a permanently red job carries no information.
@@ -232,6 +243,14 @@ end):
 | oracle independence | `tools/golden_oracle/` never imports `http_semantics_mcp`, directly or dynamically |
 | golden hygiene | every frozen case has the required fields and no `observed_*` key |
 | code literals | no hand-written package source spells a rule code; the generated catalogue (`references/codes.json` and `rules.py`) is the only copy |
+
+Two further gates live in the test suite rather than in `tools/gates.py`,
+because they must *run* the tools instead of reading files:
+
+| Gate | Rule |
+| --- | --- |
+| schema parity | for every tool, `outputSchema.properties` equals both the key set frozen in `data/README.md` section 4.10 and the key set (and value shapes) of every frozen case's real output — an equality in both directions, not a subset |
+| determinism | two calls on the same input serialise to the same sha256, for every tool and every case, and no output carries a machine-specific path or a date the caller did not supply |
 
 ### Layout
 
@@ -274,6 +293,26 @@ header-level cases in `data/golden/`. The ledger in `data/wpt-mapping.json`
 accounts for all 45 files in the directory: 15 mapped, 30 listed with a reason
 (real network, TLS, timing, browser-proprietary behaviour, or out of scope).
 Nothing is guessed at, and no test body is copied into this repository.
+
+### Measured on this build
+
+Every number below comes from the local double-interpreter run, not from CI.
+This repository has no remote yet, so all CI statements are **local equivalent
+checks (no remote wired up; CI to be verified on first push)**.
+
+| Metric | Value |
+| --- | --- |
+| Frozen golden cases, byte-identical to production | 87 / 87 |
+| Rule codes reachable by at least one case (set equality, both directions) | 31 / 31 |
+| WPT `cors/` files mapped to golden cases | 15 / 45 (30 / 45 listed with a reason; all 15 mapped rows re-run and reconcile with production) |
+| Tool descriptors (input + output schema per tool) | 5 |
+| Static gates | 8 |
+| Mutations that must turn a gate red | 43 / 43 |
+| Collected tests | 378 (Python 3.8) / 378 (Python 3.12) |
+
+The three generated artefacts are recomputed and compared byte for byte on
+every run (`gen_codes --check`, `gen_golden --check`, `gen_schemas --check`),
+and every static gate has at least one mutation proving it can fail.
 
 ---
 

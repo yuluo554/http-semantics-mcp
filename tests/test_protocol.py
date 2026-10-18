@@ -91,7 +91,9 @@ def test_tools_list_reports_the_registered_tools_in_ascii_order():
         "vary_match",
     ]
     for tool in result["tools"]:
-        assert set(tool) == {"name", "description", "inputSchema"}
+        # M5 publishes the output schema alongside the input one (decision D50).
+        assert set(tool) == {"name", "description", "inputSchema", "outputSchema"}
+        assert tool["outputSchema"]["properties"], tool["name"]
 
 
 def test_tools_call_returns_a_judgement_result_not_a_jsonrpc_error():

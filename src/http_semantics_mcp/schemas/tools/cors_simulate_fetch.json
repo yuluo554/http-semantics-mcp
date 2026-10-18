@@ -1,0 +1,250 @@
+{
+  "description": "Walk a redirect chain hop by hop and judge each hop with the CORS check. Reports the ordered redirect events (origin_set_to_null, credentials_dropped), the visible response headers, and the effective Access-Control-Max-Age.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "credentials": {
+        "description": "credentials mode of the request",
+        "enum": [
+          "omit",
+          "include"
+        ],
+        "type": "string"
+      },
+      "is_preflight": {
+        "description": "is this the preflight response?",
+        "type": "boolean"
+      },
+      "method": {
+        "description": "HTTP request method",
+        "type": "string"
+      },
+      "mode": {
+        "description": "fetch mode; defaults to cors",
+        "enum": [
+          "cors",
+          "no-cors",
+          "same-origin"
+        ],
+        "type": "string"
+      },
+      "origin": {
+        "description": "request Origin; omit or null for a same-origin request",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "redirects": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "headers": {
+              "additionalProperties": {
+                "description": "one value, or an array for a repeated header",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "string",
+                  "array"
+                ]
+              },
+              "description": "header name -> value",
+              "type": "object"
+            },
+            "status": {
+              "enum": [
+                301,
+                302,
+                303,
+                307,
+                308
+              ],
+              "type": "integer"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "url",
+            "status"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "request_headers": {
+        "additionalProperties": {
+          "description": "one value, or an array for a repeated header",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "description": "header name -> value",
+        "type": "object"
+      },
+      "response": {
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "additionalProperties": {
+              "description": "one value, or an array for a repeated header",
+              "items": {
+                "type": "string"
+              },
+              "type": [
+                "string",
+                "array"
+              ]
+            },
+            "description": "header name -> value",
+            "type": "object"
+          },
+          "status": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "url": {
+        "description": "target URL; only its origin is used",
+        "type": "string"
+      }
+    },
+    "required": [
+      "method",
+      "url",
+      "response"
+    ],
+    "type": "object"
+  },
+  "name": "cors_simulate_fetch",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "decision": {
+        "enum": [
+          "allow",
+          "block"
+        ],
+        "type": "string"
+      },
+      "events": {
+        "description": "in occurrence order, not sorted",
+        "items": {
+          "enum": [
+            "origin_set_to_null",
+            "credentials_dropped"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "final_type": {
+        "enum": [
+          "basic",
+          "cors",
+          "opaque"
+        ],
+        "type": "string"
+      },
+      "hops": {
+        "description": "in occurrence order, not sorted",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "decision": {
+              "enum": [
+                "allow",
+                "block"
+              ],
+              "type": "string"
+            },
+            "status": {
+              "description": "the hop's status code, as given",
+              "type": "integer"
+            },
+            "url": {
+              "type": "string"
+            },
+            "violations": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "description": "rule id from the generated catalogue",
+                    "type": "string"
+                  },
+                  "detail": {
+                    "description": "fixed template rendered with this case's values",
+                    "type": "string"
+                  },
+                  "spec_ref": {
+                    "description": "clause references, sorted; the first is the primary basis",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "code",
+                  "detail",
+                  "spec_ref"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "decision",
+            "status",
+            "url",
+            "violations"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "max_age_effective": {
+        "description": "whole seconds",
+        "type": "integer"
+      },
+      "preflight_cache_key": {
+        "description": "per data/README.md section 4.7",
+        "type": "string"
+      },
+      "preflight_occurred": {
+        "type": "boolean"
+      },
+      "visible_headers": {
+        "description": "lowercase header names, ASCII-sorted",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "decision",
+      "events",
+      "final_type",
+      "hops",
+      "max_age_effective",
+      "preflight_cache_key",
+      "preflight_occurred",
+      "visible_headers"
+    ],
+    "type": "object"
+  }
+}

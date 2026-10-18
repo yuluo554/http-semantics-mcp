@@ -1,0 +1,115 @@
+{
+  "description": "Judge one request's preconditions and report the status they decide. Evaluates If-Match, If-Unmodified-Since, If-None-Match and If-Modified-Since in the RFC 9110 section 13.2.2 precedence order, stopping at the first applicable one, and returns status 200|304|412, which rule decided it, and the rule IDs with their clause references.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "method": {
+        "description": "HTTP request method",
+        "type": "string"
+      },
+      "request_headers": {
+        "additionalProperties": {
+          "description": "one value, or an array for a repeated header",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "description": "header name -> value",
+        "type": "object"
+      },
+      "resource": {
+        "additionalProperties": false,
+        "properties": {
+          "etag": {
+            "description": "current entity tag, quotes (and any W/ marker) included",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_modified": {
+            "description": "current Last-Modified (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "required": [
+      "method",
+      "request_headers",
+      "resource"
+    ],
+    "type": "object"
+  },
+  "name": "conditional_evaluate",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "explain": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "description": "rule id from the generated catalogue",
+              "type": "string"
+            },
+            "detail": {
+              "description": "fixed template rendered with this case's values",
+              "type": "string"
+            },
+            "spec_ref": {
+              "description": "clause references, sorted; the first is the primary basis",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "code",
+            "detail",
+            "spec_ref"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "rule_applied": {
+        "enum": [
+          "none",
+          "if_match",
+          "if_unmodified_since",
+          "if_none_match",
+          "if_modified_since"
+        ],
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          200,
+          304,
+          412
+        ],
+        "type": "integer"
+      },
+      "weak_comparison_used": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "explain",
+      "rule_applied",
+      "status",
+      "weak_comparison_used"
+    ],
+    "type": "object"
+  }
+}

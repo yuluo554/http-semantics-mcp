@@ -1,0 +1,126 @@
+{
+  "description": "Decide whether a stored response can be reused for an incoming request, per RFC 9111 section 4.1. Compares the fields named by the stored Vary value under that field's normalisation policy and returns match hit|miss, the fields that differ, the normalised Vary members, and the rule IDs with their clause references.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "cached": {
+        "additionalProperties": false,
+        "properties": {
+          "request_headers_at_store": {
+            "additionalProperties": {
+              "description": "one value, or an array for a repeated header",
+              "items": {
+                "type": "string"
+              },
+              "type": [
+                "string",
+                "array"
+              ]
+            },
+            "description": "header name -> value",
+            "type": "object"
+          },
+          "vary": {
+            "description": "the stored response's Vary field value",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "string",
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "incoming": {
+        "additionalProperties": false,
+        "properties": {
+          "request_headers": {
+            "additionalProperties": {
+              "description": "one value, or an array for a repeated header",
+              "items": {
+                "type": "string"
+              },
+              "type": [
+                "string",
+                "array"
+              ]
+            },
+            "description": "header name -> value",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "required": [
+      "cached",
+      "incoming"
+    ],
+    "type": "object"
+  },
+  "name": "vary_match",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "differing_headers": {
+        "description": "lowercase header names, ASCII-sorted",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "match": {
+        "enum": [
+          "hit",
+          "miss"
+        ],
+        "type": "string"
+      },
+      "normalized_vary": {
+        "description": "lowercase header names, ASCII-sorted",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "reasons": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "description": "rule id from the generated catalogue",
+              "type": "string"
+            },
+            "detail": {
+              "description": "fixed template rendered with this case's values",
+              "type": "string"
+            },
+            "spec_ref": {
+              "description": "clause references, sorted; the first is the primary basis",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "code",
+            "detail",
+            "spec_ref"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "differing_headers",
+      "match",
+      "normalized_vary",
+      "reasons"
+    ],
+    "type": "object"
+  }
+}

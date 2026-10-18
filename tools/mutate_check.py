@@ -298,6 +298,45 @@ CASES = [
         '        text = ",".join(segment for segment in segments if segment)',
         ["-m", "pytest", "-q", "tests/test_vary_golden.py"],
     ),
+    (
+        "an outputSchema loses one of its properties",
+        os.path.join("src", "http_semantics_mcp", "schemas", "tools", "vary_match.json"),
+        '      "match": {\n        "enum": [\n          "hit",\n          "miss"\n        ],\n'
+        '        "type": "string"\n      },\n',
+        "",
+        ["-m", "pytest", "-q", "tests/test_schema_parity.py"],
+    ),
+    (
+        "an outputSchema starts allowing extra keys",
+        os.path.join("src", "http_semantics_mcp", "schemas", "tools", "vary_match.json"),
+        '  "outputSchema": {\n    "additionalProperties": false,',
+        '  "outputSchema": {\n    "additionalProperties": true,',
+        [os.path.join("tools", "gen_schemas.py"), "--check"],
+    ),
+    (
+        "the top-level schema mirror drifts by one byte",
+        os.path.join("schemas", "tools", "cors_evaluate.json"),
+        "Fetch Standard CORS check.",
+        "Fetch  Standard CORS check.",
+        [os.path.join("tools", "gen_schemas.py"), "--check"],
+    ),
+    (
+        "the section 4.10 table drops a field behind the schema's back",
+        os.path.join("data", "README.md"),
+        "| `cache_evaluate` | `action`, ",
+        "| `cache_evaluate` | ",
+        ["-m", "pytest", "-q", "tests/test_schema_parity.py"],
+    ),
+    (
+        "the tool face gains a per-call volatile key",
+        os.path.join("src", "http_semantics_mcp", "toolface.py"),
+        "    def call(arguments):\n        try:\n            return render(function(arguments, CATALOG))",
+        "    def call(arguments):\n"
+        "        try:\n"
+        "            payload = dict(function(arguments, CATALOG), nonce=id(object()))\n"
+        "            return render(payload)",
+        ["-m", "pytest", "-q", "tests/test_determinism.py"],
+    ),
 ]
 
 
