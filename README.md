@@ -2,11 +2,11 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: M1 (data first).** The server starts, completes the MCP handshake and
-reports **zero tools** — the five judgement tools land in M2–M4. M1 froze the
-rule catalogue (`references/codes.json`, 31 codes), 87 golden cases computed by
-an independent oracle, and the WPT `cors/` mapping ledger. Schema and
-determinism gates close in M5; the public release is M6. See
+**Status: M2 (CORS).** The server starts, completes the MCP handshake and
+reports **two tools** — `cors_evaluate` and `cors_simulate_fetch`. Both are
+judged against 34 frozen golden cases (24 + 10) and produce byte-identical
+output. Cache, conditional-request and Vary tools land in M3–M4; schema
+generation and the determinism sweep in M5; the public release is M6. See
 [`plan/05-里程碑.md`](plan/05-里程碑.md).
 
 ---
@@ -31,14 +31,15 @@ it.
 
 | Tool | Question it answers | Milestone |
 | --- | --- | --- |
-| `cors_evaluate` | Will the browser let this response through? | M2 |
-| `cors_simulate_fetch` | What happens across redirects, hop by hop? | M2 |
+| `cors_evaluate` | Will the browser let this response through? | M2 ✅ |
+| `cors_simulate_fetch` | What happens across redirects, hop by hop? | M2 ✅ |
 | `cache_evaluate` | Can this stored response be served without revalidating? | M3 |
 | `conditional_evaluate` | Which conditional-request rule decides the status? | M4 |
 | `vary_match` | Does this cached entry match the incoming request? | M4 |
 
-At M0 `tools/list` returns `[]`. That is the honest answer, not a placeholder:
-a stub descriptor would tell a client a capability exists that does not.
+`tools/list` returns exactly the tools that are implemented. A stub descriptor
+would tell a client a capability exists that does not, which is why the two
+remaining milestones add tools rather than plans.
 
 ### What it is not
 
@@ -147,6 +148,28 @@ printf '%s\n' \
   | python -m http_semantics_mcp
 ```
 
+### A verdict by hand
+
+Ask whether a cross-origin response is allowed, and what to change if not:
+
+```bash
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"cors_evaluate","arguments":{"method":"GET","url":"https://api.example.com/v1","origin":"https://app.example.com","credentials":"omit","request_headers":{},"response":{"status":200,"headers":{}},"is_preflight":false}}}' \
+  | python -m http_semantics_mcp
+```
+
+The verdict arrives as one JSON string inside `content[0].text`:
+
+```json
+{"decision":"block","missing_headers":["access-control-allow-origin"],"notes":{"allow_credentials_null_origin":false,"max_age_capped_by_client":false,"wildcard_with_credentials":false},"recommended_headers":{"access-control-allow-origin":"https://app.example.com"},"violations":[{"code":"CORS_MISSING_ALLOW_ORIGIN","detail":"response has no Access-Control-Allow-Origin (origin=https://app.example.com)","spec_ref":["Fetch §CORS check"]}]}
+```
+
+`decision: "block"` is a successful judgement, so `isError` stays `false`. Only
+a malformed *request* sets `isError: true`, and it still answers with a payload
+rather than a stack trace.
+
 ---
 
 ## Development
@@ -188,7 +211,7 @@ end):
 | line endings | every text file is LF-only and `.gitattributes` declares `eol=lf` |
 | oracle independence | `tools/golden_oracle/` never imports `http_semantics_mcp`, directly or dynamically |
 | golden hygiene | every frozen case has the required fields and no `observed_*` key |
-| code literals | no rule code is spelled out in package source; `codes.json` is the only copy |
+| code literals | no hand-written package source spells a rule code; the generated catalogue (`references/codes.json` and `rules.py`) is the only copy |
 
 ### Layout
 

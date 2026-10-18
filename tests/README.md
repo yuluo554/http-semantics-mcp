@@ -15,10 +15,11 @@ python -m pytest
 | `test_canonical.py` | single serialisation point: key order, separators, no escaping, byte-identical reruns, NaN rejection |
 | `test_entry_point.py` | exit-code contract (0 / 2), no judgement subcommand, `--help` surface |
 | `test_utf8_guard.py` | cp1252 stream reproduction — the guard is proven against a stream that really is not UTF-8 |
-| `test_registry.py` | name ordering, duplicate rejection, descriptor isolation, no callables leaking into `tools/list` |
+| `test_registry.py` | name ordering, duplicate rejection, descriptor isolation, no callables leaking into `tools/list`; the shipped tools and their declared `required` fields |
 | `test_gates.py` | the original static gates, each with an injected defect that must turn it red |
-| `test_m1_gates.py` | the M1 gates: oracle independence (including dynamic imports), golden hygiene, code-literal uniqueness |
-| `test_gen_codes.py` | `codes.json` regeneration, mirror equality, table↔catalog set equality, drift localisation |
+| `test_m1_gates.py` | the M1 gates: oracle independence (including dynamic imports), golden hygiene, code-literal uniqueness plus its one generated-file exemption |
+| `test_cors_golden.py` | T1/T2 through the registered handlers: 34 CORS golden cases byte-for-byte, error payloads, event order, header-order invariance, rerun determinism |
+| `test_gen_codes.py` | `codes.json` regeneration, mirror equality, table↔catalog set equality, the generated rule module, drift localisation |
 | `test_golden.py` | golden completeness, exact output key sets, sorting, both-direction coverage, drift and orphan detection |
 | `test_wpt_ledger.py` | WPT index shape, ledger partition (`converted + unmappable == total`), case references |
 | `test_coverage_matrix.py` | every named boundary shape from plan/04 §四 exists; redirect event order; cache arithmetic notes |

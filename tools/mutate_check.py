@@ -116,6 +116,52 @@ CASES = [
         "| `CORS_` | `CORS_NULL_ORIGIN_GONE` |",
         [os.path.join("tools", "gen_codes.py"), "--check"],
     ),
+    (
+        "the CORS check lets a wildcard cover authorization",
+        os.path.join("src", "http_semantics_mcp", "judgement", "cors.py"),
+        '    if name == "authorization":\n        return False',
+        '    if name == "authorization":\n        return "*" in declared',
+        ["-m", "pytest", "-q", "tests/test_cors_golden.py"],
+    ),
+    (
+        "the CORS check forgets that a non-simple request needs a preflight",
+        os.path.join("src", "http_semantics_mcp", "judgement", "cors.py"),
+        "    return method not in SAFELISTED_METHODS or bool(unsafe_request_headers(headers))",
+        "    return False",
+        ["-m", "pytest", "-q", "tests/test_cors_golden.py"],
+    ),
+    (
+        "redirect events are emitted in the wrong order",
+        os.path.join("src", "http_semantics_mcp", "judgement", "fetch_sim.py"),
+        '                events.append("origin_set_to_null")\n'
+        '                if credentials == "include":\n'
+        '                    events.append("credentials_dropped")',
+        '                if credentials == "include":\n'
+        '                    events.append("credentials_dropped")\n'
+        '                events.append("origin_set_to_null")',
+        ["-m", "pytest", "-q", "tests/test_cors_golden.py"],
+    ),
+    (
+        "header values stop having their optional whitespace trimmed",
+        os.path.join("src", "http_semantics_mcp", "judgement", "normalise.py"),
+        "    return values[0].strip(OWS)",
+        "    return values[0]",
+        ["-m", "pytest", "-q", "tests/test_cors_golden.py"],
+    ),
+    (
+        "a caller mistake stops being reported as a tool error",
+        os.path.join("src", "http_semantics_mcp", "toolface.py"),
+        "            return render(error.payload(), is_error=True)",
+        "            return render(error.payload(), is_error=False)",
+        ["-m", "pytest", "-q", "tests/test_cors_golden.py"],
+    ),
+    (
+        "the registry stops declaring the implemented tools",
+        os.path.join("src", "http_semantics_mcp", "registry.py"),
+        "    for name in sorted(available):",
+        "    for name in []:",
+        ["-m", "pytest", "-q", "tests/test_registry.py"],
+    ),
 ]
 
 

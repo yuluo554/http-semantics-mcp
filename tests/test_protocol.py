@@ -1,5 +1,7 @@
 """Protocol contract tests: lifecycle, dispatch, error codes."""
 
+import json
+
 import pytest
 
 from http_semantics_mcp import __version__, errors, protocol
@@ -74,12 +76,60 @@ def test_request_before_initialize_is_rejected():
     assert responses[0]["error"]["code"] == errors.SERVER_NOT_INITIALIZED
 
 
-def test_tools_list_is_empty_at_m0_and_is_a_real_array():
+def test_tools_list_reports_the_registered_tools_in_ascii_order():
     session = _session()
     _initialize(session)
 
     result = session.handle(_request("tools/list"))[0]["result"]
-    assert result == {"tools": []}
+    names = [tool["name"] for tool in result["tools"]]
+    assert names == sorted(names)
+    assert names == ["cors_evaluate", "cors_simulate_fetch"]
+    for tool in result["tools"]:
+        assert set(tool) == {"name", "description", "inputSchema"}
+
+
+def test_tools_call_returns_a_judgement_result_not_a_jsonrpc_error():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle(
+        _request(
+            "tools/call",
+            {
+                "name": "cors_evaluate",
+                "arguments": {
+                    "method": "GET",
+                    "url": "https://api.example.com/v1",
+                    "origin": "https://app.example.com",
+                    "response": {
+                        "status": 200,
+                        "headers": {"Access-Control-Allow-Origin": "https://app.example.com"},
+                    },
+                    "is_preflight": False,
+                },
+            },
+        )
+    )[0]
+    assert "result" in response, response
+    result = response["result"]
+    assert result["isError"] is False
+    payload = json.loads(result["content"][0]["text"])
+    assert payload["decision"] == "allow"
+
+
+def test_tools_call_bad_arguments_are_a_tool_error_not_a_crash():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle(
+        _request(
+            "tools/call",
+            {"name": "cors_evaluate", "arguments": {"method": "BREW"}},
+        )
+    )[0]
+    assert "result" in response, response
+    assert response["result"]["isError"] is True
+    assert json.loads(response["result"]["content"][0]["text"])["error"]["code"] == "UNSUPPORTED_METHOD"
 
 
 def test_unknown_tool_is_invalid_params():

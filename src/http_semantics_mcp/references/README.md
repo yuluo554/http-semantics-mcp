@@ -30,5 +30,10 @@ Rules enforced by gates:
 
 - No `code` may appear here that is not in `data/README.md` section 4.1, and
   vice versa. The generator is the only writer; the table is the only input.
-- No second copy of a `code` literal may exist in Python source outside this
-  file's consumer layer.
+- No hand-written module in the package may spell a `code` literal. The
+  generated `http_semantics_mcp/rules.py` is the one exempt path, and it holds
+  the same payload plus one named constant per code (decisions D41/D42). The
+  judgement layer imports those constants instead of writing codes.
+- This directory holds data files only. A `.py` file here would make it a
+  package (and would not be installed as data), which is why the generated
+  Python form lives at the package root instead.

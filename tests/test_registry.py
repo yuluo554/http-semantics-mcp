@@ -14,11 +14,46 @@ def _tool(name, description="does a thing"):
     )
 
 
-def test_m0_registry_is_empty_and_that_is_explicit():
+def test_build_registry_declares_the_shipped_tools():
     registry = build_registry()
-    assert len(registry) == 0
-    assert registry.descriptors() == []
-    assert registry.names() == []
+    assert registry.names() == ["cors_evaluate", "cors_simulate_fetch"]
+    assert [descriptor["name"] for descriptor in registry.descriptors()] == registry.names()
+
+
+def test_every_shipped_tool_has_an_object_schema_and_a_handler():
+    registry = build_registry()
+    for name in registry.names():
+        tool = registry.get(name)
+        assert tool.description.strip(), name
+        assert tool.input_schema["type"] == "object", name
+        assert tool.input_schema["additionalProperties"] is False, name
+        assert callable(tool.handler), name
+
+
+def test_declared_required_fields_are_the_ones_the_handler_rejects():
+    """A schema that promises less than the handler enforces is a lie."""
+    registry = build_registry()
+    for name in registry.names():
+        tool = registry.get(name)
+        required = set(tool.input_schema["required"])
+        complete = _minimal_arguments(name)
+        assert set(complete) >= required, name
+        assert tool.handler(complete)["isError"] is False, name
+        for field in sorted(required):
+            incomplete = {key: value for key, value in complete.items() if key != field}
+            assert tool.handler(incomplete)["isError"] is True, name + " ignores " + field
+
+
+def _minimal_arguments(name):
+    common = {
+        "method": "GET",
+        "url": "https://api.example.com/a",
+        "origin": "https://app.example.com",
+        "response": {"status": 200, "headers": {"Access-Control-Allow-Origin": "https://app.example.com"}},
+    }
+    if name == "cors_evaluate":
+        return dict(common, is_preflight=False)
+    return dict(common, mode="cors", redirects=[])
 
 
 def test_names_are_sorted_regardless_of_registration_order():

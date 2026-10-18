@@ -1,8 +1,9 @@
 """Tool registry: the single place where tools are declared.
 
-M0 ships **no tools**. ``tools/list`` therefore returns an empty list, and the
-README says so. That is intentional: a placeholder descriptor would make an
-MCP client believe a capability exists that does not.
+M2 registers the two CORS tools; M3-M4 add the remaining three here, and M5
+replaces the inlined ``inputSchema`` objects with generated ones. Until then the
+schemas are hand-written but honest: they list exactly the fields the handlers
+read, and every field the handlers require is in ``required``.
 
 Each tool descriptor is a plain dict with the exact keys the MCP schema
 requires (``name``, ``description``, ``inputSchema``) plus an optional
@@ -12,7 +13,9 @@ never accidentally serialise a callable.
 
 import copy
 
-__all__ = ["Tool", "Registry", "build_registry"]
+from .toolface import handlers
+
+__all__ = ["Tool", "Registry", "build_registry", "TOOL_DESCRIPTIONS", "INPUT_SCHEMAS"]
 
 
 class Tool(object):
@@ -69,10 +72,110 @@ class Registry(object):
         return len(self._tools)
 
 
-def build_registry():
-    """Build the registry for this build.
+# -- declarations ---------------------------------------------------------
 
-    M2-M4 register ``cors_evaluate``, ``cors_simulate_fetch``,
-    ``cache_evaluate``, ``conditional_evaluate`` and ``vary_match`` here.
-    """
-    return Registry()
+TOOL_DESCRIPTIONS = {
+    "cors_evaluate": (
+        "Judge one HTTP response against the Fetch Standard CORS check. "
+        "Returns decision allow|block, the violated rule IDs with their clause "
+        "references, the headers that are missing, and what to send instead. "
+        "No network: url is parsed for scheme/host/port only."
+    ),
+    "cors_simulate_fetch": (
+        "Walk a redirect chain hop by hop and judge each hop with the CORS "
+        "check. Reports the ordered redirect events (origin_set_to_null, "
+        "credentials_dropped), the visible response headers, and the effective "
+        "Access-Control-Max-Age."
+    ),
+}
+
+_HEADER_VALUES = {
+    "type": ["string", "array"],
+    "items": {"type": "string"},
+    "description": "one value, or an array for a repeated header",
+}
+
+_HEADERS = {
+    "type": "object",
+    "additionalProperties": _HEADER_VALUES,
+    "description": "header name -> value",
+}
+
+_RESPONSE = {
+    "type": "object",
+    "properties": {"status": {"type": "integer"}, "headers": _HEADERS},
+    "required": ["status"],
+    "additionalProperties": False,
+}
+
+_CREDENTIALS = {
+    "type": "string",
+    "enum": ["omit", "include"],
+    "description": "credentials mode of the request",
+}
+
+_ORIGIN = {
+    "type": ["string", "null"],
+    "description": "request Origin; omit or null for a same-origin request",
+}
+
+_CORS_REQUEST_PROPERTIES = {
+    "method": {"type": "string", "description": "HTTP request method"},
+    "url": {"type": "string", "description": "target URL; only its origin is used"},
+    "origin": _ORIGIN,
+    "credentials": _CREDENTIALS,
+    "request_headers": _HEADERS,
+    "response": _RESPONSE,
+    "is_preflight": {"type": "boolean", "description": "is this the preflight response?"},
+}
+
+INPUT_SCHEMAS = {
+    "cors_evaluate": {
+        "type": "object",
+        "properties": dict(_CORS_REQUEST_PROPERTIES),
+        "required": ["method", "url", "response", "is_preflight"],
+        "additionalProperties": False,
+    },
+    "cors_simulate_fetch": {
+        "type": "object",
+        "properties": dict(
+            _CORS_REQUEST_PROPERTIES,
+            mode={
+                "type": "string",
+                "enum": ["cors", "no-cors", "same-origin"],
+                "description": "fetch mode; defaults to cors",
+            },
+            redirects={
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "url": {"type": "string"},
+                        "status": {"type": "integer", "enum": [301, 302, 303, 307, 308]},
+                        "headers": _HEADERS,
+                    },
+                    "required": ["url", "status"],
+                    "additionalProperties": False,
+                },
+            },
+        ),
+        "required": ["method", "url", "response"],
+        "additionalProperties": False,
+    },
+}
+
+
+def build_registry():
+    """Build the registry for this build: one Tool per declared handler."""
+    available = handlers()
+    registry = Registry()
+    for name in sorted(available):
+        registry.register(
+            Tool(
+                name=name,
+                description=TOOL_DESCRIPTIONS[name],
+                input_schema=INPUT_SCHEMAS[name],
+                handler=available[name],
+            )
+        )
+    return registry

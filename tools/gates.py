@@ -387,9 +387,16 @@ ORACLE_DIR = ("tools", "golden_oracle")
 # prevent. The check is name-based, so it also catches dynamic imports.
 ORACLE_FORBIDDEN = ("http_semantics_mcp",)
 
-# A rule code may only be spelled in the generated catalog. Any `.py` in the
-# package spelling one out is a second copy waiting to drift.
+# A rule code may only be spelled in the generated catalog. Any other `.py` in
+# the package spelling one out is a second copy waiting to drift.
 CODE_LITERAL = re.compile(r"\b(?:CORS|CACHE|COND|VARY)_[A-Z0-9_]+\b")
+
+# The generated Python form of the catalogue (decision D41): the judgement layer
+# imports one constant per rule code instead of spelling it. It is the same
+# generated artifact as ``references/codes.json``, so it is the one file the
+# literal gate must not flag -- and it must exist, or the exemption would be a
+# silent hole in a gate that then finds nothing.
+GENERATED_CODE_MODULE = os.path.join("src", "http_semantics_mcp", "rules.py")
 
 # Fields that would turn a frozen expectation into an observation.
 OBSERVED_PREFIX = "observed_"
@@ -493,11 +500,16 @@ def golden_hygiene(root):
 
 
 def code_literals(root):
-    """Rule codes live in ``codes.json`` only, never spelled in the package.
+    """Rule codes live in the generated catalogue only, never in hand-written code.
 
-    Templates, ``spec_ref`` and severity are read from the generated catalog;
+    Templates, ``spec_ref`` and severity are read from the generated catalogue;
     a literal ``CORS_...`` in Python would be a second source of truth and the
-    first thing to drift. This gate scans every ``*.py`` under ``src/``.
+    first thing to drift. This gate scans every ``*.py`` under ``src/``, with a
+    single exempt path: the generated rule module (``rules.py``), whose whole
+    purpose is to hold those literals so the judgement layer can import names.
+
+    The exempted file must be present and non-empty -- an exemption that hides a
+    missing artifact would turn this gate into a check that scans nothing.
     """
     report = Report("code-literals")
     base = os.path.join(root, "src", "http_semantics_mcp")
@@ -505,8 +517,18 @@ def code_literals(root):
         report.add("src/http_semantics_mcp", "directory is missing")
         return report
 
+    generated = os.path.normcase(os.path.abspath(os.path.join(root, GENERATED_CODE_MODULE)))
+    if not os.path.isfile(generated):
+        report.add(GENERATED_CODE_MODULE, "generated rule module is missing")
+    else:
+        with open(generated, "rb") as handle:
+            if b"CATALOG = {" not in handle.read():
+                report.add(GENERATED_CODE_MODULE, "generated rule module has no CATALOG")
+
     for path in sorted(scan_tree(base, suffixes=(".py",), skip_dirs=SKIP_DIRS)):
         report.scanned += 1
+        if os.path.normcase(os.path.abspath(path)) == generated:
+            continue
         relative = _relative(root, path)
         with open(path, "rb") as handle:
             source = handle.read().decode("utf-8")

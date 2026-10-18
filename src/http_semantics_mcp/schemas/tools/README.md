@@ -1,8 +1,12 @@
 # schemas/tools (in-package source of truth)
 
-JSON Schemas for the five tools land here in M2–M5, one file per tool:
+JSON Schemas for the five tools land here in **M5**, one file per tool:
 `cors_evaluate.json`, `cors_simulate_fetch.json`, `cache_evaluate.json`,
 `conditional_evaluate.json`, `vary_match.json`.
+
+Until then `registry.py` carries an inlined `inputSchema` per implemented tool
+(decision D43): the client-visible surface is honest at every milestone, and the
+generated schema files arrive once all five tools exist.
 
 `schemas/tools/` at the repository root is a byte-identical mirror.
 

@@ -173,11 +173,11 @@ def test_readme_referenced_repo_files_exist():
     assert missing == [], "README points at files that do not exist: " + ", ".join(missing)
 
 
-def test_readme_does_not_claim_tools_at_m0():
-    """While the registry is empty, the README must say so.
+def test_readme_state_matches_the_registry():
+    """The README must describe the tools that actually exist, in both directions.
 
-    This test retires at M2 when the first tool is registered: it asserts the
-    documented state matches the actual state, in whichever direction.
+    While the registry was empty the README had to say so; now that tools are
+    registered it must name them and must not still claim an empty list.
     """
     sys.path.insert(0, os.path.join(ROOT, "src"))
     try:
@@ -185,11 +185,17 @@ def test_readme_does_not_claim_tools_at_m0():
     finally:
         sys.path.pop(0)
 
-    count = len(build_registry())
+    registry = build_registry()
     text = _readme()
-    if count == 0:
+    if len(registry) == 0:
         assert "zero tools" in text.lower()
         assert "returns `[]`" in text
+        return
+
+    assert "zero tools" not in text.lower()
+    assert "returns `[]`" not in text
+    for name in registry.names():
+        assert "`" + name + "`" in text, "README does not name registered tool " + name
 
 
 def test_readme_does_not_describe_a_cli_judgement_command():

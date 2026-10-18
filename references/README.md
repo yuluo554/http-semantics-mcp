@@ -13,5 +13,7 @@ Why two locations: the package path is what an installed distribution can read
 via `importlib.resources`; this top-level path is the human- and reviewer-facing
 delivery artefact named in the task document.
 
-M0 ships no `codes.json`: the rule table is built in M1 from
-`data/README.md` section 4.1.
+`codes.json` landed in M1, generated from `data/README.md` section 4.1; M2
+added the generated Python form of the same payload at
+`src/http_semantics_mcp/rules.py` (decision D41), which is a module rather than
+a data file and therefore has no mirror here.

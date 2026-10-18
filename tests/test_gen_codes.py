@@ -65,6 +65,37 @@ def test_generated_file_has_no_timestamp_or_machine_path():
         assert marker not in text
 
 
+def test_generated_rule_module_is_importable_and_matches_the_catalog():
+    """The Python rendering is a second view of one payload, not a second payload."""
+    src = os.path.join(ROOT, "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    try:
+        from http_semantics_mcp import rules
+    finally:
+        sys.path.remove(src)
+
+    assert rules.CATALOG == _catalog()
+    constants = {name for name in vars(rules) if name.isupper() and name != "CATALOG"}
+    assert constants == set(_catalog()["codes"])
+    for name in sorted(constants):
+        assert getattr(rules, name) == name
+
+
+def test_generated_rule_module_is_python_source():
+    """If it stops parsing, the judgement layer stops importing: fail loudly."""
+    payload = _read(gen_codes.PACKAGE_RULES).decode("utf-8")
+    compile(payload, gen_codes.PACKAGE_RULES, "exec")
+    assert payload.startswith('"""Generated rule catalogue')
+    assert "schema_version" in payload
+
+
+def test_rendering_is_deterministic_for_the_rule_module():
+    first = gen_codes.render(ROOT)[gen_codes.PACKAGE_RULES]
+    second = gen_codes.render(ROOT)[gen_codes.PACKAGE_RULES]
+    assert first == second
+
+
 def _contract_root(tmp_path):
     """A scratch root carrying just enough of the tree for a regeneration."""
     root = str(tmp_path)

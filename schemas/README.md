@@ -13,5 +13,6 @@ The mirror is what the task document calls "the client-visible contract"; the
 package path is what `tools/list` actually serves. Keeping both byte-identical
 means the shipped contract cannot drift from the documented one.
 
-M0 ships no schema files: T1-T5 schemas land in M2-M5 together with the
-implementations they describe.
+Nothing is generated here yet: the five tool schemas land in **M5** together
+with `tools/gen_schemas.py` (decision D43). M2's two CORS tools ship an inlined
+`inputSchema` in `registry.py`, which is what `tools/list` serves today.

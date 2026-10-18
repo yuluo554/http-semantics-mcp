@@ -155,3 +155,42 @@ def test_code_literals_ignores_substrings(tmp_path):
     )
 
     assert gates.code_literals(root).ok
+
+
+# -- the one exempt path ---------------------------------------------------
+
+
+def test_code_literals_exempts_the_generated_rule_module(tmp_path):
+    """The exemption must be exercised, not just declared.
+
+    If ``rules.py`` were empty the gate would pass for the wrong reason: no
+    literals anywhere because there are no literals at all.
+    """
+    root = _copy_repo(tmp_path)
+    module = os.path.join(root, gates.GENERATED_CODE_MODULE)
+    with open(module, "r", encoding="utf-8") as handle:
+        assert "CACHE_NO_STORE" in handle.read()
+    assert gates.code_literals(root).ok
+
+
+def test_code_literals_refuses_a_missing_rule_module(tmp_path):
+    """An exemption without its artifact would be a hole, not a rule."""
+    root = _copy_repo(tmp_path)
+    os.remove(os.path.join(root, gates.GENERATED_CODE_MODULE))
+
+    report = gates.code_literals(root)
+    assert not report.ok
+    assert any("generated rule module is missing" in detail for _, detail in report.findings)
+
+
+def test_code_literals_still_catches_a_copy_next_to_the_generated_module(tmp_path):
+    """Exempting one path must not exempt the package around it."""
+    root = _copy_repo(tmp_path)
+    _write(
+        os.path.join(root, "src", "http_semantics_mcp", "handy.py"),
+        'ALIAS = "CACHE_NO_STORE"\n',
+    )
+
+    report = gates.code_literals(root)
+    assert not report.ok
+    assert any("code literal" in detail for _, detail in report.findings)
