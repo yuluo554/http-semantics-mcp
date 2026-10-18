@@ -13,13 +13,13 @@
 | 包内 → 顶层镜像 | `tools/gen_schemas.py` + `schemas/tools/*.json` | `gen_schemas --check` → 5 tool / 0 problem（逐字节） |
 | §4.10 读成机器可读 | `tools/spectable.py::read_output_fields` | 生成器与契约门共用同一输入 |
 | registry 读描述符 | `registry.py` | 运行时读包内 JSON；缺件抛 `DescriptorError`；`tools/list` 现发布 `outputSchema` |
-| 契约门 | `tests/test_schema_parity.py`（17 项） | 五 tool `outputSchema.properties` == §4.10 == 实跑输出键集合（80 条 tool golden） |
+| 契约门 | `tests/test_schema_parity.py`（18 项） | 五 tool `outputSchema.properties` == §4.10 == 实跑输出键集合（80 条 tool golden；另把 7 条 `_time` 纳入 §4.10，全量 87 条） |
 | 确定性门 | `tests/test_determinism.py`（4 项） | 五 tool × 全部 golden 双跑 sha256 相等；无机器路径 / 无凭空日期 |
 | WPT 全量对账 | `tests/test_wpt_ledger.py` | 15/15 mapped 行实跑逐字节一致（25 条 golden 引用）；30 行各有 `reason` |
 | 端到端 stdio | `tests/test_stdio_end_to_end.py`（2 项） | 真实子进程：握手 → 列五 tool → 五 tool 各成功调用一次 → 未知 tool `-32602` |
 | README 指标段 | `README.md` | golden 87/87、WPT 15/45 + 30/45、5 描述符、8 门、43 变异、378/378 |
 | 门 + 变异 | `tools/gates.py` / `tools/mutate_check.py` | 8 门全绿（合计 730 文件项）；43/43 变异变红（M5 新增 5 条） |
-| 测试 | 全量 | 3.8 → 378 passed；3.12 → 378 passed（收集数各 378） |
+| 测试 | 全量 | 3.8 → 379 passed；3.12 → 379 passed（收集数各 379） |
 | 决策 | `plan/06` | D50（schema 真相源路线 A + `additionalProperties` 口径澄清） |
 
 ### 当前事实（下一棒必须知道）
@@ -40,7 +40,7 @@
 ## 二、M6 待办（按顺序）
 
 1. **定版**：`__init__.py:__version__` 与 `pyproject.toml` 的 `version` 同步 `0.1.0.dev0 → 0.1.0`；跑 `tests/test_packaging.py` 与 `--selftest` 复验（K16）。
-2. **写 `plan/RELEASE-M6.md`（tag 之前入库）**：两栏 `tag 时点事实` / `tag 后追加事实`；tag 时点栏写：版本、commit、双解释器 378/378、8 门、43 变异、87/87 golden、WPT 15/45+30/45、schema 5 描述符、`--pre-tag` 结论、**本地等价校验（未接远端）**的诚实措辞；tag 后栏留空待补（run id、Release URL、附件 sha256、真下载复验）。
+2. **写 `plan/RELEASE-M6.md`（tag 之前入库）**：两栏 `tag 时点事实` / `tag 后追加事实`；tag 时点栏写：版本、commit、双解释器 379/379、8 门、43 变异、87/87 golden、WPT 15/45+30/45、schema 5 描述符、`--pre-tag` 结论、**本地等价校验（未接远端）**的诚实措辞；tag 后栏留空待补（run id、Release URL、附件 sha256、真下载复验）。
 3. **建远端并首推**：`gh repo create yuluo554/http-semantics-mcp --public --source . --remote origin` → push `main` → 等 `.github/workflows/ci.yml` 四矩阵（`{ubuntu,windows} × {3.8,3.12}`）全绿；**push 数 = run 数**按事件对账（不按提交）；据实回写 run id。
 4. **手工源码包**：`git archive --format=tar --prefix=<name>/ <tag> | gzip -9n > <file>.tar.gz`；本地留副本 + `sha256sum`；**sha256 只写 Release 正文**，不写进包内（D28/D29）。
 5. **annotated tag + Release**：`git tag -a v0.1.0 -m ...`（tagger 邮箱已脱敏）→ push tag → `gh release create v0.1.0 <file>.tar.gz --notes-file ...`（正文含 sha256）。

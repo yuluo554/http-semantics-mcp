@@ -308,7 +308,7 @@ checks (no remote wired up; CI to be verified on first push)**.
 | Tool descriptors (input + output schema per tool) | 5 |
 | Static gates | 8 |
 | Mutations that must turn a gate red | 43 / 43 |
-| Collected tests | 378 (Python 3.8) / 378 (Python 3.12) |
+| Collected tests | 379 (Python 3.8) / 379 (Python 3.12) |
 
 The three generated artefacts are recomputed and compared byte for byte on
 every run (`gen_codes --check`, `gen_golden --check`, `gen_schemas --check`),

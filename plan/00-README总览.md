@@ -90,12 +90,12 @@
 
 - **契约载体**：五个 tool 各有一份 JSON Schema 描述符，落在包内 `src/http_semantics_mcp/schemas/tools/<tool>.json`（含 `name` / `description` / `inputSchema` / `outputSchema`），顶层 `schemas/tools/*.json` 为逐字节镜像。`registry.py` 改为运行时读取包内描述符（缺件抛 `DescriptorError`，不会静默退化成空表）；`tools/list` 现在同时发布 `inputSchema` 与 `outputSchema`。
 - **生成器**：`tools/gen_schemas.py --check` 逐字节比对镜像 + 形状校验（`required ⊆ properties`、带 `properties` 的对象必须 `additionalProperties: false`、纯 map 形状对象必须显式声明 `additionalProperties`、`outputSchema.properties` 与 `required` 都等于 `data/README.md` §4.10 键集合、文件必须处于规范形式）；`tools/spectable.py::read_output_fields` 把 §4.10 读成机器可读键集合。
-- **契约门**：`tests/test_schema_parity.py`（17 项）——描述符文件集合 == §4.10 工具集合 == 注册集合；五 tool 各自 `outputSchema.properties` == §4.10 == 实跑输出键集合（80 条 tool golden：78 成功 + 2 错误，错误结果固定 `{"error": {...}}`）；成功输出按 schema 逐字段校验类型/枚举/嵌套；且断言"参与比对的用例数 > 0 且五 tool 各自有用例"。
+- **契约门**：`tests/test_schema_parity.py`（18 项）——描述符文件集合 == §4.10 工具集合 == 注册集合；五 tool 各自 `outputSchema.properties` == §4.10 == 实跑输出键集合（80 条 tool golden：78 成功 + 2 错误，错误结果固定 `{"error": {...}}`）；成功输出按 schema 逐字段校验类型/枚举/嵌套；且断言"参与比对的用例数 > 0 且五 tool 各自有用例"，并把 7 条 `_time` 样例纳入 §4.10 的覆盖（全量 87 条）。
 - **确定性门**：`tests/test_determinism.py`（4 项）——五 tool × 全部 golden 双跑 `sha256(canonical.dumps(...))` 相等，且输出无机器绝对路径、无调用方未提供的日期、无 `\r`。
 - **WPT 全量对账**：`tests/test_wpt_ledger.py::test_mapped_rows_reconcile_with_the_production_output` 由台账驱动，遍历 15 条 `mapped=true` 行、逐条实跑其 `case_ids` 指向的 golden 并与冻结 `expected` 逐字节对账（25 条引用），打印 `15/15` 计数；30 条 `mapped=false` 行只校验 `reason` 在枚举内。
 - **端到端**：`tests/test_stdio_end_to_end.py`（2 项）——真实子进程 + 真实 stdio：`initialize` → `notifications/initialized` → `tools/list`（五个 tool、ASCII 升序）→ 五 tool 各成功调用一次（用服务器自己发布的 `outputSchema` 校对键集合）→ 未知 tool 走 JSON-RPC `-32602`；并验证跨进程边界的双跑字节一致。
 - **门与变异**：8 道静态门全绿（合计扫 730 文件项）；`tools/mutate_check.py` 43/43 变异变红（新增 5 条：schema 少一个 property、`additionalProperties` 改 `true`、顶层镜像改一字节、§4.10 掉一个字段、tool face 注入 volatile 键）。
-- **生成物复算**：`gen_codes --check`（9468 字节 + 镜像 + `rules.py` 16772 字节）、`gen_golden --check`（87 case / 0 problem）、`gen_schemas --check`（5 tool / 0 problem）逐字节一致；覆盖率 31/31/0/0；双解释器收集数一致（378 / 378）。
+- **生成物复算**：`gen_codes --check`（9468 字节 + 镜像 + `rules.py` 16772 字节）、`gen_golden --check`（87 case / 0 problem）、`gen_schemas --check`（5 tool / 0 problem）逐字节一致；覆盖率 31/31/0/0；双解释器收集数一致（379 / 379）。
 - **stdout 指标段**：README 新增"Measured on this build"（golden 87/87、WPT 15/45 + 30/45、5 描述符、8 门、43 变异、378/378 测试），并保留"本地等价校验（未接远端，CI 待首推验证）"措辞。
 - **决策**：D50（schema 真相源路线 A：包内 JSON 为唯一可编辑真相、registry 读它、gen_schemas 只镜像+校验；附带澄清 `additionalProperties: false` 只落在带 `properties` 的对象上）。
 

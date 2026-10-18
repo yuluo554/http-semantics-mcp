@@ -142,6 +142,29 @@ def test_the_gate_compared_every_tool_and_enough_cases():
         assert count > 0, "no case exercises " + tool
 
 
+def test_the_time_samples_are_accounted_for_by_the_contract():
+    """The seventh row of section 4.10 is the ``_time`` sample set, not a tool.
+
+    It has no descriptor and no handler, so it cannot be run through the
+    registry; its seven frozen cases are still accounted for here so that the
+    contract covers every case under ``data/golden/`` (production ``parse_time``
+    itself is pinned by ``tests/test_cache_golden.py``).
+    """
+    fields = _contract_fields()
+    assert set(fields) == set(_tool_names()) | {NON_TOOL}
+
+    all_cases = list(golden_coverage.iter_cases(ROOT))
+    assert len(all_cases) == 87, "expected the full frozen golden set"
+
+    samples = [case for tool, _case_id, case in all_cases if tool == NON_TOOL]
+    assert samples, "no _time sample found"
+    for case in samples:
+        expected = case["expected"]
+        if "error" in expected:
+            continue
+        assert set(expected) == set(fields[NON_TOOL]), case["case_id"]
+
+
 # -- mirrors -----------------------------------------------------------
 
 
