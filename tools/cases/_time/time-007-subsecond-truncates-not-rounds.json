@@ -1,0 +1,12 @@
+{
+  "case_id": "time-007-subsecond-truncates-not-rounds",
+  "input": {
+    "value": "2026-01-01T00:00:00.999Z"
+  },
+  "notes": "Same instant as time-001: .999 truncates to the same second instead of rounding up.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §5.6.7"
+  ],
+  "tool": "_time"
+}
