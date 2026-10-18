@@ -148,7 +148,10 @@ def _read_resource(arguments):
     Both fields describe the *current* representation, so both are validated
     before any rule runs: a garbage date here is a caller mistake, not a
     condition to ignore (which is how ``If-Modified-Since: not a date`` differs
-    from ``resource.last_modified: not a date``).
+    from ``resource.last_modified: not a date``). The error codes are the ones
+    ``data/README.md`` section 4.6 already assigns -- a malformed entity tag is
+    an ``INVALID_HEADER_VALUE``, an unparsable time literal is an
+    ``INVALID_TIME_FORMAT`` -- so ``parse_time`` is called without a wrapper.
     """
     resource = arguments.get("resource")
     if not isinstance(resource, dict):
@@ -164,13 +167,7 @@ def _read_resource(arguments):
     modified = None
     raw_modified = resource.get("last_modified")
     if raw_modified is not None:
-        try:
-            _, modified = parse_time(raw_modified, "resource.last_modified")
-        except JudgementError:
-            raise invalid_input(
-                "resource.last_modified",
-                "last_modified must be an ISO 8601 or HTTP-date literal",
-            )
+        _, modified = parse_time(raw_modified, "resource.last_modified")
     return etag, modified
 
 

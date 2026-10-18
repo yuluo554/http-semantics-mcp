@@ -309,7 +309,10 @@ def test_resource_fields_are_validated_before_any_rule_runs():
     )
     assert bad_date["isError"] is True
     payload = json.loads(bad_date["content"][0]["text"])
-    assert payload["error"]["code"] == "INVALID_INPUT"
+    # The resource date is a time literal, so section 4.6 maps it to the time
+    # code -- not to the "ignored condition" path, which belongs to the
+    # request-header dates.
+    assert payload["error"]["code"] == "INVALID_TIME_FORMAT"
     assert payload["error"]["field"] == "resource.last_modified"
 
 

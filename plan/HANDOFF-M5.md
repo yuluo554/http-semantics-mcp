@@ -13,7 +13,7 @@
 | T5 判定 | `src/http_semantics_mcp/judgement/vary.py` | 9 条 `vary_match` golden 逐字节相等 |
 | tool 注册 | `toolface.py` + `registry.py` | `tools/list` 返回 5 个 tool，ASCII 升序 |
 | T4/T5 测试 | `tests/test_conditional_golden.py`（43 项）/ `tests/test_vary_golden.py`（27 项） | golden 逐字节 + golden 未覆盖分支（强弱比较、`*` 与 ETag、IMS 方法门、秒级边界、策略表换行、重复字段一次） |
-| 门 + 变异 | `tools/gates.py` / `tools/mutate_check.py` | 8 门全绿（合计扫 698 文件项）；38/38 变异变红（M4 新增 12 条） |
+| 门 + 变异 | `tools/gates.py` / `tools/mutate_check.py` | 8 门全绿（合计扫 700 文件项）；38/38 变异变红（M4 新增 12 条） |
 | 测试 | 全量 | 3.8 → 354 passed；3.12 → 354 passed（收集数各 354） |
 | 决策 | `plan/06` | D47（T4 三处边缘口径）、D48（T5 重复字段 + star 短路）、D49（生产侧相对 oracle 的两处有意偏差） |
 
@@ -33,7 +33,8 @@
 - **确定性口径**（`data/README.md` §4.5）：同一输入连续两次调用的**序列化结果 sha256 相等**，该断言"M5 作为守门测试常驻"。M3/M4 的逐 tool 双跑是 `canonical.dumps` 相等，M5 要升级为 sha256 且覆盖**五 tool × 全部 golden**。
 - **判定层怎么指名 code（M2 定，D41/D42）**：`from ..rules import COND_..., VARY_...` 拿常量，**禁止**在 `src/**` 手写 code 字面量（唯一豁免生成物 `rules.py`）。签名一律 `evaluate_xxx(arguments, catalog)`，`catalog` 由 `toolface.py` 传入。
 - **golden 未覆盖处的口径由测试钉住**（D47/D48）：动 T4/T5 时不要以为"golden 没覆盖就可以随便改"，`tests/test_conditional_golden.py` / `tests/test_vary_golden.py` 与 `mutate_check.py` 的 27–38 条变异会同时打红。
-- **生产侧与 oracle 的两处有意偏差**（D49，M5 若做双侧输入面扫描不算漂移）：①T4/T5 把 `request_headers`/`resource`/`cached`/`incoming` 列为 `required` 并在缺失时报 `INVALID_INPUT`，oracle 对缺键按空对象兜底；②`golden_oracle` 对**空数组**值取首值时抛 `IndexError`，生产侧 `first_value` 按"没有该值"处理。
+- **生产侧与 oracle 的三处有意偏差**（D49，M5 若做双侧输入面扫描不算漂移）：①T4/T5 把 `request_headers`/`resource`/`cached`/`incoming` 列为 `required` 并在缺失时报 `INVALID_INPUT`，oracle 对缺键按空对象兜底；②`resource.last_modified` 非法时生产侧报 `INVALID_TIME_FORMAT`（`data/README.md` §4.6 的既有映射，K9），oracle 报 `INVALID_INPUT`；③`golden_oracle` 对**空数组**值取首值时抛 `IndexError`，生产侧 `first_value` 按"没有该值"处理。
+- **`plan/05` M4 有一处 DoD 勘误**：手写 DoD 原写"非法 `Last-Modified` / `If-*` 日期 → 忽略条件 + informational"，实测后拆成"**请求头**日期非法 → 忽略 + informational（`cond-012`）/ **`resource.last_modified`** 非法 → `INVALID_TIME_FORMAT`"（依据 §4.4 的"不做猜测性容错"）。M5 做契约或一致性检查时以 `plan/05` 的勘误段与 D47③/D49② 为准，不要按 `plan/HANDOFF-M4.md` §五 的原始措辞判"未达标"。
 - **WPT 台账已是 M1 产物**：`data/wpt-mapping.json`（45 = 15 converted + 30 unmappable，commit `850b36a5`），`tests/test_wpt_ledger.py` 已钉住形状、集合划分、`case_ids` 指向真实 golden、不夹带 WPT 原文。M5 要补的是 `data/README.md` §3.4 最后一条：**`mapped=true` 的用例逐条与 golden 期望一致**（按台账驱动实跑，而不是只查存在性）。
 - **未推送远端**：`git remote -v` 为空。一切 CI 结论只能写"本地等价校验（未接远端，CI 待首推验证）"。
 - `plan/06` §二 的 skill 门写有"**基准可重复、指标入 README**（golden 全绿率 + WPT 映射率）→ M5"：README 需要一个量化指标段，这是 M5 的对外承诺，不是可选项。

@@ -92,12 +92,13 @@
 - **工具面**：`toolface.FUNCTIONS` 注册 `conditional_evaluate` / `vary_match`；`registry.build_registry()` 现注册五个 tool（ASCII 升序 `cache_evaluate` < `conditional_evaluate` < `cors_evaluate` < `cors_simulate_fetch` < `vary_match`），`tools/list` 由 3 → 5；`inputSchema.required` 分别取 `["method","request_headers","resource"]` 与 `["cached","incoming"]`。
 - **golden**：19 条 conditional + 9 条 vary 逐字节相等（`canonical.dumps(实际) == canonical.dumps(expected)`）；错误用例（`cond-014` 小写 `w/`）返回 `isError: true` 且 `field = request_headers.if-none-match`。
 - **新增测试**：`tests/test_conditional_golden.py`（43 项）与 `tests/test_vary_golden.py`（27 项）——golden 逐字节相等之外，把 golden 未覆盖的分支直接钉住：强弱比较关系、`*` 与 ETag 的绑定、`If-Modified-Since` 的方法门、秒级边界（`>` / `<=`）、策略表换行即翻转判定（`evaluate_vary` 接收改写过的 catalog）、重复字段只报一次。
-- **门与变异**：8 道静态门全绿（合计扫 698 文件项）；`tools/mutate_check.py` 38/38 变异变红（新增 12 条：T4 弱比较、次序颠倒、`*` 语义、304/412 分叉、小写 `w/`、IMS 方法门、非法日期改报错 7 条 + T5 star 短路、缺字段、策略分支、重复提示、逗号排序 5 条）。
+- **门与变异**：8 道静态门全绿（合计扫 700 文件项）；`tools/mutate_check.py` 38/38 变异变红（新增 12 条：T4 弱比较、次序颠倒、`*` 语义、304/412 分叉、小写 `w/`、IMS 方法门、非法日期改报错 7 条 + T5 star 短路、缺字段、策略分支、重复提示、逗号排序 5 条）。
 - **生成物复算**：`gen_codes --check` 三件逐字节一致（`codes.json` 9468 字节 + 镜像 + `rules.py` 16772 字节）；`gen_golden --check` 87 case / 0 problem；覆盖率 31 declared / 31 covered / 0 uncovered / 0 unknown。
 - **双解释器**：3.8 → 354 passed；3.12 → 354 passed；收集数一致（各 354）。
 - **stdio**：5 响应 / 5 tool / 7514 字节，两个解释器一致。
-- **发布门**：`--pre-tag` 提交前 5 PASS / 1 FAIL（git-clean，预期）/ 4 SKIP；提交后 6 PASS / 0 FAIL / 4 SKIP（干净树，698 文件项，退出 0）。
-- **决策**：D47（T4 三处边缘口径）、D48（T5 重复字段与 `Vary: *` 短路）、D49（生产侧相对 oracle 的两处有意偏差：必填键更严、空数组不崩）。
+- **发布门**：`--pre-tag` 提交前 5 PASS / 1 FAIL（git-clean，预期）/ 4 SKIP；提交后 6 PASS / 0 FAIL / 4 SKIP（干净树，700 文件项，退出 0）。
+- **决策**：D47（T4 三处边缘口径：`*` 绑 ETag、IMS 方法门、`resource` 字段严格校验 vs 请求头日期忽略）、D48（T5 重复字段只报一次 + `Vary: *` 短路）、D49（生产侧相对 oracle 的三处有意偏差：必填键更严、资源日期错误码取 `INVALID_TIME_FORMAT`、空数组不崩）。
+- **DoD 勘误**：`plan/HANDOFF-M4.md` §五 的"非法日期一律忽略"收窄为"请求头日期忽略（`cond-012`）/ `resource.last_modified` 非法 → `INVALID_TIME_FORMAT`"，依据 `data/README.md` §4.4/§4.6；勘误段写在 `plan/05` 的 M4 节，差异登记在 D47③/D49②。
 
 ### M3（2026-10-18）已完成
 
