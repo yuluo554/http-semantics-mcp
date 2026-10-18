@@ -1,0 +1,179 @@
+"""Protocol contract tests: lifecycle, dispatch, error codes."""
+
+import pytest
+
+from http_semantics_mcp import __version__, errors, protocol
+from http_semantics_mcp.registry import Tool
+
+
+def _session():
+    return protocol.Session()
+
+
+def _request(method, params=None, request_id=1):
+    message = {"jsonrpc": "2.0", "id": request_id, "method": method}
+    if params is not None:
+        message["params"] = params
+    return message
+
+
+def _initialize(session):
+    responses = session.handle(_request("initialize", {"protocolVersion": "2025-06-18"}))
+    assert len(responses) == 1
+    return responses[0]["result"]
+
+
+def test_initialize_returns_protocol_version_capabilities_and_server_info():
+    result = _initialize(_session())
+
+    assert set(result) == {"protocolVersion", "capabilities", "serverInfo"}
+    assert result["protocolVersion"] == protocol.DEFAULT_PROTOCOL_VERSION
+    assert result["serverInfo"] == {"name": "http-semantics-mcp", "version": __version__}
+    assert "tools" in result["capabilities"]
+
+
+def test_capabilities_declare_only_tools():
+    """Anything not declared must answer -32601; advertising more would lie."""
+    assert set(_initialize(_session())["capabilities"]) == {"tools"}
+
+
+@pytest.mark.parametrize("requested", ["2025-06-18", "2025-03-26", "2024-11-05"])
+def test_supported_versions_are_echoed(requested):
+    session = _session()
+    result = session.handle(_request("initialize", {"protocolVersion": requested}))[0]["result"]
+    assert result["protocolVersion"] == requested
+
+
+def test_unknown_version_falls_back_to_default():
+    session = _session()
+    result = session.handle(_request("initialize", {"protocolVersion": "1999-01-01"}))[0]["result"]
+    assert result["protocolVersion"] == protocol.DEFAULT_PROTOCOL_VERSION
+
+
+def test_missing_version_falls_back_to_default():
+    session = _session()
+    result = session.handle(_request("initialize", {}))[0]["result"]
+    assert result["protocolVersion"] == protocol.DEFAULT_PROTOCOL_VERSION
+
+
+def test_notifications_produce_no_response():
+    session = _session()
+    _initialize(session)
+
+    assert session.handle({"jsonrpc": "2.0", "method": "notifications/initialized"}) == []
+    assert session.handle({"jsonrpc": "2.0", "method": "notifications/cancelled", "params": {"requestId": 1}}) == []
+
+
+def test_ping_works_before_initialize():
+    """ping is explicitly pre-init safe; clients use it as a liveness probe."""
+    assert _session().handle(_request("ping")) == [{"jsonrpc": "2.0", "id": 1, "result": {}}]
+
+
+def test_request_before_initialize_is_rejected():
+    responses = _session().handle(_request("tools/list"))
+    assert responses[0]["error"]["code"] == errors.SERVER_NOT_INITIALIZED
+
+
+def test_tools_list_is_empty_at_m0_and_is_a_real_array():
+    session = _session()
+    _initialize(session)
+
+    result = session.handle(_request("tools/list"))[0]["result"]
+    assert result == {"tools": []}
+
+
+def test_unknown_tool_is_invalid_params():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle(_request("tools/call", {"name": "nope", "arguments": {}}))[0]
+    assert response["error"]["code"] == errors.INVALID_PARAMS
+
+
+def test_tools_call_requires_a_name():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle(_request("tools/call", {"arguments": {}}))[0]
+    assert response["error"]["code"] == errors.INVALID_PARAMS
+
+
+def test_tools_call_rejects_non_object_arguments():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle(_request("tools/call", {"name": "nope", "arguments": []}))[0]
+    assert response["error"]["code"] == errors.INVALID_PARAMS
+
+
+def test_unknown_method_is_method_not_found():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle(_request("resources/list"))[0]
+    assert response["error"]["code"] == errors.METHOD_NOT_FOUND
+
+
+def test_unknown_method_notification_is_silently_dropped():
+    session = _session()
+    _initialize(session)
+
+    assert session.handle({"jsonrpc": "2.0", "method": "no/such/method"}) == []
+
+
+def test_batch_request_is_rejected():
+    response = _session().handle([_request("ping")])[0]
+    assert response["error"]["code"] == errors.INVALID_REQUEST
+
+
+@pytest.mark.parametrize("message", ["not an object", 42, None])
+def test_non_object_message_is_invalid_request(message):
+    response = _session().handle(message)[0]
+    assert response["error"]["code"] == errors.INVALID_REQUEST
+
+
+def test_wrong_jsonrpc_version_is_rejected():
+    response = _session().handle({"jsonrpc": "1.0", "id": 1, "method": "ping"})[0]
+    assert response["error"]["code"] == errors.INVALID_REQUEST
+
+
+def test_params_must_be_an_object():
+    session = _session()
+    _initialize(session)
+
+    response = session.handle({"jsonrpc": "2.0", "id": 9, "method": "ping", "params": []})[0]
+    assert response["error"]["code"] == errors.INVALID_REQUEST
+
+
+def test_handler_crash_becomes_internal_error_and_session_survives():
+    """A bug in one handler must not kill the process or the session."""
+
+    def boom(arguments):
+        raise RuntimeError("kaboom")
+
+    registry = protocol.build_registry()
+    registry.register(
+        Tool(
+            name="boom",
+            description="raises",
+            input_schema={"type": "object"},
+            handler=boom,
+        )
+    )
+    session = protocol.Session(registry=registry)
+    _initialize(session)
+
+    response = session.handle(_request("tools/call", {"name": "boom", "arguments": {}}))[0]
+    assert response["error"]["code"] == errors.INTERNAL_ERROR
+    assert "kaboom" not in str(response)
+
+    # the session is still usable afterwards
+    assert session.handle(_request("ping"))[0]["result"] == {}
+
+
+def test_response_envelope_shape():
+    session = _session()
+    response = session.handle(_request("initialize", {}))[0]
+    assert set(response) == {"jsonrpc", "id", "result"}
+    assert response["jsonrpc"] == "2.0"
+    assert response["id"] == 1

@@ -1,0 +1,138 @@
+"""Mutation verification: break the behaviour, the gate must go red.
+
+Run with: py tools/mutate_check.py
+
+Each case replaces exactly one marker, runs one command, and asserts the
+command failed. Three assertions guard against the classic silent no-op:
+marker exists, file bytes changed, file bytes restored exactly.
+"""
+
+import os
+import subprocess
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+ENV = dict(os.environ, PYTHONPATH=os.path.join(ROOT, "src"), PYTHONDONTWRITEBYTECODE="1")
+
+NEWLINE = 'b"\\n"'
+
+CASES = [
+    (
+        "canonical framing loses its newline",
+        os.path.join("src", "http_semantics_mcp", "canonical.py"),
+        'return dumps(value).encode("utf-8") + ' + NEWLINE,
+        'return dumps(value).encode("utf-8")',
+        ["-m", "pytest", "-q", "tests/test_canonical.py"],
+    ),
+    (
+        "registry stops sorting tool names",
+        os.path.join("src", "http_semantics_mcp", "registry.py"),
+        "return sorted(self._tools)",
+        "return list(self._tools)",
+        ["-m", "pytest", "-q", "tests/test_registry.py"],
+    ),
+    (
+        "lifecycle gate disappears",
+        os.path.join("src", "http_semantics_mcp", "protocol.py"),
+        "if not is_notification and not self.initialized and method not in _PRE_INIT_METHODS:",
+        "if False:",
+        ["-m", "pytest", "-q", "tests/test_protocol.py"],
+    ),
+    (
+        "utf8 guard refuses to reconfigure",
+        os.path.join("src", "http_semantics_mcp", "_utf8.py"),
+        'if normalise_encoding_name(getattr(stream, "encoding", None)) == "utf8":',
+        "if True:",
+        ["-m", "pytest", "-q", "tests/test_utf8_guard.py"],
+    ),
+    (
+        "transport emits a carriage return",
+        os.path.join("src", "http_semantics_mcp", "server.py"),
+        "_write(stream, canonical.encode_message(response))",
+        '_write(stream, canonical.dumps(response).encode("utf-8") + b"\\r\\n")',
+        ["-m", "pytest", "-q", "tests/test_server_transport.py"],
+    ),
+    (
+        "version parity check disabled",
+        os.path.join("src", "http_semantics_mcp", "selfcheck.py"),
+        "if declared != __version__:",
+        "if False:",
+        ["-m", "pytest", "-q", "tests/test_entry_point.py"],
+    ),
+    (
+        "judgement layer imports the clock",
+        os.path.join("src", "http_semantics_mcp", "judgement", "__init__.py"),
+        "__all__ = []",
+        "import time\n\n__all__ = []",
+        [os.path.join("tools", "run_gates.py")],
+    ),
+    (
+        "a second json.dumps appears",
+        os.path.join("src", "http_semantics_mcp", "server.py"),
+        "def write_response(stream, response):\n    \"\"\"Write one response object as a framed line.\"\"\"\n    _write(stream, canonical.encode_message(response))",
+        "def write_response(stream, response):\n    \"\"\"Write one response object as a framed line.\"\"\"\n    import json\n    _write(stream, json.dumps(response).encode(\"utf-8\") + b\"\\n\")",
+        [os.path.join("tools", "run_gates.py")],
+    ),
+]
+
+
+def _run(command):
+    return subprocess.run(
+        [sys.executable] + command,
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        env=ENV,
+    )
+
+
+def _mutate(description, relative, old, new, command):
+    path = os.path.join(ROOT, relative)
+    with open(path, "rb") as handle:
+        original = handle.read()
+
+    text = original.decode("utf-8")
+    occurrences = text.count(old)
+    if occurrences != 1:
+        return False, "marker occurs " + str(occurrences) + " times (expected 1)"
+
+    mutated = text.replace(old, new)
+    if mutated == text.encode("utf-8").decode("utf-8"):
+        return False, "replacement produced no change"
+
+    try:
+        with open(path, "wb") as handle:
+            handle.write(mutated.encode("utf-8"))
+        with open(path, "rb") as handle:
+            if handle.read() == original:
+                return False, "file did not change on disk"
+
+        result = _run(command)
+        if result.returncode == 0:
+            return False, "still green -- the gate does not test this behaviour"
+        return True, "red (exit " + str(result.returncode) + ")"
+    finally:
+        with open(path, "wb") as handle:
+            handle.write(original)
+        with open(path, "rb") as handle:
+            if handle.read() != original:
+                raise RuntimeError("restore failed for " + relative)
+
+
+def main():
+    failures = 0
+    for description, relative, old, new, command in CASES:
+        ok, detail = _mutate(description, relative, old, new, command)
+        if not ok:
+            failures += 1
+        sys.stdout.write(("PASS  " if ok else "FAIL  ") + description + ": " + detail + "\n")
+
+    sys.stdout.write(
+        "summary: {0} mutation(s), {1} gate(s) failed to notice\n".format(len(CASES), failures)
+    )
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

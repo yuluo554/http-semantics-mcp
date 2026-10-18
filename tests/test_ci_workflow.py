@@ -1,0 +1,98 @@
+"""CI workflow file: parses, has the expected shape, and cannot silently skip.
+
+A workflow that fails to parse creates no jobs at all, and the run still shows
+``failure`` -- so "the file exists" is not evidence. These tests parse the YAML
+locally and assert structure.
+"""
+
+import os
+
+import pytest
+import yaml
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WORKFLOW = os.path.join(ROOT, ".github", "workflows", "ci.yml")
+
+
+def _workflow():
+    with open(WORKFLOW, "r", encoding="utf-8") as handle:
+        return yaml.safe_load(handle)
+
+
+def test_workflow_parses():
+    assert isinstance(_workflow(), dict)
+
+
+def test_workflow_has_one_test_job_with_four_matrix_legs():
+    data = _workflow()
+    jobs = data["jobs"]
+    assert list(jobs) == ["test"]
+
+    job = jobs["test"]
+    matrix = job["strategy"]["matrix"]
+    assert set(matrix["os"]) == {"ubuntu-latest", "windows-latest"}
+    assert set(matrix["python"]) == {"3.8", "3.12"}
+    assert job["strategy"]["fail-fast"] is False
+
+
+def test_every_step_has_a_name():
+    """Step names must be quoted scalars in the file; asserting on parsed
+    names catches the "unquoted ': ' broke the whole workflow" failure mode."""
+    for step in _workflow()["jobs"]["test"]["steps"]:
+        assert isinstance(step.get("name"), str) and step["name"].strip()
+
+
+def test_required_steps_are_present():
+    names = [step["name"] for step in _workflow()["jobs"]["test"]["steps"]]
+    required = [
+        "Checkout",
+        "Set up Python",
+        "Install (runtime + dev extras)",
+        "Version and self-test",
+        "Console script smoke",
+        "Repository gates",
+        "Mutation verification",
+        "stdio handshake smoke",
+        "Full test suite",
+    ]
+    for expected in required:
+        assert expected in names, "missing CI step: " + expected
+
+
+def test_step_names_do_not_use_unquoted_colons():
+    """Belt and braces: the parse above would fail, but name the cause."""
+    with open(WORKFLOW, "r", encoding="utf-8") as handle:
+        for number, line in enumerate(handle, 1):
+            stripped = line.strip()
+            if not stripped.startswith("name:"):
+                continue
+            value = stripped[len("name:"):].strip()
+            quoted = value.startswith('"') or value.startswith("'")
+            if not quoted:
+                assert ": " not in value, "unquoted colon in step name at line " + str(number)
+
+
+def test_no_continue_on_error_on_a_verification_step():
+    """A verification step allowed to fail is a green matrix that proves nothing."""
+    for step in _workflow()["jobs"]["test"]["steps"]:
+        assert step.get("continue-on-error") is not True, step.get("name")
+
+
+def test_ci_does_not_run_the_release_terminal_gate():
+    """Decision D34: before a tag it is legitimately red, so it stays out."""
+    with open(WORKFLOW, "r", encoding="utf-8") as handle:
+        text = handle.read()
+    assert "check_release" not in text
+
+
+def test_ci_installs_the_same_extras_the_readme_documents():
+    with open(WORKFLOW, "r", encoding="utf-8") as handle:
+        text = handle.read()
+    assert 'pip install -e ".[dev]"' in text
+
+
+def test_ci_sets_utf8_environment():
+    data = _workflow()
+    environment = data["jobs"]["test"].get("env", {})
+    assert environment.get("PYTHONUTF8") == "1"
+    assert str(environment.get("PYTHONIOENCODING")).lower() == "utf-8"
