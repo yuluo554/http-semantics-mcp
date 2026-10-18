@@ -168,7 +168,13 @@ def evaluate_cache(arguments, catalog):
             freshness_lifetime = expires_value - date_value
             if freshness_lifetime <= 0:
                 freshness_lifetime = 0
-                _add(findings, catalog, "CACHE_EXPIRES_IN_PAST", expires=expires_raw, date=date_raw)
+                _add(
+                    findings,
+                    catalog,
+                    "CACHE_EXPIRES_IN_PAST",
+                    expires=expires_raw,
+                    date=date_raw if date_raw is not None else stored.get("stored_at"),
+                )
 
     if freshness_lifetime is None:
         last_modified_raw = first_value(response_headers, "last-modified")

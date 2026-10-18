@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-018-expires-without-date",
+  "input": {
+    "now": "2026-01-01T00:00:00Z",
+    "request_headers": {},
+    "response_headers": {
+      "Expires": "Wed, 31 Dec 2025 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "No Date header: date_value falls back to stored_at, so Expires is in the past and lifetime is 0.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.1",
+    "RFC9111 §5.3"
+  ],
+  "tool": "cache_evaluate"
+}

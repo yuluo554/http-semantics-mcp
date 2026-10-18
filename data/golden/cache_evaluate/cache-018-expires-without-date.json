@@ -1,0 +1,47 @@
+{
+  "case_id": "cache-018-expires-without-date",
+  "expected": {
+    "action": "revalidate",
+    "current_age": 0,
+    "freshness_lifetime": 0,
+    "is_fresh": false,
+    "must_revalidate": false,
+    "reasons": [
+      {
+        "code": "CACHE_AGE_EXCEEDS_LIFETIME",
+        "detail": "current_age=0 is not below freshness_lifetime=0",
+        "spec_ref": [
+          "RFC9111 §4.2",
+          "RFC9111 §4.2.3"
+        ]
+      },
+      {
+        "code": "CACHE_EXPIRES_IN_PAST",
+        "detail": "Expires=Wed, 31 Dec 2025 00:00:00 GMT is not later than Date=2026-01-01T00:00:00Z",
+        "spec_ref": [
+          "RFC9111 §5.3"
+        ]
+      }
+    ],
+    "stale_while_revalidate_window": 0
+  },
+  "input": {
+    "now": "2026-01-01T00:00:00Z",
+    "request_headers": {},
+    "response_headers": {
+      "Expires": "Wed, 31 Dec 2025 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "No Date header: date_value falls back to stored_at, so Expires is in the past and lifetime is 0.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.1",
+    "RFC9111 §5.3"
+  ],
+  "tool": "cache_evaluate"
+}
