@@ -9,7 +9,7 @@
 
 | 产出 | 位置 | 证据 |
 | --- | --- | --- |
-| 规范条款核对 | `data/README.md` §4.2 | 27 条 `spec_ref` 全部 ✅（RFC 9110/9111/5861 原文 + Fetch 活文档锚点名） |
+| 规范条款核对 | `data/README.md` §4.2 | 29 条 `spec_ref` 全部 ✅（其中 25 条用于 §4.1，4 条供 golden / 台账引用）（RFC 9110/9111/5861 原文 + Fetch 活文档锚点名） |
 | 规则表生成器 | `tools/spectable.py` + `tools/gen_codes.py` | `--check` 逐字节一致；表缺项/未核对条款 → `SpecTableError` |
 | `codes.json` + 镜像 | `src/http_semantics_mcp/references/`、`references/` | 31 个 code，9468 字节，逐字节相等 |
 | 独立复算器 | `tools/golden_oracle/`（8 文件） | 完整第二实现（T1–T5 + 时间解析）；AST 门禁 import |
