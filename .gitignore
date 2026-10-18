@@ -1,0 +1,61 @@
+# Python 标准模板
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 虚拟环境
+.venv/
+venv/
+ENV/
+env/
+
+# 环境与密钥
+.env
+.env.*
+*.key
+
+# 测试与工具缓存
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.coverage.*
+coverage.xml
+
+# 构建打包
+build_dist/
+*.spec
+
+# 隐私红线：真实抓包 / 真实响应头 / 个人配置，一律不入仓
+*.pcap
+*.pcapng
+*.har
+headers_real/
+captures_real/
+_private/
+*-real-headers*/
+testbed/
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
