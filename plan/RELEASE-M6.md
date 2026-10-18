@@ -24,7 +24,7 @@
 | tag 目标 | `main` 上本文件所在提交（提交哈希见「tag 后追加事实」栏——tag 树内无法写自身哈希，自指） |
 | 版本定版前置提交 | `c1f566f`（`0.1.0.dev0 → 0.1.0` 两处同步 + README 克隆地址改为 `http-semantics-mcp`） |
 | 双解释器全量测试 | Python 3.8 → **379 passed / 379 collected**；Python 3.12 → **379 passed / 379 collected** |
-| 静态门 | `tools/run_gates.py` → **8 gate(s), 0 failing**，合计扫描 **730** 文件项 |
+| 静态门 | `tools/run_gates.py` → **8 gate(s), 0 failing**，合计扫描 **732** 文件项 |
 | 变异验证 | `tools/mutate_check.py` → **43 mutation(s), 0 gate(s) failed to notice**（43/43 使门或测试变红） |
 | 冻结 golden | **87 / 87** 与生产输出逐字节一致（cors 24 / sim 10 / cache 18 / cond 19 / vary 9 / _time 7） |
 | 规则码覆盖 | **31 declared / 31 covered / 0 uncovered / 0 unknown**（双向集合等式） |
@@ -32,8 +32,8 @@
 | tool 描述符 | **5** 个（`inputSchema` + `outputSchema`）；4129 / 3022 / 4297 / 6373 / 3384 字节 |
 | 生成物复算 | `gen_codes --check`（codes.json 9468 字节 ×2 + rules.py 16772 字节）、`gen_golden --check`（87 case）、`gen_schemas --check`（5 tool）→ 全部 OK |
 | `dist-mirrors` | 6 文件逐字节相等（`references/codes.json` 1 + `schemas/tools/*.json` 5） |
-| 发布终态门 | `scripts/check_release.py --pre-tag`（干净树、提交后）→ **6 PASS / 0 FAIL / 4 SKIP**，退出 0 |
-| 剩余 4 项 SKIP | `tag` / `release` / `attachments` / 网络项——tag 之后由 `--online` 复核 |
+| 发布终态门 | `scripts/check_release.py --pre-tag`（干净树、提交后）→ **7 PASS / 0 FAIL / 3 SKIP**，退出 0 |
+| 剩余 3 项 SKIP | `tag` / `release` / `attachments`——tag 之后由 `--online` 复核 |
 | CI | **本地等价校验（未接远端，CI 待首推验证）** |
 
 > 诚实口径：发版时点本机 `git remote -v` 曾为空，本项目 CI 从未运行过。上表
