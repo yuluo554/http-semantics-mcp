@@ -31,7 +31,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "excess=15 > 5 -> window closed, revalidate.",
+  "notes": "current_age=25, lifetime=10 -> excess=15 > swr=5, window closed.",
   "source": "synthetic",
   "spec_basis": [
     "RFC5861 §3",

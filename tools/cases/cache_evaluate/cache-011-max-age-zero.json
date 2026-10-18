@@ -13,7 +13,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "Lifetime 0: fresh only if current_age < 0, never.",
+  "notes": "freshness_lifetime=0 and current_age=0: 0 < 0 is false, so the entry is stale immediately.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §4.2.1",

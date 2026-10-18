@@ -22,7 +22,7 @@
       "stored_at": "Thu, 01 Jan 2026 00:00:10 GMT"
     }
   },
-  "notes": "HTTP-date on both sides; same arithmetic as the ISO cases.",
+  "notes": "apparent_age=0, age_value=5, resident=50 -> current_age=55 < 120.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §4.2.3"

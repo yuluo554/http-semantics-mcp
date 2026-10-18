@@ -13,7 +13,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "Expires - Date = 0 -> CACHE_EXPIRES_IN_PAST, lifetime 0.",
+  "notes": "Expires - Date = 0 -> CACHE_EXPIRES_IN_PAST; freshness_lifetime=0.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §5.3"

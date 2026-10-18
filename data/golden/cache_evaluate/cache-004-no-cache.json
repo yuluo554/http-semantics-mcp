@@ -30,7 +30,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "Fresh by max-age, still revalidated because of no-cache.",
+  "notes": "current_age=10 < max-age=600, but no-cache forces revalidate.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §5.2.2.4"

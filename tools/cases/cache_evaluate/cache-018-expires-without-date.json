@@ -12,7 +12,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "No Date header: date_value falls back to stored_at, so Expires is in the past and lifetime is 0.",
+  "notes": "no Date header -> date_value=stored_at; Expires earlier -> lifetime=0.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §4.2.1",

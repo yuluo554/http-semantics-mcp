@@ -21,6 +21,7 @@ python -m pytest
 | `test_gen_codes.py` | `codes.json` regeneration, mirror equality, table↔catalog set equality, drift localisation |
 | `test_golden.py` | golden completeness, exact output key sets, sorting, both-direction coverage, drift and orphan detection |
 | `test_wpt_ledger.py` | WPT index shape, ledger partition (`converted + unmappable == total`), case references |
+| `test_coverage_matrix.py` | every named boundary shape from plan/04 §四 exists; redirect event order; cache arithmetic notes |
 | `test_mirrors.py` | package/top-level mirror equality, including missing and diverged cases |
 | `test_readme_gate.py` | README commands/flags/extras/file references against the real parser and the real tree |
 | `test_ci_workflow.py` | workflow parses, four matrix legs, required steps, no silent skips, release gate stays out |

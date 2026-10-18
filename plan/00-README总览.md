@@ -3,7 +3,7 @@
 - **项目**：HTTP 语义判定 MCP Server（CORS 放行判定 + 缓存新鲜度 + 条件请求 + Vary 命中）
 - **性质**：不参赛项目题（模拟项目），发布 GitHub **公开仓库**，署名 `yuluo554`
 - **版本**：v1（2026-10-17 定稿；检索基准日 2026-10-17，实测窗口 2026-10-18 10:33–11:05 UTC）
-- **当前里程碑**：M1 数据先行 ✅（2026-10-18：codes.json + 86 条 golden + WPT 台账 + 8 道门）；M2–M6 待开工
+- **当前里程碑**：M1 数据先行 ✅（2026-10-18：codes.json + 87 条 golden + WPT 台账 + 8 道门）；M2–M6 待开工
 - **交付形态**：**MCP Server（stdio 传输）**，唯一形态，不设备选
 - **一句话定位**：把 Fetch Standard 的 CORS 协议算法与 RFC 9111 缓存新鲜度算法编译成可调用的 oracle——给一组请求/响应头，返回 `allow|block`、违反的规则编号 + 规范条款、以及该改哪个 header。**不联网、不抓包、不做安全打分。**
 
@@ -89,11 +89,11 @@
 ### M1（2026-10-18）已完成
 
 - **规则表**：`references/codes.json`（包内真相源）+ 顶层镜像，31 个 `code`，由 `data/README.md` §4.1 生成；`gen_codes --check` 逐字节比对。
-- **golden**：86 条（cors 24 / sim 10 / cache 18 / cond 18 / vary 9 / _time 7），期望值全部由 `tools/golden_oracle/` 产出；`gen_golden --check` 逐字节比对且检出 orphan。
+- **golden**：87 条（cors 24 / sim 10 / cache 18 / cond 19 / vary 9 / _time 7），期望值全部由 `tools/golden_oracle/` 产出；`gen_golden --check` 逐字节比对且检出 orphan。
 - **覆盖**：31 declared / 31 covered / 0 uncovered / 0 unknown。
 - **WPT**：`data/wpt/cors-index.json`（45 条，commit `850b36a5`，数据日 2026-10-18）；`data/wpt-mapping.json` 15 converted + 30 unmappable = 45。
 - **门**：8 道静态门（新增 oracle 独立性 / golden 卫生 / code 字面量）；`tools/mutate_check.py` 14/14 变异变红。
-- **双解释器**：3.8 → 194 passed；3.12 → 194 passed；收集数一致。
+- **双解释器**：3.8 → 198 passed；3.12 → 198 passed；收集数一致。
 
 ### M0（2026-10-18）已完成
 

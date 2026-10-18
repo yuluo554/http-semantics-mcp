@@ -14,7 +14,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "Invalid max-age is ignored; Expires supplies 60 seconds.",
+  "notes": "max-age=sixty invalid -> ignored; Expires-Date=60 gives lifetime=60, current_age=30.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §4.2.1"

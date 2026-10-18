@@ -13,7 +13,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "current_age=20 >= 10; must-revalidate forbids serving stale.",
+  "notes": "current_age=20, freshness_lifetime=10 -> stale; must-revalidate forbids serving stale.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §4.2.4",

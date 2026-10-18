@@ -31,7 +31,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "s-maxage wins over max-age: lifetime 30, age 40 -> stale.",
+  "notes": "s-maxage=30 wins over max-age=300: lifetime=30, current_age=40 -> stale.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §4.2.1",

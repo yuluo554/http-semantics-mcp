@@ -13,12 +13,12 @@
 | 规则表生成器 | `tools/spectable.py` + `tools/gen_codes.py` | `--check` 逐字节一致；表缺项/未核对条款 → `SpecTableError` |
 | `codes.json` + 镜像 | `src/http_semantics_mcp/references/`、`references/` | 31 个 code，9468 字节，逐字节相等 |
 | 独立复算器 | `tools/golden_oracle/`（8 文件） | 完整第二实现（T1–T5 + 时间解析）；AST 门禁 import |
-| golden 生成器 | `tools/gen_golden.py` | 输入面 `tools/cases/**`（86 条）→ 冻结面 `data/golden/**`；`--check` 含 orphan 检测 |
+| golden 生成器 | `tools/gen_golden.py` | 输入面 `tools/cases/**`（87 条）→ 冻结面 `data/golden/**`；`--check` 含 orphan 检测 |
 | 覆盖度 | `tools/golden_coverage.py` | 31 declared / 31 covered / 0 unknown |
 | WPT 索引 + 台账 | `data/wpt/cors-index.json`、`data/wpt-mapping.json` | 45 = 15 converted + 30 unmappable，commit `850b36a5` |
 | 三道新门 | `tools/gates.py`：`oracle_independence` / `golden_hygiene` / `code_literals` | 8 门全绿，扫 235 文件 |
 | 变异验证 | `tools/mutate_check.py` | 14/14 变异使门变红 |
-| 测试 | `tests/test_gen_codes.py`、`test_golden.py`、`test_wpt_ledger.py`、`test_m1_gates.py` | 3.8 → 194 passed；3.12 → 194 passed（收集数一致） |
+| 测试 | `tests/test_gen_codes.py`、`test_golden.py`、`test_wpt_ledger.py`、`test_m1_gates.py` | 3.8 → 198 passed；3.12 → 198 passed（收集数一致） |
 
 ### 当前事实（下一棒必须知道）
 

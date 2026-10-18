@@ -13,7 +13,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "no-store short-circuits before any freshness arithmetic.",
+  "notes": "no-store short-circuits: action=miss, current_age=0, freshness_lifetime=0, no Age/Date arithmetic.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §5.2.2.5"

@@ -4,7 +4,7 @@ Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
 **Status: M1 (data first).** The server starts, completes the MCP handshake and
 reports **zero tools** — the five judgement tools land in M2–M4. M1 froze the
-rule catalogue (`references/codes.json`, 31 codes), 86 golden cases computed by
+rule catalogue (`references/codes.json`, 31 codes), 87 golden cases computed by
 an independent oracle, and the WPT `cors/` mapping ledger. Schema and
 determinism gates close in M5; the public release is M6. See
 [`plan/05-里程碑.md`](plan/05-里程碑.md).

@@ -13,7 +13,7 @@
       "stored_at": "2026-01-01T00:00:00Z"
     }
   },
-  "notes": "Age header unparsable -> treated as 0, reason recorded.",
+  "notes": "Age unparsable -> age_value=0; apparent_age=0; current_age=30 < 60.",
   "source": "synthetic",
   "spec_basis": [
     "RFC9111 §5.1"
