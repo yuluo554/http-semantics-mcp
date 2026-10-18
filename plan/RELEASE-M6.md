@@ -72,6 +72,7 @@ printf '%s\n' \
 | tag 对象 | `d20ba5fe625b4b2251573a3e9ca1c93b4b823784`（annotated；本地 == 远端 `refs/tags/v0.1.0`） |
 | tagger | `yuluo554 <282769740+yuluo554@users.noreply.github.com>`（已脱敏） |
 | 首推事件与 run 数对账 | **push 事件 2 → run 2**（`main` 1 + `v0.1.0` 1），`run_attempt` 均为 1；据事件对账成立 |
+| 回写提交的事件对账 | 截至 `ada0965`：`main` push 共 2 次（`d50011f` 首推、`ada0965` 回写）+ tag push 1 次 = **push 事件 3 → run 3**，全绿（回写提交的 run = `39142585779`）。此后每个文档面提交仍是 **1 push = 1 run** 一一对应（本留档自身所在的文档提交亦然），可在仓库 Actions 页按事件核对 |
 | CI 四矩阵 run id 与结论 | `main` push → run [`39141511111`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111) success：jobs `117716738734`(ubuntu-3.8) / `117716738838`(windows-3.8) / `117716738893`(windows-3.12) / `117716738894`(ubuntu-3.12)，四腿全 success |
 | CI tag run | `v0.1.0` push → run [`39141686281`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281) success：jobs `117717244536`(windows-3.12) / `117717244651`(windows-3.8) / `117717244708`(ubuntu-3.12) / `117717244911`(ubuntu-3.8)，四腿全 success |
 | GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0（`isDraft=false`、`isPrerelease=false`） |

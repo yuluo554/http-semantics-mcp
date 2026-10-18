@@ -28,7 +28,7 @@
 | --- | --- |
 | 版本定版 `0.1.0`，`--version` / `--selftest` 通过 | `--version` → `0.1.0`；`--selftest` → 6 passed / 0 failed（3.8 与 3.12 各一次）；`selfcheck._check_version_parity` PASS |
 | `plan/RELEASE-M6.md` tag 之前入库、含两栏 | 提交 `9cb9960`（文件入库）→ `d50011f`（校正 tag 树实测）；`check_release.check_release_doc` 逐字匹配两个小标题 |
-| 远端建好并首推；四矩阵全绿；push 数 = run 数 | push 事件 2 = run 2：`main` run [`39141511111`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111)、`v0.1.0` run [`39141686281`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281)，四腿全 success |
+| 远端建好并首推；四矩阵全绿；push 数 = run 数 | 首推阶段 push 事件 2 = run 2：`main` run [`39141511111`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111)、`v0.1.0` run [`39141686281`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281)；回写提交再加 1 push = 1 run（`ada0965` → [`39142585779`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39142585779)）；四腿全 success |
 | 手工源码包 + 本地 sha256 副本；sha256 只在 Release 正文 | `git archive --format=tar --prefix=http-semantics-mcp-0.1.0/ v0.1.0 \| gzip -9n`；sha256 `8cc8892c…`；tag 树内 `plan/RELEASE-M6.md` 无 digest 行（自指检查：`_registered_digests` 在包内文件上返回空） |
 | annotated tag（tagger 邮箱脱敏）+ Release + 附件 | tagger `yuluo554 <282769740+yuluo554@users.noreply.github.com>`；Release 两附件 `state=uploaded` |
 | 干净 clone（`--no-local`）+ 新 venv + README 逐条 | `--no-local` rc=0、https clone rc=0；`pip install -e ".[dev]"` rc=0；`--version`/`--selftest`/控制台脚本/stdio 握手 rc 全 0；`pytest` 379 passed |
