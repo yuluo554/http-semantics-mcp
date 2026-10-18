@@ -83,7 +83,13 @@ def test_tools_list_reports_the_registered_tools_in_ascii_order():
     result = session.handle(_request("tools/list"))[0]["result"]
     names = [tool["name"] for tool in result["tools"]]
     assert names == sorted(names)
-    assert names == ["cache_evaluate", "cors_evaluate", "cors_simulate_fetch"]
+    assert names == [
+        "cache_evaluate",
+        "conditional_evaluate",
+        "cors_evaluate",
+        "cors_simulate_fetch",
+        "vary_match",
+    ]
     for tool in result["tools"]:
         assert set(tool) == {"name", "description", "inputSchema"}
 

@@ -2,21 +2,22 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: M3 (cache).** The server starts, completes the MCP handshake and
-reports **three tools** — `cache_evaluate`, `cors_evaluate` and
-`cors_simulate_fetch`. All three are judged against frozen golden cases
-(18 + 24 + 10) and produce byte-identical output. Conditional-request and Vary
-tools land in M4; schema generation and the determinism sweep in M5; the public
-release is M6. See [`plan/05-里程碑.md`](plan/05-里程碑.md).
+**Status: M4 (conditional requests and Vary).** The server starts, completes
+the MCP handshake and reports **five tools** — `cache_evaluate`,
+`conditional_evaluate`, `cors_evaluate`, `cors_simulate_fetch` and
+`vary_match`. All five are judged against frozen golden cases
+(18 + 19 + 24 + 10 + 9) and produce byte-identical output. Schema generation
+and the determinism sweep land in M5; the public release is M6. See
+[`plan/05-里程碑.md`](plan/05-里程碑.md).
 
 ---
 
 ## What this is
 
-An oracle for the two corners of HTTP that fail silently: CORS and cache
-semantics. You hand it request/response headers as literals; it hands back a
-specification-derived verdict plus the rule IDs and clause references behind
-it.
+An oracle for the corners of HTTP that fail silently: CORS, cache semantics,
+conditional requests and `Vary`. You hand it request/response headers as
+literals; it hands back a specification-derived verdict plus the rule IDs and
+clause references behind it.
 
 - **No network.** No DNS, no TCP, no HTTP. `url` is parsed for
   scheme/host/port only. There is nothing to capture, proxy or replay.
@@ -34,8 +35,8 @@ it.
 | `cors_evaluate` | Will the browser let this response through? | M2 ✅ |
 | `cors_simulate_fetch` | What happens across redirects, hop by hop? | M2 ✅ |
 | `cache_evaluate` | Can this stored response be served without revalidating? | M3 ✅ |
-| `conditional_evaluate` | Which conditional-request rule decides the status? | M4 |
-| `vary_match` | Does this cached entry match the incoming request? | M4 |
+| `conditional_evaluate` | Which conditional-request rule decides the status? | M4 ✅ |
+| `vary_match` | Does this cached entry match the incoming request? | M4 ✅ |
 
 `tools/list` returns exactly the tools that are implemented. A stub descriptor
 would tell a client a capability exists that does not, which is why the

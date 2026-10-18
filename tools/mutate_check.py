@@ -207,6 +207,97 @@ CASES = [
         "        return ISO_FORM, days * _SECONDS_PER_DAY + hour * 3600 + minute * 60 + min(second, 59) + (1 if iso.group(7) else 0)",
         ["-m", "pytest", "-q", "tests/test_cache_golden.py"],
     ),
+    (
+        "If-Match starts using weak comparison",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        "    return any(strong_compare(tag, etag) for tag in tags)",
+        "    return any(weak_compare(tag, etag) for tag in tags)",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "If-None-Match is allowed to outrank If-Match",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        "    if if_match is not None:",
+        "    if if_match is not None and first_value(headers, IF_NONE_MATCH) is None:",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "If-None-Match stops treating * as a match",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        "    if wildcard:\n        return True\n    return any(weak_compare(tag, etag) for tag in tags)",
+        "    if False:\n        return True\n    return any(weak_compare(tag, etag) for tag in tags)",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "a matched If-None-Match always answers 304",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        "            status = STATUS_NOT_MODIFIED if method in SAFE_METHODS else STATUS_PRECONDITION_FAILED",
+        "            status = STATUS_NOT_MODIFIED",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "the lowercase weak marker stops being rejected",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        '        if text[:2] != "W/":',
+        "        if False:",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "If-Modified-Since is evaluated for every method",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        "    if if_modified is not None and method in SAFE_METHODS:",
+        "    if if_modified is not None:",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "an unparsable request date becomes a tool error",
+        os.path.join("src", "http_semantics_mcp", "judgement", "conditional.py"),
+        "    except JudgementError:\n"
+        "        findings.append(_finding(catalog, COND_IGNORED_INVALID_DATE, header=header))\n"
+        "        return None",
+        "    except JudgementError:\n"
+        "        raise",
+        ["-m", "pytest", "-q", "tests/test_conditional_golden.py"],
+    ),
+    (
+        "Vary: * stops short-circuiting the field comparison",
+        os.path.join("src", "http_semantics_mcp", "judgement", "vary.py"),
+        "    if WILDCARD in members:",
+        "    if False:",
+        ["-m", "pytest", "-q", "tests/test_vary_golden.py"],
+    ),
+    (
+        "a field missing on one side stops being reported",
+        os.path.join("src", "http_semantics_mcp", "judgement", "vary.py"),
+        "        if (member in stored_headers) != (member in incoming_headers):\n"
+        "            findings.append(_finding(catalog, VARY_FIELD_MISSING, header=member))",
+        "        if (member in stored_headers) != (member in incoming_headers):\n"
+        "            pass",
+        ["-m", "pytest", "-q", "tests/test_vary_golden.py"],
+    ),
+    (
+        "the per-field normalisation policy is ignored",
+        os.path.join("src", "http_semantics_mcp", "judgement", "vary.py"),
+        '    if not policy["case_sensitive"]:',
+        "    if False:",
+        ["-m", "pytest", "-q", "tests/test_vary_golden.py"],
+    ),
+    (
+        "a repeated Vary member stops being reported",
+        os.path.join("src", "http_semantics_mcp", "judgement", "vary.py"),
+        "    if repeated is not None:\n"
+        "        findings.append(_finding(catalog, VARY_DUPLICATE_FIELD, header=repeated))",
+        "    if False:\n"
+        "        findings.append(_finding(catalog, VARY_DUPLICATE_FIELD, header=repeated))",
+        ["-m", "pytest", "-q", "tests/test_vary_golden.py"],
+    ),
+    (
+        "comma-separated segments stop being order-blind",
+        os.path.join("src", "http_semantics_mcp", "judgement", "vary.py"),
+        '        text = ",".join(sorted(segment for segment in segments if segment))',
+        '        text = ",".join(segment for segment in segments if segment)',
+        ["-m", "pytest", "-q", "tests/test_vary_golden.py"],
+    ),
 ]
 
 

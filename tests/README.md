@@ -19,6 +19,9 @@ python -m pytest
 | `test_gates.py` | the original static gates, each with an injected defect that must turn it red |
 | `test_m1_gates.py` | the M1 gates: oracle independence (including dynamic imports), golden hygiene, code-literal uniqueness plus its one generated-file exemption |
 | `test_cors_golden.py` | T1/T2 through the registered handlers: 34 CORS golden cases byte-for-byte, error payloads, event order, header-order invariance, rerun determinism |
+| `test_cache_golden.py` | T3 through the registered handler: 18 cache golden cases byte-for-byte, the 7 `_time` samples, integer-second arithmetic, the swr boundary and the missing-`now` refusal |
+| `test_conditional_golden.py` | T4: 19 conditional golden cases byte-for-byte, the strong/weak comparison split, `*` against a missing ETag, the `If-Modified-Since` method gate, second-granular boundaries, error payloads |
+| `test_vary_golden.py` | T5: 9 vary golden cases byte-for-byte, the per-field policy table (proved by swapping a catalog row), absent-vs-empty, one repeat notice in source order, `Vary: *` short circuit |
 | `test_gen_codes.py` | `codes.json` regeneration, mirror equality, table↔catalog set equality, the generated rule module, drift localisation |
 | `test_golden.py` | golden completeness, exact output key sets, sorting, both-direction coverage, drift and orphan detection |
 | `test_wpt_ledger.py` | WPT index shape, ledger partition (`converted + unmappable == total`), case references |

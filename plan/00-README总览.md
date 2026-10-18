@@ -3,7 +3,7 @@
 - **项目**：HTTP 语义判定 MCP Server（CORS 放行判定 + 缓存新鲜度 + 条件请求 + Vary 命中）
 - **性质**：不参赛项目题（模拟项目），发布 GitHub **公开仓库**，署名 `yuluo554`
 - **版本**：v1（2026-10-17 定稿；检索基准日 2026-10-17，实测窗口 2026-10-18 10:33–11:05 UTC）
-- **当前里程碑**：M3 缓存 ✅（2026-10-18：T3 `cache_evaluate` 落地，18 条 cache golden 逐字节相等，7 条 `_time` 样例锁定时间解析；`tools/list` 由 2 → 3 个 tool）；M4–M6 待开工
+- **当前里程碑**：M4 条件请求与 Vary ✅（2026-10-18：T4 `conditional_evaluate` + T5 `vary_match` 落地，19 + 9 条 golden 逐字节相等；`tools/list` 由 3 → 5 个 tool）；M5–M6 待开工
 - **交付形态**：**MCP Server（stdio 传输）**，唯一形态，不设备选
 - **一句话定位**：把 Fetch Standard 的 CORS 协议算法与 RFC 9111 缓存新鲜度算法编译成可调用的 oracle——给一组请求/响应头，返回 `allow|block`、违反的规则编号 + 规范条款、以及该改哪个 header。**不联网、不抓包、不做安全打分。**
 
@@ -17,7 +17,7 @@
 | `plan/03-模块详设.md` | T1–T5 判定算法、规则编号表、`spec_ref` 生成方式 | ✅ M0 定稿 |
 | `plan/04-数据计划.md` | golden case 组织、WPT 映射台账、假时钟用例、oracle 独立性 | ✅ M0 定稿；M1 已按实况补记（不降级、递归覆盖） |
 | `plan/05-里程碑.md` | M0–M6 DoD 与状态 | ✅ M0 定稿 |
-| `plan/06-交付对标与决策记录.md` | 评分对标、决策细化（D19–D46）、待定决策回写 | ✅ M0 定稿；M1 增补 D35–D40；M2 增补 D41–D43；M3 增补 D44–D46 |
+| `plan/06-交付对标与决策记录.md` | 评分对标、决策细化（D19–D49）、待定决策回写 | ✅ M0 定稿；M1 增补 D35–D40；M2 增补 D41–D43；M3 增补 D44–D46；M4 增补 D47–D49 |
 | `data/README.md` | 依据查证记录（三态）、数据源可获取性、合成数据纪律、**数值口径（唯一出处）** | ✅ M1 §4 定稿（条款全核对、输出键集合登记） |
 
 ## 二、决策记录
@@ -63,10 +63,10 @@
 | T1 `cors_evaluate` | 本题设计 | MCP tool + `schemas/tools/cors_evaluate.json`（M5） | golden case 正反例 | ✅ M2（24 条 golden 逐字节相等） |
 | T2 `cors_simulate_fetch` | 本题设计 | MCP tool + schema（M5） | 重定向事件 golden case | ✅ M2（10 条 golden；事件顺序/条数被锁定） |
 | T3 `cache_evaluate` | 本题设计 | MCP tool + schema | 假时钟 golden case | ✅ M3（18 条 golden 逐字节相等；7 条 `_time` 锁定两种时间格式） |
-| T4 `conditional_evaluate` | 本题设计 | MCP tool + schema | RFC 9110 §13 优先级 golden case | ⬜ 待 M4 |
-| T5 `vary_match` | 本题设计 | MCP tool + schema | 归一化 + `Vary: *` golden case | ⬜ 待 M4 |
-| 字节级确定性 | 本题设计 | 全部 tool | 同输入双跑序列化 sha256 相等 | 🟡 M0 已建门（序列化层）；M1 已证生成侧双跑字节一致；M2 已证两个 CORS tool 双跑字节一致；M3 已证 `cache_evaluate` 双跑字节一致；M5 扩到五 tool |
-| stdio server 可被真实客户端调用 | MCP 协议 | `README.md` 安装说明 | 客户端启动 + `tools/list` 五个 tool 全列 | 🟡 M2 握手已验（2 tool / 3719 字节）；M3 已验（3 tool / 5276 字节）；M5 验五 tool |
+| T4 `conditional_evaluate` | 本题设计 | MCP tool + schema | RFC 9110 §13 优先级 golden case | ✅ M4（19 条 golden 逐字节相等；§13.2.2 四条件两两组合与短路被锁定） |
+| T5 `vary_match` | 本题设计 | MCP tool + schema | 归一化 + `Vary: *` golden case | ✅ M4（9 条 golden 逐字节相等；归一化策略表从 `codes.json` 读取） |
+| 字节级确定性 | 本题设计 | 全部 tool | 同输入双跑序列化 sha256 相等 | 🟡 M0 已建门（序列化层）；M1 已证生成侧双跑字节一致；M2 已证两个 CORS tool 双跑字节一致；M3 已证 `cache_evaluate` 双跑字节一致；M4 已证 `conditional_evaluate` / `vary_match` 双跑字节一致；M5 扩到五 tool 全量 sha256 |
+| stdio server 可被真实客户端调用 | MCP 协议 | `README.md` 安装说明 | 客户端启动 + `tools/list` 五个 tool 全列 | 🟡 M2 握手已验（2 tool / 3719 字节）；M3 已验（3 tool / 5276 字节）；M4 已验（5 tool / 7514 字节）；M5 补端到端客户端测试 |
 | WPT `cors/` 全量映射 | 本题设计 | `data/wpt-mapping.json` | 可转写用例全绿 + 不可转写逐条登记原因 | ⬜ 待 M5 |
 | 发布三件套 | M6 DoD | tag / Release 附产物 / `plan/RELEASE-M6.md` | `scripts/check_release.py` | ⬜ 待 M6 |
 
@@ -78,13 +78,26 @@
 | **M1 数据先行** | 规范条款核对（RFC 9111 / 9110 / 5861 + Fetch 算法锚点）+ golden case 组织方式 + WPT `cors/` 用例 JSON 化 + `data/wpt-mapping.json` 初版 | 每个 `code` 至少 1 条 golden case；WPT 可转写用例全部映射；不可转写用例逐条登记原因；`data/README.md` §4 口径定稿 | ✅ 完成（2026-10-18） |
 | **M2 CORS** | T1 `cors_evaluate` + T2 `cors_simulate_fetch` 判定实现（M2 用内联 `inputSchema`，正式 schema 随 M5） | golden case 全绿；重定向事件（`origin_set_to_null` / `credentials_dropped`）显式输出；`no-cors` / `same-origin` 模式可见性正确 | ✅ 完成（2026-10-18） |
 | **M3 缓存** | T3 `cache_evaluate` | 假时钟注入可用；RFC 9111 新鲜度 / 年龄 / 动作判定 golden case 全绿；`reasons[]` 带条款号 | ✅ 完成（2026-10-18） |
-| **M4 条件请求与 Vary** | T4 `conditional_evaluate` + T5 `vary_match` | §13.2.2 求值顺序与短路正确；强弱比较分离；`Vary: *` 与归一化用例全绿 | ⬜ 待开工 |
+| **M4 条件请求与 Vary** | T4 `conditional_evaluate` + T5 `vary_match` | §13.2.2 求值顺序与短路正确；强弱比较分离；`Vary: *` 与归一化用例全绿 | ✅ 完成（2026-10-18） |
 | **M5 schema 与自检** | 五个 tool schema 定稿、server 组装、确定性守门、WPT 全量映射跑通 | schema 与实现字段集合相等；同输入双跑字节一致；stdio 客户端可启动并列出五个 tool；WPT 映射全量通过 | ⬜ 待开工 |
 | **M6 发布** | 发布 GitHub **公开仓库** | **M6 DoD = 三件套：①git tag ②GitHub Release（附产物：至少一个手工上传附件，本地留副本 + sha256）③发布留档文件 `plan/RELEASE-M6.md`（tag 之前写好并进 tag 树）**；发布后跑 `scripts/check_release.py` | ⬜ 待开工 |
 
 > 发布留档文件必须在 tag **之前**入库；tag 之后只允许追加类提交（回写实测值 / 对账 / 补记），并在留档里分栏写"tag 时点事实 / tag 后追加事实"。
 
 ## 五、当前状态
+
+### M4（2026-10-18）已完成
+
+- **判定层**：`judgement/conditional.py`（T4，E1–E5 固定短路；`strong_compare` / `weak_compare` 分开写）、`judgement/vary.py`（T5，V1–V4；归一化策略从 `catalog["vary_normalization"]` 读，代码里没有第二份策略分支）。判定层仍是无时钟、无网络、无盘、无 env 的纯函数。
+- **工具面**：`toolface.FUNCTIONS` 注册 `conditional_evaluate` / `vary_match`；`registry.build_registry()` 现注册五个 tool（ASCII 升序 `cache_evaluate` < `conditional_evaluate` < `cors_evaluate` < `cors_simulate_fetch` < `vary_match`），`tools/list` 由 3 → 5；`inputSchema.required` 分别取 `["method","request_headers","resource"]` 与 `["cached","incoming"]`。
+- **golden**：19 条 conditional + 9 条 vary 逐字节相等（`canonical.dumps(实际) == canonical.dumps(expected)`）；错误用例（`cond-014` 小写 `w/`）返回 `isError: true` 且 `field = request_headers.if-none-match`。
+- **新增测试**：`tests/test_conditional_golden.py`（43 项）与 `tests/test_vary_golden.py`（27 项）——golden 逐字节相等之外，把 golden 未覆盖的分支直接钉住：强弱比较关系、`*` 与 ETag 的绑定、`If-Modified-Since` 的方法门、秒级边界（`>` / `<=`）、策略表换行即翻转判定（`evaluate_vary` 接收改写过的 catalog）、重复字段只报一次。
+- **门与变异**：8 道静态门全绿（合计扫 698 文件项）；`tools/mutate_check.py` 38/38 变异变红（新增 12 条：T4 弱比较、次序颠倒、`*` 语义、304/412 分叉、小写 `w/`、IMS 方法门、非法日期改报错 7 条 + T5 star 短路、缺字段、策略分支、重复提示、逗号排序 5 条）。
+- **生成物复算**：`gen_codes --check` 三件逐字节一致（`codes.json` 9468 字节 + 镜像 + `rules.py` 16772 字节）；`gen_golden --check` 87 case / 0 problem；覆盖率 31 declared / 31 covered / 0 uncovered / 0 unknown。
+- **双解释器**：3.8 → 354 passed；3.12 → 354 passed；收集数一致（各 354）。
+- **stdio**：5 响应 / 5 tool / 7514 字节，两个解释器一致。
+- **发布门**：`--pre-tag` 提交前 5 PASS / 1 FAIL（git-clean，预期）/ 4 SKIP；提交后 6 PASS / 0 FAIL / 4 SKIP（干净树，698 文件项，退出 0）。
+- **决策**：D47（T4 三处边缘口径）、D48（T5 重复字段与 `Vary: *` 短路）、D49（生产侧相对 oracle 的两处有意偏差：必填键更严、空数组不崩）。
 
 ### M3（2026-10-18）已完成
 
@@ -126,10 +139,10 @@
   - 双解释器 pytest：`py -3.8` 129 passed / `py -3.12` 129 passed。
   - `tools/run_gates.py`：purity / absolute-paths / crlf 三门前绿，扫描 48 个文件。
   - `scripts/check_release.py --pre-tag`：5 PASS / 1 FAIL（工作树未提交，预期）/ 4 SKIP。
-- **M3 后仍未建立**：T4/T5 判定与五个 tool 的正式 schema、发布件（M4–M6）。`tools/list` 现返回 3 个已实现的 tool，这是当前正确行为。
+- **M4 后仍未建立**：五个 tool 的正式 schema 文件（`schemas/tools/*.json` + 包内镜像）与"schema `properties` 键集合 == 实跑输出键集合"门、确定性全量 sha256 扫描、WPT 全量映射对账、发布件（M5–M6）。`tools/list` 现返回五个已实现的 tool，这是当前正确行为。
 
 ### 诚实口径
 
-- **未推送远端**：本项目的 CI 从未运行过。任何"CI 绿"的说法在此刻都不成立；M0–M3 的等价证据只有本地实跑项（双解释器 / 真实子进程 / 静态门 / 生成物复算 / 变异验证）。
+- **未推送远端**：本项目的 CI 从未运行过。任何"CI 绿"的说法在此刻都不成立；M0–M4 的等价证据只有本地实跑项（双解释器 / 真实子进程 / 静态门 / 生成物复算 / 变异验证）。
 - M6 首推后据实补记 run id 与首跑结果；历史文档保留"本地等价校验"原措辞，补记是追加事实。
-- `tools/list` 在 M0/M1 返回空列表是**正确行为**，README 已如实写明；M2 起返回两个 CORS tool，M3 起再返回 `cache_evaluate` 共三个；五 tool 的 schema 与剩余判定实现随 M4–M5 落地，M5 用"schema 键集合 == 输出键集合"把契约钉死（字段集合已由 `data/README.md` §4.10 先行冻结）。
+- `tools/list` 在 M0/M1 返回空列表是**正确行为**，README 已如实写明；M2 起返回两个 CORS tool，M3 起再返回 `cache_evaluate` 共三个，M4 起返回全部五个；五个 tool 的正式 schema 与"schema 键集合 == 输出键集合"门在 M5 落地（字段集合已由 `data/README.md` §4.10 先行冻结）。

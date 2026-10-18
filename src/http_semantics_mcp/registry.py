@@ -1,9 +1,10 @@
 """Tool registry: the single place where tools are declared.
 
-M2 registers the two CORS tools; M3-M4 add the remaining three here, and M5
-replaces the inlined ``inputSchema`` objects with generated ones. Until then the
-schemas are hand-written but honest: they list exactly the fields the handlers
-read, and every field the handlers require is in ``required``.
+M2 registered the two CORS tools, M3 added ``cache_evaluate`` and M4 the
+remaining two; M5 replaces the inlined ``inputSchema`` objects with generated
+ones. Until then the schemas are hand-written but honest: they list exactly the
+fields the handlers read, and every field the handlers require is in
+``required``.
 
 Each tool descriptor is a plain dict with the exact keys the MCP schema
 requires (``name``, ``description``, ``inputSchema``) plus an optional
@@ -83,6 +84,13 @@ TOOL_DESCRIPTIONS = {
         "seconds, and the rule IDs with their clause references. now is an "
         "argument: the cache never reads a clock."
     ),
+    "conditional_evaluate": (
+        "Judge one request's preconditions and report the status they decide. "
+        "Evaluates If-Match, If-Unmodified-Since, If-None-Match and "
+        "If-Modified-Since in the RFC 9110 section 13.2.2 precedence order, "
+        "stopping at the first applicable one, and returns status 200|304|412, "
+        "which rule decided it, and the rule IDs with their clause references."
+    ),
     "cors_evaluate": (
         "Judge one HTTP response against the Fetch Standard CORS check. "
         "Returns decision allow|block, the violated rule IDs with their clause "
@@ -94,6 +102,13 @@ TOOL_DESCRIPTIONS = {
         "check. Reports the ordered redirect events (origin_set_to_null, "
         "credentials_dropped), the visible response headers, and the effective "
         "Access-Control-Max-Age."
+    ),
+    "vary_match": (
+        "Decide whether a stored response can be reused for an incoming "
+        "request, per RFC 9111 section 4.1. Compares the fields named by the "
+        "stored Vary value under that field's normalisation policy and returns "
+        "match hit|miss, the fields that differ, the normalised Vary members, "
+        "and the rule IDs with their clause references."
     ),
 }
 
@@ -164,11 +179,52 @@ _CACHE_DIRECTIVES = {
     "stored": _STORED,
 }
 
+# The current representation, as the server knows it. Both fields are optional:
+# a resource with no entity tag cannot satisfy ``If-Match`` at all, which is a
+# verdict rather than a caller mistake.
+_RESOURCE = {
+    "type": "object",
+    "properties": {
+        "etag": {
+            "type": ["string", "null"],
+            "description": "current entity tag, quotes (and any W/ marker) included",
+        },
+        "last_modified": {
+            "type": ["string", "null"],
+            "description": "current Last-Modified (YYYY-MM-DDTHH:MM:SSZ or an HTTP-date)",
+        },
+    },
+    "additionalProperties": False,
+}
+
+_CACHED_ENTRY = {
+    "type": "object",
+    "properties": {
+        "vary": {
+            "type": ["string", "array"],
+            "items": {"type": "string"},
+            "description": "the stored response's Vary field value",
+        },
+        "request_headers_at_store": _HEADERS,
+    },
+    "additionalProperties": False,
+}
+
 INPUT_SCHEMAS = {
     "cache_evaluate": {
         "type": "object",
         "properties": dict(_CACHE_DIRECTIVES),
         "required": ["now", "stored"],
+        "additionalProperties": False,
+    },
+    "conditional_evaluate": {
+        "type": "object",
+        "properties": {
+            "method": {"type": "string", "description": "HTTP request method"},
+            "request_headers": _HEADERS,
+            "resource": _RESOURCE,
+        },
+        "required": ["method", "request_headers", "resource"],
         "additionalProperties": False,
     },
     "cors_evaluate": {
@@ -201,6 +257,19 @@ INPUT_SCHEMAS = {
             },
         ),
         "required": ["method", "url", "response"],
+        "additionalProperties": False,
+    },
+    "vary_match": {
+        "type": "object",
+        "properties": {
+            "cached": _CACHED_ENTRY,
+            "incoming": {
+                "type": "object",
+                "properties": {"request_headers": _HEADERS},
+                "additionalProperties": False,
+            },
+        },
+        "required": ["cached", "incoming"],
         "additionalProperties": False,
     },
 }

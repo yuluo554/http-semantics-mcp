@@ -15,8 +15,10 @@ place where a caller mistake becomes a payload.
 from . import canonical
 from .judgement import errors as judgement_errors
 from .judgement.cache import evaluate_cache
+from .judgement.conditional import evaluate_conditional
 from .judgement.cors import evaluate_cors
 from .judgement.fetch_sim import evaluate_fetch
+from .judgement.vary import evaluate_vary
 from .rules import CATALOG
 
 __all__ = ["FUNCTIONS", "handlers", "render"]
@@ -26,8 +28,10 @@ __all__ = ["FUNCTIONS", "handlers", "render"]
 # descriptors.
 FUNCTIONS = {
     "cache_evaluate": evaluate_cache,
+    "conditional_evaluate": evaluate_conditional,
     "cors_evaluate": evaluate_cors,
     "cors_simulate_fetch": evaluate_fetch,
+    "vary_match": evaluate_vary,
 }
 
 

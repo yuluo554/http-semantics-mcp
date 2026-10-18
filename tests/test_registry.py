@@ -16,7 +16,13 @@ def _tool(name, description="does a thing"):
 
 def test_build_registry_declares_the_shipped_tools():
     registry = build_registry()
-    assert registry.names() == ["cache_evaluate", "cors_evaluate", "cors_simulate_fetch"]
+    assert registry.names() == [
+        "cache_evaluate",
+        "conditional_evaluate",
+        "cors_evaluate",
+        "cors_simulate_fetch",
+        "vary_match",
+    ]
     assert [descriptor["name"] for descriptor in registry.descriptors()] == registry.names()
 
 
@@ -57,9 +63,22 @@ def _minimal_arguments(name):
             "response_headers": {"Cache-Control": "max-age=60"},
             "stored": {"stored_at": "2026-01-01T00:00:00Z"},
         }
+    if name == "conditional_evaluate":
+        return {
+            "method": "GET",
+            "request_headers": {},
+            "resource": {"etag": '"abc123"', "last_modified": "2026-01-01T00:00:00Z"},
+        }
+    if name == "vary_match":
+        return {
+            "cached": {"vary": "Accept", "request_headers_at_store": {"Accept": "text/html"}},
+            "incoming": {"request_headers": {"Accept": "text/html"}},
+        }
     if name == "cors_evaluate":
         return dict(common, is_preflight=False)
-    return dict(common, mode="cors", redirects=[])
+    if name == "cors_simulate_fetch":
+        return dict(common, mode="cors", redirects=[])
+    raise AssertionError("no minimal arguments declared for " + name)
 
 
 def test_names_are_sorted_regardless_of_registration_order():
