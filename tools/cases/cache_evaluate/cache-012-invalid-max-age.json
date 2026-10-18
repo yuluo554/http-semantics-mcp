@@ -1,0 +1,23 @@
+{
+  "case_id": "cache-012-invalid-max-age",
+  "input": {
+    "now": "2026-01-01T00:00:30Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=sixty",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT",
+      "Expires": "Thu, 01 Jan 2026 00:01:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Invalid max-age is ignored; Expires supplies 60 seconds.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.1"
+  ],
+  "tool": "cache_evaluate"
+}

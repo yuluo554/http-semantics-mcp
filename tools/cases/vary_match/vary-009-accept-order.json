@@ -1,0 +1,22 @@
+{
+  "case_id": "vary-009-accept-order",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept": "text/html, application/json"
+      },
+      "vary": "Accept"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept": "application/json,text/html"
+      }
+    }
+  },
+  "notes": "Comma-separated preference lists compare order-independently.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

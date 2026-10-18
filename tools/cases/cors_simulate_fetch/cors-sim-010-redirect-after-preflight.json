@@ -1,0 +1,36 @@
+{
+  "case_id": "cors-sim-010-redirect-after-preflight",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [
+      {
+        "headers": {
+          "Access-Control-Allow-Origin": "https://app.example.com"
+        },
+        "status": 302,
+        "url": "https://cdn.example.net/b"
+      }
+    ],
+    "request_headers": {
+      "x-test": "test"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "null"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Successful preflight, then a cross-origin redirect: origin goes null.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS-preflight fetch",
+    "Fetch §HTTP-redirect fetch"
+  ],
+  "tool": "cors_simulate_fetch"
+}

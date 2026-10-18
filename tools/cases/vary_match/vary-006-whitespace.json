@@ -1,0 +1,22 @@
+{
+  "case_id": "vary-006-whitespace",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "X-Mode": "  fast   path  "
+      },
+      "vary": "X-Mode"
+    },
+    "incoming": {
+      "request_headers": {
+        "X-Mode": "fast path"
+      }
+    }
+  },
+  "notes": "trim + internal whitespace folding.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

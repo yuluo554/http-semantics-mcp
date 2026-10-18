@@ -1,0 +1,23 @@
+{
+  "case_id": "cors-eval-023-allow-origin-whitespace",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "origin": "https://app.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": " * "
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "OWS around the header value is stripped before comparison.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

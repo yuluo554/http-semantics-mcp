@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-006-stale-while-revalidate",
+  "input": {
+    "now": "2026-01-01T00:00:25Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=10, stale-while-revalidate=30",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "current_age=25, lifetime=10, excess=15 <= 30 -> serve while revalidating.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC5861 §3"
+  ],
+  "tool": "cache_evaluate"
+}

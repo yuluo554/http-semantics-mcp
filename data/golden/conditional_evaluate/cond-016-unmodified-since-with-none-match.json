@@ -1,0 +1,35 @@
+{
+  "case_id": "cond-016-unmodified-since-with-none-match",
+  "expected": {
+    "explain": [
+      {
+        "code": "COND_IF_UNMODIFIED_SINCE_FAILED",
+        "detail": "resource was modified after If-Unmodified-Since=Wed, 31 Dec 2025 00:00:00 GMT",
+        "spec_ref": [
+          "RFC9110 §13.1.4",
+          "RFC9110 §13.2.2"
+        ]
+      }
+    ],
+    "rule_applied": "if_unmodified_since",
+    "status": 412,
+    "weak_comparison_used": false
+  },
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-None-Match": "\"other\"",
+      "If-Unmodified-Since": "Wed, 31 Dec 2025 00:00:00 GMT"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Precedence pair: If-Unmodified-Since is evaluated before If-None-Match.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

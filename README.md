@@ -2,8 +2,10 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: M0 (scaffold).** The server starts, completes the MCP handshake and
-reports **zero tools**. The five judgement tools land in M2–M4; schema and
+**Status: M1 (data first).** The server starts, completes the MCP handshake and
+reports **zero tools** — the five judgement tools land in M2–M4. M1 froze the
+rule catalogue (`references/codes.json`, 31 codes), 80 golden cases computed by
+an independent oracle, and the WPT `cors/` mapping ledger. Schema and
 determinism gates close in M5; the public release is M6. See
 [`plan/05-里程碑.md`](plan/05-里程碑.md).
 
@@ -159,7 +161,7 @@ python scripts/check_release.py --pre-tag
 
 - `pytest` runs the full suite (protocol, transport framing, determinism,
   gates, packaging surface).
-- `tools/run_gates.py` runs the five static gates and names the failing one.
+- `tools/run_gates.py` runs the eight static gates and names the failing one.
 - `tools/mutate_check.py` breaks one behaviour per gate and asserts the gate
   goes red. A gate that cannot fail is decoration; this script is how that
   claim is kept honest rather than asserted.
@@ -172,9 +174,10 @@ python scripts/check_release.py --pre-tag
 
 ### Repository gates
 
-Five static gates run in tests, in CI, and inside the release check. Each one
-must be provably able to fail (`tests/test_gates.py` injects a defect for every
-gate, and `tools/mutate_check.py` proves it end to end):
+Eight static gates run in tests, in CI, and inside the release check. Each one
+must be provably able to fail (`tests/test_gates.py` and `tests/test_m1_gates.py`
+inject a defect for every gate, and `tools/mutate_check.py` proves it end to
+end):
 
 | Gate | Rule |
 | --- | --- |
@@ -183,6 +186,9 @@ gate, and `tools/mutate_check.py` proves it end to end):
 | single-serialiser | `json.dumps` appears exactly once, in `canonical.py` |
 | absolute paths | no machine-specific path (drive letter, home directory, UNC share) in repository text |
 | line endings | every text file is LF-only and `.gitattributes` declares `eol=lf` |
+| oracle independence | `tools/golden_oracle/` never imports `http_semantics_mcp`, directly or dynamically |
+| golden hygiene | every frozen case has the required fields and no `observed_*` key |
+| code literals | no rule code is spelled out in package source; `codes.json` is the only copy |
 
 ### Layout
 
@@ -191,6 +197,7 @@ src/http_semantics_mcp/   server, protocol, registry, judgement layer
 schemas/tools/            generated mirror of the in-package JSON Schemas
 references/               generated mirror of the in-package code table
 data/golden/              frozen golden cases (input + expected output)
+data/wpt/                 WPT cors/ directory index (paths + blob shas only)
 data/wpt-mapping.json     WPT cors/ mapping ledger
 plan/                     the project plan, milestones and release records
 tools/                    gates, smoke test, generators
@@ -219,9 +226,11 @@ with itself.
 
 Browser behaviour is cross-checked against
 [`web-platform-tests/wpt`](https://github.com/web-platform-tests/wpt)'s `cors/`
-suite, transcribed to header-level cases in `data/golden/`. Cases that depend
-on real network, TLS or timing are listed with a reason instead of being
-guessed at.
+suite (index pinned to commit `850b36a5`, data day 2026-10-18), transcribed to
+header-level cases in `data/golden/`. The ledger in `data/wpt-mapping.json`
+accounts for all 45 files in the directory: 15 mapped, 30 listed with a reason
+(real network, TLS, timing, browser-proprietary behaviour, or out of scope).
+Nothing is guessed at, and no test body is copied into this repository.
 
 ---
 

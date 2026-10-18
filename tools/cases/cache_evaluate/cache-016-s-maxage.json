@@ -1,0 +1,23 @@
+{
+  "case_id": "cache-016-s-maxage",
+  "input": {
+    "now": "2026-01-01T00:00:40Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "s-maxage=30, max-age=300",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "s-maxage wins over max-age: lifetime 30, age 40 -> stale.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.1",
+    "RFC9111 §5.2.2.10"
+  ],
+  "tool": "cache_evaluate"
+}

@@ -1,0 +1,413 @@
+{
+  "converted": 15,
+  "directory": "cors",
+  "fetched_at": "2026-10-18",
+  "notes": "Granularity is the file: a mapped file's core assertion must agree with every case_id listed. Edge cases inside a file that the header-level model does not cover are out of scope for this ledger and are tracked as future cases, never as silent conversions.",
+  "records": [
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "requires_timing",
+      "spec_basis": [
+        "RFC9111 §4.3"
+      ],
+      "wpt_path": "cors/304.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/META.yml"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/README.md"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/WEB_FEATURES.yml"
+    },
+    {
+      "case_ids": [
+        "cors-sim-008-expose-headers"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS protocol"
+      ],
+      "wpt_path": "cors/access-control-expose-headers-parsing.window.js"
+    },
+    {
+      "case_ids": [
+        "cors-eval-001-basic-allow",
+        "cors-eval-002-missing-allow-origin"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/basic.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/client-hint-request-headers-2.tentative.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/client-hint-request-headers.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-021-safelisted-content-type",
+        "cors-eval-022-json-content-type-preflight"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS protocol"
+      ],
+      "wpt_path": "cors/cors-safelisted-request-header.any.js"
+    },
+    {
+      "case_ids": [
+        "cors-eval-006-missing-allow-credentials",
+        "cors-eval-007-credentials-allow"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/credentials-flag.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "not_header_observable",
+      "spec_basis": [],
+      "wpt_path": "cors/image-tainting-in-cross-origin-iframe.sub.html"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "browser_proprietary",
+      "spec_basis": [],
+      "wpt_path": "cors/late-upload-events.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-001-basic-allow",
+        "cors-eval-003-origin-mismatch",
+        "cors-eval-023-allow-origin-whitespace"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/origin.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "browser_proprietary",
+      "spec_basis": [],
+      "wpt_path": "cors/preflight-cache-partitioning.sub.window.js"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "requires_timing",
+      "spec_basis": [
+        "Fetch §CORS-preflight fetch",
+        "Fetch §CORS-preflight cache"
+      ],
+      "wpt_path": "cors/preflight-cache.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "requires_real_network",
+      "spec_basis": [
+        "Fetch §CORS-preflight fetch"
+      ],
+      "wpt_path": "cors/preflight-failure.htm"
+    },
+    {
+      "case_ids": [
+        "cors-sim-002-cross-origin-credentials-dropped",
+        "cors-sim-003-cross-origin-omit",
+        "cors-sim-006-cross-to-cross"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §HTTP-redirect fetch",
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/redirect-origin.htm"
+    },
+    {
+      "case_ids": [
+        "cors-sim-010-redirect-after-preflight"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS-preflight fetch",
+        "Fetch §CORS-preflight cache",
+        "Fetch §HTTP-redirect fetch"
+      ],
+      "wpt_path": "cors/redirect-preflight-2.htm"
+    },
+    {
+      "case_ids": [
+        "cors-sim-010-redirect-after-preflight"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS-preflight fetch",
+        "Fetch §CORS-preflight cache",
+        "Fetch §HTTP-redirect fetch"
+      ],
+      "wpt_path": "cors/redirect-preflight.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [
+        "Fetch §HTTP-redirect fetch"
+      ],
+      "wpt_path": "cors/redirect-userinfo.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-003-origin-mismatch"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/remote-origin.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-009-preflight-missing-headers",
+        "cors-eval-012-disallowed-header",
+        "cors-eval-015-authorization-not-wildcard"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS-preflight fetch"
+      ],
+      "wpt_path": "cors/request-headers.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/304.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/access-control-expose-headers.json"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/cache-304.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/checkandremove.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/cors-cookie.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/cors-headers.asis"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/cors-makeheader.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/expose-headers.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/image-tainting-checker.sub.html"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/preflight-cache-partitioning-iframe.sub.html"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/preflight-cache-partitioning.sub.html"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/preflight-partitioning.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/preflight.py"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/remote-xhrer.html"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/resources/status.py"
+    },
+    {
+      "case_ids": [
+        "cors-sim-008-expose-headers"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS protocol"
+      ],
+      "wpt_path": "cors/response-headers.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "requires_timing",
+      "spec_basis": [
+        "RFC9111 §4.3"
+      ],
+      "wpt_path": "cors/script-304.html"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/simple-requests-ch.tentative.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-021-safelisted-content-type"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS protocol"
+      ],
+      "wpt_path": "cors/simple-requests.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-001-basic-allow"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/status-async.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-010-preflight-allow"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS-preflight fetch"
+      ],
+      "wpt_path": "cors/status-preflight.htm"
+    },
+    {
+      "case_ids": [
+        "cors-eval-001-basic-allow",
+        "cors-eval-002-missing-allow-origin"
+      ],
+      "mapped": true,
+      "reason": null,
+      "spec_basis": [
+        "Fetch §CORS check"
+      ],
+      "wpt_path": "cors/status.htm"
+    },
+    {
+      "case_ids": [],
+      "mapped": false,
+      "reason": "out_of_scope",
+      "spec_basis": [],
+      "wpt_path": "cors/support.js"
+    }
+  ],
+  "repository": "web-platform-tests/wpt",
+  "total": 45,
+  "unmappable": 30,
+  "wpt_commit": "850b36a56cfc15b9117a9d222d32a63104662f49"
+}

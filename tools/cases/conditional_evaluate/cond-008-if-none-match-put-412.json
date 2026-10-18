@@ -1,0 +1,20 @@
+{
+  "case_id": "cond-008-if-none-match-put-412",
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-None-Match": "\"abc123\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "notes": "Same match on a non-GET/HEAD method yields 412.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.2",
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

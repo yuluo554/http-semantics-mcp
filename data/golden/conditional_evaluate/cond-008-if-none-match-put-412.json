@@ -1,0 +1,43 @@
+{
+  "case_id": "cond-008-if-none-match-put-412",
+  "expected": {
+    "explain": [
+      {
+        "code": "COND_IF_NONE_MATCH_MATCHED",
+        "detail": "If-None-Match matched the current entity tag",
+        "spec_ref": [
+          "RFC9110 §13.1.2",
+          "RFC9110 §13.2.2"
+        ]
+      },
+      {
+        "code": "COND_WEAK_COMPARISON_USED",
+        "detail": "If-None-Match is evaluated with weak comparison",
+        "spec_ref": [
+          "RFC9110 §13.1.2",
+          "RFC9110 §8.8.3.2"
+        ]
+      }
+    ],
+    "rule_applied": "if_none_match",
+    "status": 412,
+    "weak_comparison_used": true
+  },
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-None-Match": "\"abc123\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "notes": "Same match on a non-GET/HEAD method yields 412.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.2",
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

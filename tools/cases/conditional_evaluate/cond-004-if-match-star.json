@@ -1,0 +1,19 @@
+{
+  "case_id": "cond-004-if-match-star",
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-Match": "*"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "notes": "'*' matches any current representation.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.1"
+  ],
+  "tool": "conditional_evaluate"
+}

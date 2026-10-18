@@ -1,0 +1,37 @@
+{
+  "case_id": "cors-eval-021-safelisted-content-type",
+  "expected": {
+    "decision": "allow",
+    "missing_headers": [],
+    "notes": {
+      "allow_credentials_null_origin": false,
+      "max_age_capped_by_client": false,
+      "wildcard_with_credentials": false
+    },
+    "recommended_headers": {},
+    "violations": []
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "POST",
+    "origin": "https://app.example.com",
+    "request_headers": {
+      "content-type": "text/plain"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "text/plain is a safelisted Content-Type: no preflight needed.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS protocol",
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

@@ -1,0 +1,23 @@
+{
+  "case_id": "vary-008-multi-field",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept-Encoding": "gzip",
+        "Accept-Language": "en"
+      },
+      "vary": "Accept-Encoding, Accept-Language"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept-Encoding": "gzip",
+        "Accept-Language": "fr"
+      }
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

@@ -1,0 +1,41 @@
+{
+  "case_id": "cache-005-must-revalidate-stale",
+  "expected": {
+    "action": "revalidate",
+    "current_age": 20,
+    "freshness_lifetime": 10,
+    "is_fresh": false,
+    "must_revalidate": true,
+    "reasons": [
+      {
+        "code": "CACHE_MUST_REVALIDATE_STALE",
+        "detail": "stale response with must-revalidate must not be served",
+        "spec_ref": [
+          "RFC9111 §4.2.4",
+          "RFC9111 §5.2.2.2"
+        ]
+      }
+    ],
+    "stale_while_revalidate_window": 0
+  },
+  "input": {
+    "now": "2026-01-01T00:00:20Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=10, must-revalidate",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "current_age=20 >= 10; must-revalidate forbids serving stale.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.4",
+    "RFC9111 §5.2.2.2"
+  ],
+  "tool": "cache_evaluate"
+}

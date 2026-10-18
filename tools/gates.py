@@ -10,7 +10,9 @@ nothing -- that is the failure mode this reporting shape exists to prevent.
 """
 
 import ast
+import json
 import os
+import re
 
 __all__ = [
     "Report",
@@ -21,6 +23,9 @@ __all__ = [
     "single_serialiser",
     "absolute_paths",
     "crlf",
+    "oracle_independence",
+    "golden_hygiene",
+    "code_literals",
     "all_reports",
 ]
 
@@ -374,6 +379,149 @@ def single_serialiser(root):
     return report
 
 
+ORACLE_DIR = ("tools", "golden_oracle")
+
+# The oracle must be an independent second implementation (decision D27).
+# Importing the package at all would let a production bug produce a matching
+# expectation, which is the one failure mode this whole arrangement exists to
+# prevent. The check is name-based, so it also catches dynamic imports.
+ORACLE_FORBIDDEN = ("http_semantics_mcp",)
+
+# A rule code may only be spelled in the generated catalog. Any `.py` in the
+# package spelling one out is a second copy waiting to drift.
+CODE_LITERAL = re.compile(r"\b(?:CORS|CACHE|COND|VARY)_[A-Z0-9_]+\b")
+
+# Fields that would turn a frozen expectation into an observation.
+OBSERVED_PREFIX = "observed_"
+
+
+def oracle_independence(root):
+    """``tools/golden_oracle/`` must not import the implementation under test.
+
+    Scanned with the AST, not by looking for the string: a comment saying
+    "do not import http_semantics_mcp" is fine, an ``import`` inside a
+    function is not.
+    """
+    report = Report("oracle-independence")
+    base = os.path.join(root, *ORACLE_DIR)
+    if not os.path.isdir(base):
+        report.add("/".join(ORACLE_DIR), "directory is missing")
+        return report
+
+    for path in sorted(scan_tree(base, suffixes=(".py",), skip_dirs=SKIP_DIRS)):
+        report.scanned += 1
+        relative = _relative(root, path)
+        with open(path, "rb") as handle:
+            source = handle.read().decode("utf-8")
+        try:
+            tree = ast.parse(source, filename=path)
+        except SyntaxError as exc:
+            report.add(relative, "syntax error: " + str(exc))
+            continue
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name.split(".")[0] in ORACLE_FORBIDDEN:
+                        report.add(relative, "oracle imports the implementation: " + alias.name)
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+                if module.split(".")[0] in ORACLE_FORBIDDEN:
+                    report.add(relative, "oracle imports the implementation: " + module)
+                for alias in node.names:
+                    if alias.name in ORACLE_FORBIDDEN:
+                        report.add(relative, "oracle imports the implementation: " + alias.name)
+            elif isinstance(node, ast.Call):
+                function = node.func
+                name = getattr(function, "id", None) or getattr(function, "attr", None)
+                if name in ("import_module", "__import__"):
+                    for argument in node.args:
+                        if isinstance(argument, ast.Constant) and argument.value in ORACLE_FORBIDDEN:
+                            report.add(relative, "oracle imports the implementation dynamically")
+    return report
+
+
+def golden_hygiene(root):
+    """Golden cases carry inputs and expectations, never observations.
+
+    Two rules (plan/04 section 3):
+
+    * no key starting with ``observed_`` anywhere in a frozen case;
+    * no key called ``expected`` inside ``tools/cases`` (the oracle owns it).
+
+    The gate also refuses an empty ``data/golden``: scanning zero files and
+    finding zero problems must not look like success.
+    """
+    report = Report("golden-hygiene")
+    golden = os.path.join(root, "data", "golden")
+    if not os.path.isdir(golden):
+        report.add("data/golden", "directory is missing")
+        return report
+
+    def walk(value, relative):
+        if isinstance(value, dict):
+            for key in value:
+                if key.startswith(OBSERVED_PREFIX):
+                    report.add(relative, "observed field: " + key)
+            for item in value.values():
+                walk(item, relative)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item, relative)
+
+    for path in sorted(scan_tree(golden, suffixes=(".json",), skip_dirs=SKIP_DIRS)):
+        report.scanned += 1
+        relative = _relative(root, path)
+        with open(path, "rb") as handle:
+            raw = handle.read()
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError):
+            report.add(relative, "not valid UTF-8 JSON")
+            continue
+        walk(payload, relative)
+        if not isinstance(payload, dict):
+            report.add(relative, "case must be a JSON object")
+            continue
+        for key in ("case_id", "tool", "input", "expected", "spec_basis", "source"):
+            if key not in payload:
+                report.add(relative, "missing " + key)
+
+    if report.scanned == 0:
+        report.add("data/golden", "no golden case found")
+    return report
+
+
+def code_literals(root):
+    """Rule codes live in ``codes.json`` only, never spelled in the package.
+
+    Templates, ``spec_ref`` and severity are read from the generated catalog;
+    a literal ``CORS_...`` in Python would be a second source of truth and the
+    first thing to drift. This gate scans every ``*.py`` under ``src/``.
+    """
+    report = Report("code-literals")
+    base = os.path.join(root, "src", "http_semantics_mcp")
+    if not os.path.isdir(base):
+        report.add("src/http_semantics_mcp", "directory is missing")
+        return report
+
+    for path in sorted(scan_tree(base, suffixes=(".py",), skip_dirs=SKIP_DIRS)):
+        report.scanned += 1
+        relative = _relative(root, path)
+        with open(path, "rb") as handle:
+            source = handle.read().decode("utf-8")
+        try:
+            tree = ast.parse(source, filename=path)
+        except SyntaxError as exc:
+            report.add(relative, "syntax error: " + str(exc))
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                if CODE_LITERAL.fullmatch(node.value):
+                    report.add(relative, "code literal: " + node.value)
+    return report
+
+
 def all_reports(root):
     """Run every gate and return the list of reports."""
     return [
@@ -382,4 +530,7 @@ def all_reports(root):
         single_serialiser(root),
         absolute_paths(root),
         crlf(root),
+        oracle_independence(root),
+        golden_hygiene(root),
+        code_literals(root),
     ]

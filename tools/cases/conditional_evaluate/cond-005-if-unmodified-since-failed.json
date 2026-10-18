@@ -1,0 +1,19 @@
+{
+  "case_id": "cond-005-if-unmodified-since-failed",
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-Unmodified-Since": "Wed, 31 Dec 2025 00:00:00 GMT"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.4",
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

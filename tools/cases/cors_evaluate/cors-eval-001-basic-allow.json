@@ -1,0 +1,23 @@
+{
+  "case_id": "cors-eval-001-basic-allow",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "origin": "https://app.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "Simple cross-origin GET, exact origin echoed -> allow.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

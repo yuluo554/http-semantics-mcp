@@ -1,0 +1,24 @@
+{
+  "case_id": "cors-eval-011-preflight-required",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "PUT",
+    "origin": "https://app.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "PUT without is_preflight: the caller skipped the preflight.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS protocol",
+    "Fetch §CORS-preflight fetch"
+  ],
+  "tool": "cors_evaluate"
+}

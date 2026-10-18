@@ -1,0 +1,16 @@
+{
+  "case_id": "time-002-http-date",
+  "expected": {
+    "form": "http-date",
+    "timestamp": 1767225600
+  },
+  "input": {
+    "value": "Thu, 01 Jan 2026 00:00:00 GMT"
+  },
+  "notes": "Same instant as time-001, different form.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §5.6.7"
+  ],
+  "tool": "_time"
+}

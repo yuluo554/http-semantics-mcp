@@ -1,0 +1,53 @@
+{
+  "case_id": "cors-sim-009-max-age-effective",
+  "expected": {
+    "decision": "allow",
+    "events": [],
+    "final_type": "cors",
+    "hops": [
+      {
+        "decision": "allow",
+        "status": 204,
+        "url": "https://api.example.com",
+        "violations": []
+      }
+    ],
+    "max_age_effective": 600,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": true,
+    "visible_headers": [
+      "access-control-allow-headers",
+      "access-control-allow-methods",
+      "access-control-allow-origin",
+      "access-control-max-age"
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [],
+    "request_headers": {
+      "x-custom": "1"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Headers": "x-custom",
+        "Access-Control-Allow-Methods": "PUT",
+        "Access-Control-Allow-Origin": "https://app.example.com",
+        "Access-Control-Max-Age": "600"
+      },
+      "status": 204
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "max_age_effective echoes the declared 600 seconds; no client-side capping.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS-preflight fetch",
+    "Fetch §CORS-preflight cache"
+  ],
+  "tool": "cors_simulate_fetch"
+}

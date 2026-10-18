@@ -1,0 +1,23 @@
+{
+  "case_id": "cache-011-max-age-zero",
+  "input": {
+    "now": "2026-01-01T00:00:00Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=0",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Lifetime 0: fresh only if current_age < 0, never.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.1",
+    "RFC9111 §5.2.2.1"
+  ],
+  "tool": "cache_evaluate"
+}

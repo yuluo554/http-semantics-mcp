@@ -1,0 +1,26 @@
+{
+  "case_id": "cond-014-lowercase-weak-marker",
+  "expected": {
+    "error": {
+      "code": "INVALID_HEADER_VALUE",
+      "detail": "weak prefix must be exactly W/ (uppercase)",
+      "field": "request_headers.if-none-match"
+    }
+  },
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-None-Match": "w/\"abc123\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "notes": "Lowercase w/ is not a valid weak marker -> tool error.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §8.8.3.2"
+  ],
+  "tool": "conditional_evaluate"
+}

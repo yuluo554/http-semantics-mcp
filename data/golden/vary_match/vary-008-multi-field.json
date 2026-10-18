@@ -1,0 +1,42 @@
+{
+  "case_id": "vary-008-multi-field",
+  "expected": {
+    "differing_headers": [
+      "accept-language"
+    ],
+    "match": "miss",
+    "normalized_vary": [
+      "accept-encoding",
+      "accept-language"
+    ],
+    "reasons": [
+      {
+        "code": "VARY_FIELD_MISMATCH",
+        "detail": "Vary field accept-language differs between stored and incoming request",
+        "spec_ref": [
+          "RFC9111 §4.1"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept-Encoding": "gzip",
+        "Accept-Language": "en"
+      },
+      "vary": "Accept-Encoding, Accept-Language"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept-Encoding": "gzip",
+        "Accept-Language": "fr"
+      }
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

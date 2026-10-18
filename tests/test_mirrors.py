@@ -22,7 +22,10 @@ PACKAGE_SCHEMAS = os.path.join("src", "http_semantics_mcp", "schemas", "tools")
 
 
 def test_mirrors_are_equal_on_the_clean_tree():
-    assert check_release.check_dist_mirrors().startswith("0 mirror")
+    detail = check_release.check_dist_mirrors()
+    assert "byte-identical" in detail
+    # M1 lands the first generated mirror; a clean tree must compare at least one.
+    assert not detail.startswith("0 mirror")
 
 
 def _write(path, payload):

@@ -1,0 +1,52 @@
+{
+  "case_id": "cors-sim-004-no-cors-opaque",
+  "expected": {
+    "decision": "allow",
+    "events": [],
+    "final_type": "opaque",
+    "hops": [
+      {
+        "decision": "allow",
+        "status": 200,
+        "url": "https://api.example.com",
+        "violations": [
+          {
+            "code": "CORS_MODE_OPAQUE",
+            "detail": "no-cors response is opaque; response headers are not visible",
+            "spec_ref": [
+              "Fetch §CORS protocol",
+              "Fetch §HTTP fetch"
+            ]
+          }
+        ]
+      }
+    ],
+    "max_age_effective": 0,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": false,
+    "visible_headers": []
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "no-cors",
+    "origin": "https://app.example.com",
+    "redirects": [],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "no-cors: opaque response, no visible headers, informational CORS_MODE_OPAQUE.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS protocol",
+    "Fetch §HTTP fetch"
+  ],
+  "tool": "cors_simulate_fetch"
+}

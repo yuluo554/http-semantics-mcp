@@ -1,0 +1,19 @@
+{
+  "case_id": "vary-004-field-missing",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept-Language": "en"
+      },
+      "vary": "Accept-Language"
+    },
+    "incoming": {
+      "request_headers": {}
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

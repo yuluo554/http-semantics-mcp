@@ -1,0 +1,22 @@
+{
+  "case_id": "vary-007-duplicate",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept": "text/html"
+      },
+      "vary": "Accept, Accept"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept": "text/html"
+      }
+    }
+  },
+  "notes": "Duplicate member is de-duplicated and reported.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

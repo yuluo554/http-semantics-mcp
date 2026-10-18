@@ -1,0 +1,62 @@
+{
+  "case_id": "cors-sim-007-preflight-cache-key",
+  "expected": {
+    "decision": "block",
+    "events": [],
+    "final_type": "cors",
+    "hops": [
+      {
+        "decision": "block",
+        "status": 200,
+        "url": "https://api.example.com",
+        "violations": [
+          {
+            "code": "CORS_MISSING_ALLOW_HEADERS",
+            "detail": "preflight response has no Access-Control-Allow-Headers (request header x-custom)",
+            "spec_ref": [
+              "Fetch §CORS-preflight fetch"
+            ]
+          },
+          {
+            "code": "CORS_MISSING_ALLOW_METHODS",
+            "detail": "preflight response does not allow method PUT",
+            "spec_ref": [
+              "Fetch §CORS-preflight fetch"
+            ]
+          }
+        ]
+      }
+    ],
+    "max_age_effective": 0,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": true,
+    "visible_headers": [
+      "access-control-allow-origin"
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [],
+    "request_headers": {
+      "x-custom": "1"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a?x=1"
+  },
+  "notes": "preflight_cache_key = first 16 hex of sha256(origin + newline + canonical url); max-age defaults to 0 when the header is absent.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS-preflight fetch",
+    "Fetch §CORS-preflight cache"
+  ],
+  "tool": "cors_simulate_fetch"
+}

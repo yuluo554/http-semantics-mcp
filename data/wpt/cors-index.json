@@ -1,0 +1,280 @@
+{
+  "directory": "cors",
+  "fetched_at": "2026-10-18",
+  "files": [
+    {
+      "blob_sha": "2aee01417a7cdfb5cb9a69cce2bcc59d7b8eded2",
+      "path": "cors/304.htm",
+      "size": 3415,
+      "type": "file"
+    },
+    {
+      "blob_sha": "3187818d44d2da8fbee207a8a1c6086a5f939787",
+      "path": "cors/META.yml",
+      "size": 120,
+      "type": "file"
+    },
+    {
+      "blob_sha": "aa5ff90d486e8bc15134b797be7b40928466e133",
+      "path": "cors/README.md",
+      "size": 200,
+      "type": "file"
+    },
+    {
+      "blob_sha": "4aef9287226a1eb8be20d0fa04fd98f0d66f9eac",
+      "path": "cors/WEB_FEATURES.yml",
+      "size": 22,
+      "type": "file"
+    },
+    {
+      "blob_sha": "a139ff6f1e71d3839c167f5ee8fa77d026fd2ca5",
+      "path": "cors/access-control-expose-headers-parsing.window.js",
+      "size": 701,
+      "type": "file"
+    },
+    {
+      "blob_sha": "cbdb4ca9aa79c9f4919720b29cdfe221df7f04e6",
+      "path": "cors/basic.htm",
+      "size": 2043,
+      "type": "file"
+    },
+    {
+      "blob_sha": "f7ec3dc6d1b91ee2d9386590971d424d37069ebb",
+      "path": "cors/client-hint-request-headers-2.tentative.htm",
+      "size": 1744,
+      "type": "file"
+    },
+    {
+      "blob_sha": "6cf298433eb14953a9ae3c21cd6fd6030515133c",
+      "path": "cors/client-hint-request-headers.htm",
+      "size": 3611,
+      "type": "file"
+    },
+    {
+      "blob_sha": "e840990fb2db2b367fa148ed499c456901384368",
+      "path": "cors/cors-safelisted-request-header.any.js",
+      "size": 2713,
+      "type": "file"
+    },
+    {
+      "blob_sha": "45a714368560936439889855c36453463295ae51",
+      "path": "cors/credentials-flag.htm",
+      "size": 4376,
+      "type": "file"
+    },
+    {
+      "blob_sha": "0cd87756e944321264d105e26c4c72e23fa7f5c2",
+      "path": "cors/image-tainting-in-cross-origin-iframe.sub.html",
+      "size": 893,
+      "type": "file"
+    },
+    {
+      "blob_sha": "02cd27322b4c628cff866642195f957037c1477d",
+      "path": "cors/late-upload-events.htm",
+      "size": 1423,
+      "type": "file"
+    },
+    {
+      "blob_sha": "3d46002933bb3ce6e21da8cf6a4cbcd06d50602f",
+      "path": "cors/origin.htm",
+      "size": 4709,
+      "type": "file"
+    },
+    {
+      "blob_sha": "6b37a843c40fbafa2d2fb855c007fc1999b98360",
+      "path": "cors/preflight-cache-partitioning.sub.window.js",
+      "size": 1194,
+      "type": "file"
+    },
+    {
+      "blob_sha": "b3de663ebc1d32409c8ed376a3873b2a2b675eb5",
+      "path": "cors/preflight-cache.htm",
+      "size": 4743,
+      "type": "file"
+    },
+    {
+      "blob_sha": "fd34d55b790def8ef7a7bcc8d8a6570c6469fe27",
+      "path": "cors/preflight-failure.htm",
+      "size": 1882,
+      "type": "file"
+    },
+    {
+      "blob_sha": "5463292fa5d36875b409b6c506e5def3992d2b5c",
+      "path": "cors/redirect-origin.htm",
+      "size": 6938,
+      "type": "file"
+    },
+    {
+      "blob_sha": "fe58d90a26eec8fdd7a568ddee5d1adc84edaabf",
+      "path": "cors/redirect-preflight-2.htm",
+      "size": 2192,
+      "type": "file"
+    },
+    {
+      "blob_sha": "ff64284e90d7a98c4727a438411face2cb3300b9",
+      "path": "cors/redirect-preflight.htm",
+      "size": 1535,
+      "type": "file"
+    },
+    {
+      "blob_sha": "fd3864d2497a679eee7893e1c3e8e6c4e0afb1a5",
+      "path": "cors/redirect-userinfo.htm",
+      "size": 3364,
+      "type": "file"
+    },
+    {
+      "blob_sha": "07267751690fe80d00f884805fb4c1d785f4db63",
+      "path": "cors/remote-origin.htm",
+      "size": 3832,
+      "type": "file"
+    },
+    {
+      "blob_sha": "7634eca9fc8bf1a714bfb355c7e42b38b511d809",
+      "path": "cors/request-headers.htm",
+      "size": 2924,
+      "type": "file"
+    },
+    {
+      "blob_sha": "aa5f5ab56081402ea2eb305cb6adbd5842772017",
+      "path": "cors/resources/304.py",
+      "size": 2318,
+      "type": "file"
+    },
+    {
+      "blob_sha": "e8915f7ffe1533eb9b00292552ea216cc818c0ca",
+      "path": "cors/resources/access-control-expose-headers.json",
+      "size": 1463,
+      "type": "file"
+    },
+    {
+      "blob_sha": "0626091794063a9a4428e4d36650aafa83a84262",
+      "path": "cors/resources/cache-304.py",
+      "size": 477,
+      "type": "file"
+    },
+    {
+      "blob_sha": "5cd7868199f32e3c8e3529172785267a1ad6ee3d",
+      "path": "cors/resources/checkandremove.py",
+      "size": 174,
+      "type": "file"
+    },
+    {
+      "blob_sha": "ee42494ad053e9462e6bfe1982f77e0c8442e984",
+      "path": "cors/resources/cors-cookie.py",
+      "size": 684,
+      "type": "file"
+    },
+    {
+      "blob_sha": "2e92da28a0ac07eb79cb4547f418dc3bd0cef93a",
+      "path": "cors/resources/cors-headers.asis",
+      "size": 757,
+      "type": "file"
+    },
+    {
+      "blob_sha": "e0576a003dfb918c45d8ae2afa80c98a64287387",
+      "path": "cors/resources/cors-makeheader.py",
+      "size": 2371,
+      "type": "file"
+    },
+    {
+      "blob_sha": "4e568f4063542b090ca9625dd9a53fcb0d4870b2",
+      "path": "cors/resources/expose-headers.py",
+      "size": 444,
+      "type": "file"
+    },
+    {
+      "blob_sha": "59de9e7a23ce6ef949d03db610609c61ce4d98c1",
+      "path": "cors/resources/image-tainting-checker.sub.html",
+      "size": 711,
+      "type": "file"
+    },
+    {
+      "blob_sha": "031cc94d10cef22852f0939fb9a63b2f2f11cae6",
+      "path": "cors/resources/preflight-cache-partitioning-iframe.sub.html",
+      "size": 719,
+      "type": "file"
+    },
+    {
+      "blob_sha": "e4bbdec013953ceffe761fc9cb7f24ac2813535d",
+      "path": "cors/resources/preflight-cache-partitioning.sub.html",
+      "size": 562,
+      "type": "file"
+    },
+    {
+      "blob_sha": "d0d9a4ebb6c67b853a9d14f12f325120a692e96d",
+      "path": "cors/resources/preflight-partitioning.py",
+      "size": 1264,
+      "type": "file"
+    },
+    {
+      "blob_sha": "d8bce26d280a12a30bb83d9e25f9108a9cd86624",
+      "path": "cors/resources/preflight.py",
+      "size": 1263,
+      "type": "file"
+    },
+    {
+      "blob_sha": "73a7cb444ffb5f85a33a20de596ae33dd4f5ff8f",
+      "path": "cors/resources/remote-xhrer.html",
+      "size": 753,
+      "type": "file"
+    },
+    {
+      "blob_sha": "5d37e7a038277121cd0ce44b9c161e4c9360e428",
+      "path": "cors/resources/status.py",
+      "size": 1299,
+      "type": "file"
+    },
+    {
+      "blob_sha": "cc06a239a64ced368442a9b2c4c2c2a2c775d77b",
+      "path": "cors/response-headers.htm",
+      "size": 4040,
+      "type": "file"
+    },
+    {
+      "blob_sha": "e164ca6f41b761c93884854298742ddf50c79a97",
+      "path": "cors/script-304.html",
+      "size": 1134,
+      "type": "file"
+    },
+    {
+      "blob_sha": "78212de49e00c8c44ea3785d10bf47678200ed23",
+      "path": "cors/simple-requests-ch.tentative.htm",
+      "size": 1899,
+      "type": "file"
+    },
+    {
+      "blob_sha": "185e9a75e39f81b14055237ab5f547cfb57931e2",
+      "path": "cors/simple-requests.htm",
+      "size": 3195,
+      "type": "file"
+    },
+    {
+      "blob_sha": "5bcfa0cf7c2554ae6614d0138a1b32a2c6c36182",
+      "path": "cors/status-async.htm",
+      "size": 4500,
+      "type": "file"
+    },
+    {
+      "blob_sha": "a72c2fd79f1415e92e37e7ecca2621506ae84200",
+      "path": "cors/status-preflight.htm",
+      "size": 2046,
+      "type": "file"
+    },
+    {
+      "blob_sha": "73244288d412814bb312a1326902ad3213c542b5",
+      "path": "cors/status.htm",
+      "size": 2493,
+      "type": "file"
+    },
+    {
+      "blob_sha": "2dde95d9a07be7c8682d6743efa837ac2b120923",
+      "path": "cors/support.js",
+      "size": 597,
+      "type": "file"
+    }
+  ],
+  "note": "Paths, blob shas and sizes only. Test bodies are not copied into this repository; they were read once to decide transcribability (data/README.md section 2).",
+  "repository": "web-platform-tests/wpt",
+  "total": 45,
+  "wpt_commit": "850b36a56cfc15b9117a9d222d32a63104662f49"
+}

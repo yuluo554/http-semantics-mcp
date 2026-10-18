@@ -1,0 +1,38 @@
+{
+  "case_id": "vary-007-duplicate",
+  "expected": {
+    "differing_headers": [],
+    "match": "hit",
+    "normalized_vary": [
+      "accept"
+    ],
+    "reasons": [
+      {
+        "code": "VARY_DUPLICATE_FIELD",
+        "detail": "Vary lists accept more than once; duplicates removed",
+        "spec_ref": [
+          "RFC9111 §4.1"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept": "text/html"
+      },
+      "vary": "Accept, Accept"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept": "text/html"
+      }
+    }
+  },
+  "notes": "Duplicate member is de-duplicated and reported.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

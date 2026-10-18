@@ -1,0 +1,18 @@
+{
+  "case_id": "cond-002-if-match-pass",
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-Match": "\"abc123\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.1"
+  ],
+  "tool": "conditional_evaluate"
+}

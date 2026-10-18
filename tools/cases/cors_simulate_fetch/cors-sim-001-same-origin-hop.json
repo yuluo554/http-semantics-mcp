@@ -1,0 +1,34 @@
+{
+  "case_id": "cors-sim-001-same-origin-hop",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [
+      {
+        "headers": {
+          "Access-Control-Allow-Origin": "https://app.example.com"
+        },
+        "status": 302,
+        "url": "https://api.example.com/b"
+      }
+    ],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Same-origin hop: two hops, no events.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §HTTP-redirect fetch"
+  ],
+  "tool": "cors_simulate_fetch"
+}

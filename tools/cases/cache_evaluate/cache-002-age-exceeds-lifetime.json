@@ -1,0 +1,23 @@
+{
+  "case_id": "cache-002-age-exceeds-lifetime",
+  "input": {
+    "now": "2026-01-01T00:00:30Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=60",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "30",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "current_age=30+30=60; 60 < 60 is false -> stale.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2",
+    "RFC9111 §4.2.4"
+  ],
+  "tool": "cache_evaluate"
+}

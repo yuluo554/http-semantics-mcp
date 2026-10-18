@@ -26,6 +26,7 @@ def _copy_repo(tmp_path):
     target.mkdir()
     shutil.copytree(os.path.join(ROOT, "src"), target / "src")
     shutil.copytree(os.path.join(ROOT, "tools"), target / "tools")
+    shutil.copytree(os.path.join(ROOT, "data"), target / "data")
     shutil.copy(os.path.join(ROOT, ".gitattributes"), target / ".gitattributes")
     shutil.copy(os.path.join(ROOT, "pyproject.toml"), target / "pyproject.toml")
     return str(target)
@@ -237,3 +238,4 @@ def test_single_serialiser_reports_a_broken_probe(tmp_path):
     report = gates.single_serialiser(root)
     assert not report.ok
     assert any("probe is broken" in detail for _, detail in report.findings)
+

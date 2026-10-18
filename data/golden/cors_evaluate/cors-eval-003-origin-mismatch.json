@@ -1,0 +1,43 @@
+{
+  "case_id": "cors-eval-003-origin-mismatch",
+  "expected": {
+    "decision": "block",
+    "missing_headers": [],
+    "notes": {
+      "allow_credentials_null_origin": false,
+      "max_age_capped_by_client": false,
+      "wildcard_with_credentials": false
+    },
+    "recommended_headers": {
+      "access-control-allow-origin": "https://app.example.com"
+    },
+    "violations": [
+      {
+        "code": "CORS_ORIGIN_MISMATCH",
+        "detail": "Access-Control-Allow-Origin=https://other.example.net does not match origin=https://app.example.com",
+        "spec_ref": [
+          "Fetch §CORS check"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "origin": "https://app.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://other.example.net"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

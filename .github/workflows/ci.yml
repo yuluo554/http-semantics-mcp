@@ -50,6 +50,12 @@ jobs:
       - name: "Repository gates"
         run: python tools/run_gates.py
 
+      - name: "Generated data is reproducible"
+        run: |
+          python tools/gen_codes.py --check
+          python tools/gen_golden.py --check
+          python tools/golden_coverage.py
+
       - name: "Mutation verification"
         run: python tools/mutate_check.py
 

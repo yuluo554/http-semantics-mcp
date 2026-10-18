@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-003-no-store",
+  "input": {
+    "now": "2026-01-01T00:00:10Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "no-store, max-age=600",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "no-store short-circuits before any freshness arithmetic.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §5.2.2.5"
+  ],
+  "tool": "cache_evaluate"
+}

@@ -1,0 +1,21 @@
+{
+  "case_id": "vary-001-hit-single",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept-Encoding": "gzip"
+      },
+      "vary": "Accept-Encoding"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept-Encoding": "gzip"
+      }
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

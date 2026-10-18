@@ -1,0 +1,21 @@
+{
+  "case_id": "vary-002-miss-value",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept-Encoding": "gzip"
+      },
+      "vary": "Accept-Encoding"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept-Encoding": "br"
+      }
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

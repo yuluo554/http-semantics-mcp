@@ -1,0 +1,20 @@
+{
+  "case_id": "cond-007-if-none-match-weak-304",
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-None-Match": "W/\"abc123\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "notes": "Weak comparison matches W/\"abc123\" against \"abc123\".",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.2",
+    "RFC9110 §8.8.3.2"
+  ],
+  "tool": "conditional_evaluate"
+}

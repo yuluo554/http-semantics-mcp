@@ -1,0 +1,32 @@
+{
+  "case_id": "cors-eval-016-same-origin",
+  "expected": {
+    "decision": "allow",
+    "missing_headers": [],
+    "notes": {
+      "allow_credentials_null_origin": false,
+      "max_age_capped_by_client": false,
+      "wildcard_with_credentials": false
+    },
+    "recommended_headers": {},
+    "violations": []
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "origin": "https://api.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {},
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "Same origin: no CORS headers required.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

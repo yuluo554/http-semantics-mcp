@@ -1,0 +1,19 @@
+{
+  "case_id": "cond-009-if-none-match-star",
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-None-Match": "*"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "notes": "'*' matches whenever a representation exists -> 304.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.2"
+  ],
+  "tool": "conditional_evaluate"
+}

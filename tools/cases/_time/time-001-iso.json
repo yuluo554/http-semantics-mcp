@@ -1,0 +1,12 @@
+{
+  "case_id": "time-001-iso",
+  "input": {
+    "value": "2026-01-01T00:00:00Z"
+  },
+  "notes": "Unix epoch base check: 2026-01-01T00:00:00Z.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §5.6.7"
+  ],
+  "tool": "_time"
+}

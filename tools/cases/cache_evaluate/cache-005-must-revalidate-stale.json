@@ -1,0 +1,23 @@
+{
+  "case_id": "cache-005-must-revalidate-stale",
+  "input": {
+    "now": "2026-01-01T00:00:20Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=10, must-revalidate",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "current_age=20 >= 10; must-revalidate forbids serving stale.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.4",
+    "RFC9111 §5.2.2.2"
+  ],
+  "tool": "cache_evaluate"
+}

@@ -1,0 +1,34 @@
+{
+  "case_id": "cors-sim-003-cross-origin-omit",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [
+      {
+        "headers": {
+          "Access-Control-Allow-Origin": "https://app.example.com"
+        },
+        "status": 302,
+        "url": "https://cdn.example.net/b"
+      }
+    ],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "null"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Credentials omitted: only origin_set_to_null.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §HTTP-redirect fetch"
+  ],
+  "tool": "cors_simulate_fetch"
+}

@@ -3,7 +3,7 @@
 - **项目**：HTTP 语义判定 MCP Server（CORS 放行判定 + 缓存新鲜度 + 条件请求 + Vary 命中）
 - **性质**：不参赛项目题（模拟项目），发布 GitHub **公开仓库**，署名 `yuluo554`
 - **版本**：v1（2026-10-17 定稿；检索基准日 2026-10-17，实测窗口 2026-10-18 10:33–11:05 UTC）
-- **当前里程碑**：M0 计划与骨架 ✅（2026-10-18：plan/02–06 定稿 + 可启动空 server + 全套工程门）；M1–M6 待开工
+- **当前里程碑**：M1 数据先行 ✅（2026-10-18：codes.json + 85 条 golden + WPT 台账 + 8 道门）；M2–M6 待开工
 - **交付形态**：**MCP Server（stdio 传输）**，唯一形态，不设备选
 - **一句话定位**：把 Fetch Standard 的 CORS 协议算法与 RFC 9111 缓存新鲜度算法编译成可调用的 oracle——给一组请求/响应头，返回 `allow|block`、违反的规则编号 + 规范条款、以及该改哪个 header。**不联网、不抓包、不做安全打分。**
 
@@ -15,10 +15,10 @@
 | `plan/01-题目文档.md` | 十段式题目定稿（**定稿不改写**；后续勘误走新版本号 + 版本史行） | ✅ 已建立 |
 | `plan/02-架构与技术选型.md` | 交付形态、分层架构、目录结构、stdio 协议与错误契约 | ✅ M0 定稿 |
 | `plan/03-模块详设.md` | T1–T5 判定算法、规则编号表、`spec_ref` 生成方式 | ✅ M0 定稿 |
-| `plan/04-数据计划.md` | golden case 组织、WPT 映射台账、假时钟用例、oracle 独立性 | ✅ M0 定稿 |
+| `plan/04-数据计划.md` | golden case 组织、WPT 映射台账、假时钟用例、oracle 独立性 | ✅ M0 定稿；M1 已按实况补记（不降级、递归覆盖） |
 | `plan/05-里程碑.md` | M0–M6 DoD 与状态 | ✅ M0 定稿 |
 | `plan/06-交付对标与决策记录.md` | 评分对标、决策细化（D19–D34）、待定决策回写 | ✅ M0 定稿 |
-| `data/README.md` | 依据查证记录（三态）、数据源可获取性、合成数据纪律、**数值口径（唯一出处）** | ✅ 已建立 |
+| `data/README.md` | 依据查证记录（三态）、数据源可获取性、合成数据纪律、**数值口径（唯一出处）** | ✅ M1 §4 定稿（条款全核对、输出键集合登记） |
 
 ## 二、决策记录
 
@@ -59,13 +59,13 @@
 | 相邻形态区分（129★ / 83★ / 0★） | `gh api` + 仓库自述 | `plan/01` §1.3 | 仓库可访问复核 | ✅ 已登记 |
 | 底层引擎参照（262★ / 6194★） | `gh api` | `plan/01` §1.4 | 同上 | ✅ 已登记 |
 | npm 生态体量 | npm registry 周下载 2026-10-10 ~ 10-16 | `data/README.md` §1.3 | 按周复跑 | ✅ 已登记 |
-| WPT `cors/` 语料可得 | `web-platform-tests/wpt` 仓库 | `data/README.md` §2、`data/wpt-mapping.json` | 目录可访问 + 映射台账逐条对照 | ⬜ 待 M1 建立映射 |
+| WPT `cors/` 语料可得 | `web-platform-tests/wpt` 仓库（commit `850b36a5`） | `data/README.md` §2、`data/wpt-mapping.json` | 目录可访问 + 映射台账逐条对照 | 🟡 M1 已建（45 条 = 15 mapped + 30 unmappable）；M5 逐条核对判定 |
 | T1 `cors_evaluate` | 本题设计 | MCP tool + `schemas/tools/cors_evaluate.json` | golden case 正反例 | ⬜ 待 M2 |
 | T2 `cors_simulate_fetch` | 本题设计 | MCP tool + schema | 重定向事件 golden case | ⬜ 待 M2 |
 | T3 `cache_evaluate` | 本题设计 | MCP tool + schema | 假时钟 golden case | ⬜ 待 M3 |
 | T4 `conditional_evaluate` | 本题设计 | MCP tool + schema | RFC 9110 §13 优先级 golden case | ⬜ 待 M4 |
 | T5 `vary_match` | 本题设计 | MCP tool + schema | 归一化 + `Vary: *` golden case | ⬜ 待 M4 |
-| 字节级确定性 | 本题设计 | 全部 tool | 同输入双跑序列化 sha256 相等 | 🟡 M0 已建门（序列化层），M5 扩到五 tool |
+| 字节级确定性 | 本题设计 | 全部 tool | 同输入双跑序列化 sha256 相等 | 🟡 M0 已建门（序列化层）；M1 已证生成侧双跑字节一致；M5 扩到五 tool |
 | stdio server 可被真实客户端调用 | MCP 协议 | `README.md` 安装说明 | 客户端启动 + `tools/list` 五个 tool 全列 | 🟡 M0 握手已验（0 tool），M5 验五 tool |
 | WPT `cors/` 全量映射 | 本题设计 | `data/wpt-mapping.json` | 可转写用例全绿 + 不可转写逐条登记原因 | ⬜ 待 M5 |
 | 发布三件套 | M6 DoD | tag / Release 附产物 / `plan/RELEASE-M6.md` | `scripts/check_release.py` | ⬜ 待 M6 |
@@ -75,7 +75,7 @@
 | 里程碑 | 内容 | DoD | 状态 |
 | --- | --- | --- | --- |
 | **M0 计划与骨架** | plan/02–06 定稿；可启动空 server；全套工程门 | 双解释器 pytest 全绿；stdio 握手通过；三道静态门可证伪 | ✅ 完成（2026-10-18） |
-| **M1 数据先行** | 规范条款核对（RFC 9111 / 9110 / Fetch 算法锚点）+ golden case 组织方式 + WPT `cors/` 用例 JSON 化 + `data/wpt-mapping.json` 初版 | 每个 `code` 至少 1 条 golden case；WPT 可转写用例全部映射；不可转写用例逐条登记原因；`data/README.md` §4 口径定稿 | ⬜ 待开工 |
+| **M1 数据先行** | 规范条款核对（RFC 9111 / 9110 / 5861 + Fetch 算法锚点）+ golden case 组织方式 + WPT `cors/` 用例 JSON 化 + `data/wpt-mapping.json` 初版 | 每个 `code` 至少 1 条 golden case；WPT 可转写用例全部映射；不可转写用例逐条登记原因；`data/README.md` §4 口径定稿 | ✅ 完成（2026-10-18） |
 | **M2 CORS** | T1 `cors_evaluate` + T2 `cors_simulate_fetch` 判定实现与 schema | golden case 全绿；重定向事件（`origin_set_to_null` / `credentials_dropped`）显式输出；`no-cors` / `same-origin` 模式可见性正确 | ⬜ 待开工 |
 | **M3 缓存** | T3 `cache_evaluate` | 假时钟注入可用；RFC 9111 新鲜度 / 年龄 / 动作判定 golden case 全绿；`reasons[]` 带条款号 | ⬜ 待开工 |
 | **M4 条件请求与 Vary** | T4 `conditional_evaluate` + T5 `vary_match` | §13.2.2 求值顺序与短路正确；强弱比较分离；`Vary: *` 与归一化用例全绿 | ⬜ 待开工 |
@@ -85,6 +85,15 @@
 > 发布留档文件必须在 tag **之前**入库；tag 之后只允许追加类提交（回写实测值 / 对账 / 补记），并在留档里分栏写"tag 时点事实 / tag 后追加事实"。
 
 ## 五、当前状态
+
+### M1（2026-10-18）已完成
+
+- **规则表**：`references/codes.json`（包内真相源）+ 顶层镜像，31 个 `code`，由 `data/README.md` §4.1 生成；`gen_codes --check` 逐字节比对。
+- **golden**：85 条（cors 24 / sim 10 / cache 17 / cond 18 / vary 9 / _time 7），期望值全部由 `tools/golden_oracle/` 产出；`gen_golden --check` 逐字节比对且检出 orphan。
+- **覆盖**：31 declared / 31 covered / 0 uncovered / 0 unknown。
+- **WPT**：`data/wpt/cors-index.json`（45 条，commit `850b36a5`，数据日 2026-10-18）；`data/wpt-mapping.json` 15 converted + 30 unmappable = 45。
+- **门**：8 道静态门（新增 oracle 独立性 / golden 卫生 / code 字面量）；`tools/mutate_check.py` 14/14 变异变红。
+- **双解释器**：3.8 → 194 passed；3.12 → 194 passed；收集数一致。
 
 ### M0（2026-10-18）已完成
 
@@ -97,10 +106,10 @@
   - 双解释器 pytest：`py -3.8` 129 passed / `py -3.12` 129 passed。
   - `tools/run_gates.py`：purity / absolute-paths / crlf 三门前绿，扫描 48 个文件。
   - `scripts/check_release.py --pre-tag`：5 PASS / 1 FAIL（工作树未提交，预期）/ 4 SKIP。
-- **未建立**：`codes.json`、golden case、WPT 映射、五个 tool 实现与 schema —— 全部由 M1–M5 产出。
+- **M1 后仍未建立**：五个 tool 的实现与 schema（M2–M5）、发布件（M6）。`tools/list` 仍返回空列表，这是当前正确行为。
 
 ### 诚实口径
 
-- **未推送远端**：本项目的 CI 从未运行过。任何"CI 绿"的说法在此刻都不成立；M0 的等价证据只有上列本地实跑项（双解释器 / 真实子进程 / 静态门 / 安装态冒烟）。
+- **未推送远端**：本项目的 CI 从未运行过。任何"CI 绿"的说法在此刻都不成立；M0/M1 的等价证据只有本地实跑项（双解释器 / 真实子进程 / 静态门 / 生成物复算 / 变异验证）。
 - M6 首推后据实补记 run id 与首跑结果；历史文档保留"本地等价校验"原措辞，补记是追加事实。
-- `tools/list` 在 M0 返回空列表是**正确行为**，README 已如实写明；五 tool 的 schema 与判定实现随 M2–M4 落地，M5 用"schema 键集合 == 输出键集合"把契约钉死。
+- `tools/list` 在 M0/M1 返回空列表是**正确行为**，README 已如实写明；五 tool 的 schema 与判定实现随 M2–M4 落地，M5 用"schema 键集合 == 输出键集合"把契约钉死（字段集合已由 `data/README.md` §4.10 先行冻结）。

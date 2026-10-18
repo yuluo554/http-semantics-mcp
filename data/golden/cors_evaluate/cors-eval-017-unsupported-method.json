@@ -1,0 +1,28 @@
+{
+  "case_id": "cors-eval-017-unsupported-method",
+  "expected": {
+    "error": {
+      "code": "UNSUPPORTED_METHOD",
+      "detail": "method not in the accepted set: 'BREW'",
+      "field": "method"
+    }
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "BREW",
+    "origin": "https://app.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {},
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "Tool-level error, not a judgement: method BREW is not in the accepted set.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

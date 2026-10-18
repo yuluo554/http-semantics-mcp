@@ -1,0 +1,22 @@
+{
+  "case_id": "vary-003-star",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept": "*/*"
+      },
+      "vary": "*"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept": "*/*"
+      }
+    }
+  },
+  "notes": "Vary: * never matches.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

@@ -1,0 +1,23 @@
+{
+  "case_id": "cors-eval-013-null-origin",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "origin": "null",
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "null"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "Origin: null echoed literally; informational only.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_evaluate"
+}

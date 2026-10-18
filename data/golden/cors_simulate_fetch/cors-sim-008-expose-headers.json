@@ -1,0 +1,49 @@
+{
+  "case_id": "cors-sim-008-expose-headers",
+  "expected": {
+    "decision": "allow",
+    "events": [],
+    "final_type": "cors",
+    "hops": [
+      {
+        "decision": "allow",
+        "status": 200,
+        "url": "https://api.example.com",
+        "violations": []
+      }
+    ],
+    "max_age_effective": 0,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": false,
+    "visible_headers": [
+      "access-control-allow-origin",
+      "access-control-expose-headers",
+      "x-request-id",
+      "x-trace"
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com",
+        "Access-Control-Expose-Headers": "X-Request-Id, X-Trace"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Default-readable headers stay visible; the expose list adds two.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS protocol",
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_simulate_fetch"
+}

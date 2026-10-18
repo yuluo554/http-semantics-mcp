@@ -1,0 +1,64 @@
+{
+  "case_id": "cors-sim-010-redirect-after-preflight",
+  "expected": {
+    "decision": "block",
+    "events": [],
+    "final_type": "cors",
+    "hops": [
+      {
+        "decision": "block",
+        "status": 302,
+        "url": "https://api.example.com",
+        "violations": [
+          {
+            "code": "CORS_PREFLIGHT_REQUIRED",
+            "detail": "method GET with non-safelisted request headers requires a preflight",
+            "spec_ref": [
+              "Fetch §CORS protocol",
+              "Fetch §CORS-preflight fetch"
+            ]
+          }
+        ]
+      }
+    ],
+    "max_age_effective": 0,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": true,
+    "visible_headers": [
+      "access-control-allow-origin"
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [
+      {
+        "headers": {
+          "Access-Control-Allow-Origin": "https://app.example.com"
+        },
+        "status": 302,
+        "url": "https://cdn.example.net/b"
+      }
+    ],
+    "request_headers": {
+      "x-test": "test"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "null"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Successful preflight, then a cross-origin redirect: origin goes null.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS-preflight fetch",
+    "Fetch §HTTP-redirect fetch"
+  ],
+  "tool": "cors_simulate_fetch"
+}

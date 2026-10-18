@@ -1,0 +1,46 @@
+{
+  "case_id": "cors-eval-008-preflight-missing-methods",
+  "expected": {
+    "decision": "block",
+    "missing_headers": [
+      "access-control-allow-methods"
+    ],
+    "notes": {
+      "allow_credentials_null_origin": false,
+      "max_age_capped_by_client": false,
+      "wildcard_with_credentials": false
+    },
+    "recommended_headers": {
+      "access-control-allow-methods": "PUT"
+    },
+    "violations": [
+      {
+        "code": "CORS_MISSING_ALLOW_METHODS",
+        "detail": "preflight response does not allow method PUT",
+        "spec_ref": [
+          "Fetch §CORS-preflight fetch"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "origin": "https://app.example.com",
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 204
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §CORS-preflight fetch"
+  ],
+  "tool": "cors_evaluate"
+}

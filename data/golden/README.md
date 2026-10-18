@@ -41,3 +41,14 @@ Rules:
 
 `data/README.md` section 3 governs content: reserved example domains only,
 explicit fake ETags, fixed time literals, never a real response header.
+
+## Regenerating
+
+Inputs live in `tools/cases/<tool>/<case_id>.json` and carry no `expected`.
+`tools/gen_golden.py` recomputes every expectation with the oracle:
+
+```bash
+python tools/gen_golden.py            # rewrite data/golden/**
+python tools/gen_golden.py --check    # byte compare, exit 1 on drift or orphans
+python tools/golden_coverage.py       # code enum vs. golden coverage, both directions
+```

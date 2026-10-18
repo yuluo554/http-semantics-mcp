@@ -1,0 +1,28 @@
+{
+  "case_id": "cors-eval-015-authorization-not-wildcard",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "origin": "https://app.example.com",
+    "request_headers": {
+      "authorization": "Bearer abc123"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "PUT",
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 204
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "'*' never covers Authorization (CORS non-wildcard request-header name).",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §CORS-preflight fetch"
+  ],
+  "tool": "cors_evaluate"
+}

@@ -1,0 +1,64 @@
+{
+  "case_id": "cors-sim-005-same-origin-mode-blocked",
+  "expected": {
+    "decision": "block",
+    "events": [],
+    "final_type": "basic",
+    "hops": [
+      {
+        "decision": "allow",
+        "status": 302,
+        "url": "https://api.example.com",
+        "violations": []
+      },
+      {
+        "decision": "block",
+        "status": 302,
+        "url": "https://cdn.example.net",
+        "violations": [
+          {
+            "code": "CORS_REDIRECT_NOT_SAME_ORIGIN",
+            "detail": "same-origin mode cannot follow a redirect to https://cdn.example.net",
+            "spec_ref": [
+              "Fetch §CORS protocol",
+              "Fetch §HTTP-redirect fetch"
+            ]
+          }
+        ]
+      }
+    ],
+    "max_age_effective": 0,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": false,
+    "visible_headers": []
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "same-origin",
+    "origin": "https://app.example.com",
+    "redirects": [
+      {
+        "headers": {},
+        "status": 302,
+        "url": "https://cdn.example.net/b"
+      }
+    ],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "same-origin mode cannot follow a cross-origin redirect.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §HTTP-redirect fetch",
+    "Fetch §CORS protocol"
+  ],
+  "tool": "cors_simulate_fetch"
+}

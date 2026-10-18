@@ -16,7 +16,11 @@ python -m pytest
 | `test_entry_point.py` | exit-code contract (0 / 2), no judgement subcommand, `--help` surface |
 | `test_utf8_guard.py` | cp1252 stream reproduction — the guard is proven against a stream that really is not UTF-8 |
 | `test_registry.py` | name ordering, duplicate rejection, descriptor isolation, no callables leaking into `tools/list` |
-| `test_gates.py` | the three static gates, each with an injected defect that must turn it red |
+| `test_gates.py` | the original static gates, each with an injected defect that must turn it red |
+| `test_m1_gates.py` | the M1 gates: oracle independence (including dynamic imports), golden hygiene, code-literal uniqueness |
+| `test_gen_codes.py` | `codes.json` regeneration, mirror equality, table↔catalog set equality, drift localisation |
+| `test_golden.py` | golden completeness, exact output key sets, sorting, both-direction coverage, drift and orphan detection |
+| `test_wpt_ledger.py` | WPT index shape, ledger partition (`converted + unmappable == total`), case references |
 | `test_mirrors.py` | package/top-level mirror equality, including missing and diverged cases |
 | `test_readme_gate.py` | README commands/flags/extras/file references against the real parser and the real tree |
 | `test_ci_workflow.py` | workflow parses, four matrix legs, required steps, no silent skips, release gate stays out |

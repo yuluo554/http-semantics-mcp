@@ -51,6 +51,7 @@ def test_required_steps_are_present():
         "Version and self-test",
         "Console script smoke",
         "Repository gates",
+        "Generated data is reproducible",
         "Mutation verification",
         "stdio handshake smoke",
         "Full test suite",

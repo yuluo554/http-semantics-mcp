@@ -1,0 +1,49 @@
+{
+  "case_id": "cors-eval-009-preflight-missing-headers",
+  "expected": {
+    "decision": "block",
+    "missing_headers": [
+      "access-control-allow-headers"
+    ],
+    "notes": {
+      "allow_credentials_null_origin": false,
+      "max_age_capped_by_client": false,
+      "wildcard_with_credentials": false
+    },
+    "recommended_headers": {
+      "access-control-allow-headers": "x-custom"
+    },
+    "violations": [
+      {
+        "code": "CORS_MISSING_ALLOW_HEADERS",
+        "detail": "preflight response has no Access-Control-Allow-Headers (request header x-custom)",
+        "spec_ref": [
+          "Fetch §CORS-preflight fetch"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "origin": "https://app.example.com",
+    "request_headers": {
+      "x-custom": "1"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Methods": "PUT",
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 204
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §CORS-preflight fetch"
+  ],
+  "tool": "cors_evaluate"
+}

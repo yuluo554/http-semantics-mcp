@@ -1,0 +1,33 @@
+{
+  "case_id": "cond-012-invalid-date-ignored",
+  "expected": {
+    "explain": [
+      {
+        "code": "COND_IGNORED_INVALID_DATE",
+        "detail": "if-modified-since is not a valid HTTP-date and was ignored",
+        "spec_ref": [
+          "RFC9110 §13.1.3"
+        ]
+      }
+    ],
+    "rule_applied": "none",
+    "status": 200,
+    "weak_comparison_used": false
+  },
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-Modified-Since": "not a date"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Invalid HTTP-date: the condition is ignored, status 200.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.3"
+  ],
+  "tool": "conditional_evaluate"
+}

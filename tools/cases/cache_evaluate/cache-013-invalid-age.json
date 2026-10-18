@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-013-invalid-age",
+  "input": {
+    "now": "2026-01-01T00:00:30Z",
+    "request_headers": {},
+    "response_headers": {
+      "Age": "many",
+      "Cache-Control": "max-age=60",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Age header unparsable -> treated as 0, reason recorded.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §5.1"
+  ],
+  "tool": "cache_evaluate"
+}

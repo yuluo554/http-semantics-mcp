@@ -1,0 +1,19 @@
+{
+  "case_id": "cond-003-if-match-failed",
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-Match": "\"other\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.1",
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

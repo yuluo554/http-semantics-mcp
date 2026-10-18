@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-008-expires-in-past",
+  "input": {
+    "now": "2026-01-01T00:00:01Z",
+    "request_headers": {},
+    "response_headers": {
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT",
+      "Expires": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Expires - Date = 0 -> CACHE_EXPIRES_IN_PAST, lifetime 0.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §5.3"
+  ],
+  "tool": "cache_evaluate"
+}

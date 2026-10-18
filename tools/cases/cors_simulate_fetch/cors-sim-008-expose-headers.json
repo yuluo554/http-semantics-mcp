@@ -1,0 +1,27 @@
+{
+  "case_id": "cors-sim-008-expose-headers",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://app.example.com",
+        "Access-Control-Expose-Headers": "X-Request-Id, X-Trace"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Default-readable headers stay visible; the expose list adds two.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS protocol",
+    "Fetch §CORS check"
+  ],
+  "tool": "cors_simulate_fetch"
+}

@@ -1,0 +1,40 @@
+{
+  "case_id": "cors-eval-018-header-order-invariance-a",
+  "expected": {
+    "decision": "allow",
+    "missing_headers": [],
+    "notes": {
+      "allow_credentials_null_origin": false,
+      "max_age_capped_by_client": false,
+      "wildcard_with_credentials": false
+    },
+    "recommended_headers": {},
+    "violations": []
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "origin": "https://app.example.com",
+    "request_headers": {
+      "x-a": "1",
+      "x-b": "2"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Headers": "x-a, x-b",
+        "Access-Control-Allow-Methods": "PUT",
+        "Access-Control-Allow-Origin": "https://app.example.com"
+      },
+      "status": 204
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "notes": "Same input as -b with the request headers written in the other order.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §CORS-preflight fetch"
+  ],
+  "tool": "cors_evaluate"
+}

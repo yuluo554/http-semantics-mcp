@@ -1,0 +1,20 @@
+{
+  "case_id": "cond-018-unmodified-since-with-modified-since",
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-Modified-Since": "Thu, 01 Jan 2026 00:00:00 GMT",
+      "If-Unmodified-Since": "Wed, 31 Dec 2025 00:00:00 GMT"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Precedence pair: If-Unmodified-Since fails before the cache-validator rule is reached.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

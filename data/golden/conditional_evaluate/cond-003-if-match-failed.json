@@ -1,0 +1,34 @@
+{
+  "case_id": "cond-003-if-match-failed",
+  "expected": {
+    "explain": [
+      {
+        "code": "COND_IF_MATCH_FAILED",
+        "detail": "If-Match did not match any current entity tag",
+        "spec_ref": [
+          "RFC9110 §13.1.1",
+          "RFC9110 §13.2.2"
+        ]
+      }
+    ],
+    "rule_applied": "if_match",
+    "status": 412,
+    "weak_comparison_used": false
+  },
+  "input": {
+    "method": "PUT",
+    "request_headers": {
+      "If-Match": "\"other\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": null
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.1",
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

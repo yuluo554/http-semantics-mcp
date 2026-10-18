@@ -1,0 +1,44 @@
+{
+  "case_id": "vary-004-field-missing",
+  "expected": {
+    "differing_headers": [
+      "accept-language"
+    ],
+    "match": "miss",
+    "normalized_vary": [
+      "accept-language"
+    ],
+    "reasons": [
+      {
+        "code": "VARY_FIELD_MISMATCH",
+        "detail": "Vary field accept-language differs between stored and incoming request",
+        "spec_ref": [
+          "RFC9111 §4.1"
+        ]
+      },
+      {
+        "code": "VARY_FIELD_MISSING",
+        "detail": "Vary field accept-language is absent on one side",
+        "spec_ref": [
+          "RFC9111 §4.1"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept-Language": "en"
+      },
+      "vary": "Accept-Language"
+    },
+    "incoming": {
+      "request_headers": {}
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

@@ -1,0 +1,41 @@
+{
+  "case_id": "cache-007-swr-window-closed",
+  "expected": {
+    "action": "revalidate",
+    "current_age": 25,
+    "freshness_lifetime": 10,
+    "is_fresh": false,
+    "must_revalidate": false,
+    "reasons": [
+      {
+        "code": "CACHE_AGE_EXCEEDS_LIFETIME",
+        "detail": "current_age=25 is not below freshness_lifetime=10",
+        "spec_ref": [
+          "RFC9111 §4.2",
+          "RFC9111 §4.2.3"
+        ]
+      }
+    ],
+    "stale_while_revalidate_window": 5
+  },
+  "input": {
+    "now": "2026-01-01T00:00:25Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=10, stale-while-revalidate=5",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "excess=15 > 5 -> window closed, revalidate.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC5861 §3",
+    "RFC9111 §4.2.4"
+  ],
+  "tool": "cache_evaluate"
+}

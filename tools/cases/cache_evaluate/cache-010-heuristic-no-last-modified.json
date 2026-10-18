@@ -1,0 +1,21 @@
+{
+  "case_id": "cache-010-heuristic-no-last-modified",
+  "input": {
+    "now": "2026-01-01T00:00:05Z",
+    "request_headers": {},
+    "response_headers": {
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "No explicit freshness and no Last-Modified -> heuristic 0.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.2"
+  ],
+  "tool": "cache_evaluate"
+}

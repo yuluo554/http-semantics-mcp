@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-017-http-date-now",
+  "input": {
+    "now": "Thu, 01 Jan 2026 00:01:00 GMT",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "max-age=120",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "5",
+      "headers": {},
+      "stored_at": "Thu, 01 Jan 2026 00:00:10 GMT"
+    }
+  },
+  "notes": "HTTP-date on both sides; same arithmetic as the ISO cases.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.3"
+  ],
+  "tool": "cache_evaluate"
+}

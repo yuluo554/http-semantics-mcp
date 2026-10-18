@@ -1,0 +1,43 @@
+{
+  "case_id": "cond-017-none-match-with-modified-since",
+  "expected": {
+    "explain": [
+      {
+        "code": "COND_IF_NONE_MATCH_MATCHED",
+        "detail": "If-None-Match matched the current entity tag",
+        "spec_ref": [
+          "RFC9110 §13.1.2",
+          "RFC9110 §13.2.2"
+        ]
+      },
+      {
+        "code": "COND_WEAK_COMPARISON_USED",
+        "detail": "If-None-Match is evaluated with weak comparison",
+        "spec_ref": [
+          "RFC9110 §13.1.2",
+          "RFC9110 §8.8.3.2"
+        ]
+      }
+    ],
+    "rule_applied": "if_none_match",
+    "status": 304,
+    "weak_comparison_used": true
+  },
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-Modified-Since": "Wed, 31 Dec 2025 00:00:00 GMT",
+      "If-None-Match": "\"abc123\""
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Precedence pair: If-None-Match decides; If-Modified-Since is ignored on match.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

@@ -1,0 +1,29 @@
+{
+  "case_id": "cors-eval-010-preflight-allow",
+  "input": {
+    "credentials": "omit",
+    "is_preflight": true,
+    "method": "PUT",
+    "origin": "https://app.example.com",
+    "request_headers": {
+      "content-type": "application/json",
+      "x-custom": "1"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Headers": "x-custom, content-type",
+        "Access-Control-Allow-Methods": "GET, PUT",
+        "Access-Control-Allow-Origin": "https://app.example.com",
+        "Access-Control-Max-Age": "600"
+      },
+      "status": 204
+    },
+    "url": "https://api.example.com/v1"
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §CORS-preflight fetch"
+  ],
+  "tool": "cors_evaluate"
+}

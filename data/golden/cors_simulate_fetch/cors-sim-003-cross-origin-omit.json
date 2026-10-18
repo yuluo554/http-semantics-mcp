@@ -1,0 +1,70 @@
+{
+  "case_id": "cors-sim-003-cross-origin-omit",
+  "expected": {
+    "decision": "allow",
+    "events": [
+      "origin_set_to_null"
+    ],
+    "final_type": "cors",
+    "hops": [
+      {
+        "decision": "allow",
+        "status": 302,
+        "url": "https://api.example.com",
+        "violations": []
+      },
+      {
+        "decision": "allow",
+        "status": 200,
+        "url": "https://cdn.example.net",
+        "violations": [
+          {
+            "code": "CORS_NULL_ORIGIN",
+            "detail": "Origin: null is an opaque origin",
+            "spec_ref": [
+              "Fetch §CORS check",
+              "Fetch §CORS protocol and credentials"
+            ]
+          }
+        ]
+      }
+    ],
+    "max_age_effective": 0,
+    "preflight_cache_key": "7a10f62b78f65b5a",
+    "preflight_occurred": false,
+    "visible_headers": [
+      "access-control-allow-origin"
+    ]
+  },
+  "input": {
+    "credentials": "omit",
+    "is_preflight": false,
+    "method": "GET",
+    "mode": "cors",
+    "origin": "https://app.example.com",
+    "redirects": [
+      {
+        "headers": {
+          "Access-Control-Allow-Origin": "https://app.example.com"
+        },
+        "status": 302,
+        "url": "https://cdn.example.net/b"
+      }
+    ],
+    "request_headers": {},
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "null"
+      },
+      "status": 200
+    },
+    "url": "https://api.example.com/a"
+  },
+  "notes": "Credentials omitted: only origin_set_to_null.",
+  "source": "synthetic",
+  "spec_basis": [
+    "Fetch §CORS check",
+    "Fetch §HTTP-redirect fetch"
+  ],
+  "tool": "cors_simulate_fetch"
+}

@@ -1,0 +1,12 @@
+{
+  "case_id": "time-005-wrong-weekday",
+  "input": {
+    "value": "Fri, 01 Jan 2026 00:00:00 GMT"
+  },
+  "notes": "2026-01-01 is a Thursday; a wrong weekday is an invalid HTTP-date.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §5.6.7"
+  ],
+  "tool": "_time"
+}

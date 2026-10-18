@@ -1,0 +1,22 @@
+{
+  "case_id": "vary-005-accept-case-insensitive",
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept": "text/HTML"
+      },
+      "vary": "Accept"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept": "text/html"
+      }
+    }
+  },
+  "notes": "Accept is case-insensitive: values match after folding.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

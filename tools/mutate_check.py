@@ -74,6 +74,48 @@ CASES = [
         "def write_response(stream, response):\n    \"\"\"Write one response object as a framed line.\"\"\"\n    import json\n    _write(stream, json.dumps(response).encode(\"utf-8\") + b\"\\n\")",
         [os.path.join("tools", "run_gates.py")],
     ),
+    (
+        "the oracle imports the implementation",
+        os.path.join("tools", "golden_oracle", "engine.py"),
+        "import json\nimport os\n",
+        "import json\nimport os\n\nimport http_semantics_mcp\n",
+        [os.path.join("tools", "run_gates.py")],
+    ),
+    (
+        "a golden case gains an observed field",
+        os.path.join("data", "golden", "vary_match", "vary-001-hit-single.json"),
+        '  "case_id": "vary-001-hit-single",',
+        '  "case_id": "vary-001-hit-single",\n  "observed_match": "hit",',
+        [os.path.join("tools", "run_gates.py")],
+    ),
+    (
+        "the package spells a rule code as a literal",
+        os.path.join("src", "http_semantics_mcp", "judgement", "__init__.py"),
+        "__all__ = []",
+        '__all__ = []\n\nFIRST_CODE = "CACHE_NO_STORE"',
+        [os.path.join("tools", "run_gates.py")],
+    ),
+    (
+        "the code catalog drifts from the table",
+        os.path.join("src", "http_semantics_mcp", "references", "codes.json"),
+        '"CACHE_NO_STORE":{"meaning":',
+        '"CACHE_NO_STORE":{"edited_by_hand":true,"meaning":',
+        [os.path.join("tools", "gen_codes.py"), "--check"],
+    ),
+    (
+        "a golden expectation drifts from the oracle",
+        os.path.join("data", "golden", "vary_match", "vary-001-hit-single.json"),
+        '"match": "hit"',
+        '"match": "miss"',
+        [os.path.join("tools", "gen_golden.py"), "--check"],
+    ),
+    (
+        "the table renames a code behind the catalog's back",
+        os.path.join("data", "README.md"),
+        "| `CORS_` | `CORS_NULL_ORIGIN` |",
+        "| `CORS_` | `CORS_NULL_ORIGIN_GONE` |",
+        [os.path.join("tools", "gen_codes.py"), "--check"],
+    ),
 ]
 
 

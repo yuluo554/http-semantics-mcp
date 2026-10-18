@@ -1,0 +1,38 @@
+{
+  "case_id": "vary-003-star",
+  "expected": {
+    "differing_headers": [],
+    "match": "miss",
+    "normalized_vary": [
+      "*"
+    ],
+    "reasons": [
+      {
+        "code": "VARY_STAR_NEVER_MATCHES",
+        "detail": "Vary: * always fails to match",
+        "spec_ref": [
+          "RFC9111 §4.1"
+        ]
+      }
+    ]
+  },
+  "input": {
+    "cached": {
+      "request_headers_at_store": {
+        "Accept": "*/*"
+      },
+      "vary": "*"
+    },
+    "incoming": {
+      "request_headers": {
+        "Accept": "*/*"
+      }
+    }
+  },
+  "notes": "Vary: * never matches.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.1"
+  ],
+  "tool": "vary_match"
+}

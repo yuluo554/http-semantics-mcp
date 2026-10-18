@@ -1,0 +1,16 @@
+{
+  "case_id": "cond-001-no-condition",
+  "input": {
+    "method": "GET",
+    "request_headers": {},
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.2.2"
+  ],
+  "tool": "conditional_evaluate"
+}

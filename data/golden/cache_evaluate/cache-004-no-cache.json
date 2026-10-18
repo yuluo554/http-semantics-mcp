@@ -1,0 +1,39 @@
+{
+  "case_id": "cache-004-no-cache",
+  "expected": {
+    "action": "revalidate",
+    "current_age": 10,
+    "freshness_lifetime": 600,
+    "is_fresh": true,
+    "must_revalidate": false,
+    "reasons": [
+      {
+        "code": "CACHE_NO_CACHE",
+        "detail": "Cache-Control: no-cache requires revalidation",
+        "spec_ref": [
+          "RFC9111 §5.2.2.4"
+        ]
+      }
+    ],
+    "stale_while_revalidate_window": 0
+  },
+  "input": {
+    "now": "2026-01-01T00:00:10Z",
+    "request_headers": {},
+    "response_headers": {
+      "Cache-Control": "no-cache, max-age=600",
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "Fresh by max-age, still revalidated because of no-cache.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §5.2.2.4"
+  ],
+  "tool": "cache_evaluate"
+}

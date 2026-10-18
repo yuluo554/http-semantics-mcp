@@ -1,0 +1,22 @@
+{
+  "case_id": "cache-009-heuristic",
+  "input": {
+    "now": "2026-01-01T00:10:00Z",
+    "request_headers": {},
+    "response_headers": {
+      "Date": "Thu, 01 Jan 2026 00:00:00 GMT",
+      "Last-Modified": "Wed, 31 Dec 2025 22:00:00 GMT"
+    },
+    "stored": {
+      "age": "0",
+      "headers": {},
+      "stored_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "notes": "date-last_modified=7200; 10% = 720 seconds heuristic lifetime.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9111 §4.2.2"
+  ],
+  "tool": "cache_evaluate"
+}

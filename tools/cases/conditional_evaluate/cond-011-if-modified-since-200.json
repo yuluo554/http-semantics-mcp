@@ -1,0 +1,18 @@
+{
+  "case_id": "cond-011-if-modified-since-200",
+  "input": {
+    "method": "GET",
+    "request_headers": {
+      "If-Modified-Since": "Wed, 31 Dec 2025 00:00:00 GMT"
+    },
+    "resource": {
+      "etag": "\"abc123\"",
+      "last_modified": "2026-01-01T00:00:00Z"
+    }
+  },
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §13.1.3"
+  ],
+  "tool": "conditional_evaluate"
+}

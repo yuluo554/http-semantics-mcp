@@ -1,0 +1,12 @@
+{
+  "case_id": "time-006-missing-zone",
+  "input": {
+    "value": "2026-01-01T00:00:00"
+  },
+  "notes": "No Z, no GMT -> rejected; no local-time guessing.",
+  "source": "synthetic",
+  "spec_basis": [
+    "RFC9110 §5.6.7"
+  ],
+  "tool": "_time"
+}
