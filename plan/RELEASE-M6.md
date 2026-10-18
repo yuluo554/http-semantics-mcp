@@ -91,7 +91,24 @@ sha256: 3fa920e376b4870f34975db75f45dd4fef15609eca5d4ff977128eaeb8fab805  SHA256
 
 ### `--online` 复核
 
-待回填（下一次仅文档面提交）。
+在 tag 后、回写提交之后实跑（干净树）：
+
+```
+version-parity  PASS  pyproject and package agree on 0.1.0
+license-file    PASS  LICENSE present
+readme          PASS  README present
+repo-gates      PASS  8 gates green, 734 files scanned
+dist-mirrors    PASS  6 mirror file(s) byte-identical
+release-note    PASS  release note has both columns
+git-clean       PASS  working tree clean
+tag             PASS  tag v0.1.0 exists
+release         PASS  2 asset(s) uploaded
+attachments     PASS  2 registered digest(s) match published asset names
+summary: 10 passed, 0 failed, 0 skipped (10 checks)
+```
+
+退出码 `0`。即：`v0.1.0` 指向的 tag 对象与远端一致、Release 非 draft、附件集合完整
+（2 个，均 `uploaded`）、上表登记的两个摘要行与已发布附件名一一对应。
 
 <!--
 注册行格式（check_release._registered_digests 逐字解析，tag 后回填时保持此形态）：

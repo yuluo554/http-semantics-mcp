@@ -33,7 +33,7 @@
 | annotated tag（tagger 邮箱脱敏）+ Release + 附件 | tagger `yuluo554 <282769740+yuluo554@users.noreply.github.com>`；Release 两附件 `state=uploaded` |
 | 干净 clone（`--no-local`）+ 新 venv + README 逐条 | `--no-local` rc=0、https clone rc=0；`pip install -e ".[dev]"` rc=0；`--version`/`--selftest`/控制台脚本/stdio 握手 rc 全 0；`pytest` 379 passed |
 | 真下载 → `sha256sum -c` → `cmp` → `diff -r` → 中立目录三命令 | `sha256sum -c` OK；`cmp` identical；解包树 `diff -r` 无差异（284 文件）；中立 venv 三命令 rc 全 0 |
-| `check_release.py --online` 全绿 | 见 `plan/RELEASE-M6.md`「`--online` 复核」 |
+| `check_release.py --online` 全绿 | tag 后实跑：**10 PASS / 0 FAIL / 0 SKIP**（tag 指向一致、Release 非 draft、2 附件 `uploaded`、登记摘要名匹配），退出 0；逐行输出见 `plan/RELEASE-M6.md`「`--online` 复核」 |
 | 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 noreply；②tag tagger 邮箱脱敏；③`absolute-paths` 门在 tag 树 / 解包树 0 findings；④产物扫描无 `.venv`/`__pycache__`/`.pyc` |
 | README 转正；`plan/00` 回写；`plan/05` M6 打勾；本档落盘 | 本提交（tag 之后仅 `plan/` 与 `README.md` 变更，`git diff --name-only v0.1.0..HEAD` 可验） |
 

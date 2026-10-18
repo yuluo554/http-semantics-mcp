@@ -70,7 +70,7 @@
 | 字节级确定性 | 本题设计 | 全部 tool | 同输入双跑序列化 sha256 相等 | ✅ M5（五 tool × 全部 golden 双跑 sha256 相等；输出无时间戳/随机/路径） |
 | stdio server 可被真实客户端调用 | MCP 协议 | `README.md` 安装说明 | 客户端启动 + `tools/list` 五个 tool 全列 | ✅ M5（`tests/test_stdio_end_to_end.py`：握手 → 列五 tool → 五 tool 各成功调用一次 → 未知 tool `-32602`） |
 | WPT `cors/` 全量映射 | 本题设计 | `data/wpt-mapping.json` | 可转写用例全绿 + 不可转写逐条登记原因 | ✅ M5（15/15 mapped 行实跑对账；30 行逐条有 `reason`） |
-| 发布三件套 | M6 DoD | tag / Release 附产物 / `plan/RELEASE-M6.md` | `scripts/check_release.py` | ✅ M6（annotated tag `v0.1.0` + Release 附 `http-semantics-mcp-0.1.0.tar.gz` 与 `SHA256SUMS`；留档 `plan/RELEASE-M6.md` tag 之前入库。发布终态门结论见留档「`--online` 复核」） |
+| 发布三件套 | M6 DoD | tag / Release 附产物 / `plan/RELEASE-M6.md` | `scripts/check_release.py` | ✅ M6（annotated tag `v0.1.0` + Release 附 `http-semantics-mcp-0.1.0.tar.gz` 与 `SHA256SUMS`；留档 `plan/RELEASE-M6.md` tag 之前入库；`check_release.py --online` **10 PASS / 0 FAIL / 0 SKIP**） |
 
 ## 四、里程碑
 
@@ -95,7 +95,7 @@
 - **远端**：`yuluo554/http-semantics-mcp`（public）建仓并首推 `main`；push 事件 2 = run 2，四矩阵 `{ubuntu,windows} × {3.8,3.12}` 全绿（`main` run `39141511111`；tag run `39141686281`）。
 - **发布三件套**：annotated tag `v0.1.0`（tagger 邮箱脱敏；tag 对象 `d20ba5fe`，指向提交 `d50011f`）+ GitHub Release（非 draft）+ 手工源码包 `http-semantics-mcp-0.1.0.tar.gz`（231914 字节，sha256 `8cc8892c…`）+ `SHA256SUMS`；附件 sha256 只进 Release 正文与 tag 后的留档，不进 tag 树。
 - **复验**：真下载 → `sha256sum -c` OK → `cmp` 与本地构建件 identical → 下载件解包树 vs `git archive v0.1.0` 解包树 `diff -r` 无差异（284 文件）；`--no-local` 干净 clone + 新 venv 按 README 逐条跑通（退出码全 0，`pytest` 379 passed）。
-- **发布终态门**：`scripts/check_release.py --pre-tag` 7 PASS / 0 FAIL / 3 SKIP；`--online` 结论见 `plan/RELEASE-M6.md`「`--online` 复核」。
+- **发布终态门**：`scripts/check_release.py --pre-tag` 7 PASS / 0 FAIL / 3 SKIP；tag 后 `--online` **10 PASS / 0 FAIL / 0 SKIP**（tag 指向、Release 非 draft、2 附件集合、逐附件摘要名，见 `plan/RELEASE-M6.md`）。
 - **脱敏四步**：单一 noreply 邮箱、annotated tag tagger 邮箱脱敏、树内零本机路径（`absolute-paths` 门）、产物扫描无残留。
 
 ### M5（2026-10-18）已完成
