@@ -81,8 +81,8 @@ bytes, on any machine, at any time.
 Requires Python 3.8 or newer. The runtime has **no third-party dependencies**.
 
 ```bash
-git clone https://github.com/yuluo554/10-19-http-semantics-mcp.git
-cd 10-19-http-semantics-mcp
+git clone https://github.com/yuluo554/http-semantics-mcp.git
+cd http-semantics-mcp
 python -m pip install -e ".[dev]"
 ```
 
