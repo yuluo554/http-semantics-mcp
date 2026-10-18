@@ -3,7 +3,7 @@
 - **项目**：HTTP 语义判定 MCP Server（CORS 放行判定 + 缓存新鲜度 + 条件请求 + Vary 命中）
 - **性质**：不参赛项目题（模拟项目），发布 GitHub **公开仓库**，署名 `yuluo554`
 - **版本**：v1（2026-10-17 定稿；检索基准日 2026-10-17，实测窗口 2026-10-18 10:33–11:05 UTC）
-- **当前里程碑**：M5 schema 与自检 ✅（2026-10-18：五个 tool 的 schema 描述符落地并逐字节镜像，契约门 / 确定性门 / WPT 全量对账 / 端到端 stdio 全部就位）；M6 发布待开工
+- **当前里程碑**：M6 发布 ✅（2026-10-18：定版 0.1.0；公开仓库 `yuluo554/http-semantics-mcp` 首推；四矩阵 CI 全绿；annotated tag `v0.1.0` + GitHub Release + 手工源码包附件 + `plan/RELEASE-M6.md`）。**M0–M6 全部完成**
 - **交付形态**：**MCP Server（stdio 传输）**，唯一形态，不设备选
 - **一句话定位**：把 Fetch Standard 的 CORS 协议算法与 RFC 9111 缓存新鲜度算法编译成可调用的 oracle——给一组请求/响应头，返回 `allow|block`、违反的规则编号 + 规范条款、以及该改哪个 header。**不联网、不抓包、不做安全打分。**
 
@@ -16,8 +16,10 @@
 | `plan/02-架构与技术选型.md` | 交付形态、分层架构、目录结构、stdio 协议与错误契约 | ✅ M0 定稿 |
 | `plan/03-模块详设.md` | T1–T5 判定算法、规则编号表、`spec_ref` 生成方式 | ✅ M0 定稿 |
 | `plan/04-数据计划.md` | golden case 组织、WPT 映射台账、假时钟用例、oracle 独立性 | ✅ M0 定稿；M1 已按实况补记（不降级、递归覆盖） |
-| `plan/05-里程碑.md` | M0–M6 DoD 与状态 | ✅ M0 定稿 |
+| `plan/05-里程碑.md` | M0–M6 DoD 与状态 | ✅ M0 定稿；M1–M6 逐棒回写实测 |
 | `plan/06-交付对标与决策记录.md` | 评分对标、决策细化（D19–D50）、待定决策回写 | ✅ M0 定稿；M1 增补 D35–D40；M2 增补 D41–D43；M3 增补 D44–D46；M4 增补 D47–D49；M5 增补 D50 |
+| `plan/RELEASE-M6.md` | 发布留档（tag 时点事实 / tag 后追加事实两栏；附件 sha256 只在此处 tag 后栏与 Release 正文） | ✅ M6 |
+| `plan/WRAPUP-M6.md` | 收官档（一句话结论 + 交付物 + DoD→证据索引 + 从零复现 + 边界与后续） | ✅ M6 |
 | `data/README.md` | 依据查证记录（三态）、数据源可获取性、合成数据纪律、**数值口径（唯一出处）** | ✅ M1 §4 定稿（条款全核对、输出键集合登记） |
 
 ## 二、决策记录
@@ -68,7 +70,7 @@
 | 字节级确定性 | 本题设计 | 全部 tool | 同输入双跑序列化 sha256 相等 | ✅ M5（五 tool × 全部 golden 双跑 sha256 相等；输出无时间戳/随机/路径） |
 | stdio server 可被真实客户端调用 | MCP 协议 | `README.md` 安装说明 | 客户端启动 + `tools/list` 五个 tool 全列 | ✅ M5（`tests/test_stdio_end_to_end.py`：握手 → 列五 tool → 五 tool 各成功调用一次 → 未知 tool `-32602`） |
 | WPT `cors/` 全量映射 | 本题设计 | `data/wpt-mapping.json` | 可转写用例全绿 + 不可转写逐条登记原因 | ✅ M5（15/15 mapped 行实跑对账；30 行逐条有 `reason`） |
-| 发布三件套 | M6 DoD | tag / Release 附产物 / `plan/RELEASE-M6.md` | `scripts/check_release.py` | ⬜ 待 M6 |
+| 发布三件套 | M6 DoD | tag / Release 附产物 / `plan/RELEASE-M6.md` | `scripts/check_release.py` | ✅ M6（annotated tag `v0.1.0` + Release 附 `http-semantics-mcp-0.1.0.tar.gz` 与 `SHA256SUMS`；留档 `plan/RELEASE-M6.md` tag 之前入库。发布终态门结论见留档「`--online` 复核」） |
 
 ## 四、里程碑
 
@@ -80,11 +82,21 @@
 | **M3 缓存** | T3 `cache_evaluate` | 假时钟注入可用；RFC 9111 新鲜度 / 年龄 / 动作判定 golden case 全绿；`reasons[]` 带条款号 | ✅ 完成（2026-10-18） |
 | **M4 条件请求与 Vary** | T4 `conditional_evaluate` + T5 `vary_match` | §13.2.2 求值顺序与短路正确；强弱比较分离；`Vary: *` 与归一化用例全绿 | ✅ 完成（2026-10-18） |
 | **M5 schema 与自检** | 五个 tool schema 定稿、server 组装、确定性守门、WPT 全量映射跑通 | schema 与实现字段集合相等；同输入双跑字节一致；stdio 客户端可启动并列出五个 tool；WPT 映射全量通过 | ✅ 完成（2026-10-18） |
-| **M6 发布** | 发布 GitHub **公开仓库** | **M6 DoD = 三件套：①git tag ②GitHub Release（附产物：至少一个手工上传附件，本地留副本 + sha256）③发布留档文件 `plan/RELEASE-M6.md`（tag 之前写好并进 tag 树）**；发布后跑 `scripts/check_release.py` | ⬜ 待开工 |
+| **M6 发布** | 发布 GitHub **公开仓库** | **M6 DoD = 三件套：①git tag ②GitHub Release（附产物：至少一个手工上传附件，本地留副本 + sha256）③发布留档文件 `plan/RELEASE-M6.md`（tag 之前写好并进 tag 树）**；发布后跑 `scripts/check_release.py` | ✅ 完成（2026-10-18）：annotated tag `v0.1.0`（指向 `d50011f`）+ Release（非 draft）附手工源码包 + `SHA256SUMS`；首推 `main` 与 tag 各一 run，四矩阵全绿 |
 
 > 发布留档文件必须在 tag **之前**入库；tag 之后只允许追加类提交（回写实测值 / 对账 / 补记），并在留档里分栏写"tag 时点事实 / tag 后追加事实"。
 
 ## 五、当前状态
+
+### M6（2026-10-18）已完成
+
+- **定版**：`0.1.0.dev0 → 0.1.0`（`src/http_semantics_mcp/__init__.py:__version__` 与 `pyproject.toml` 两处一致，`selfcheck._check_version_parity` PASS）；README 克隆地址修正为 `http-semantics-mcp`。
+- **留档**：`plan/RELEASE-M6.md` 在 tag **之前**入库，两栏 `tag 时点事实` / `tag 后追加事实`；tag 树内不含任何附件 sha256（自指规避，D28/D29）。
+- **远端**：`yuluo554/http-semantics-mcp`（public）建仓并首推 `main`；push 事件 2 = run 2，四矩阵 `{ubuntu,windows} × {3.8,3.12}` 全绿（`main` run `39141511111`；tag run `39141686281`）。
+- **发布三件套**：annotated tag `v0.1.0`（tagger 邮箱脱敏；tag 对象 `d20ba5fe`，指向提交 `d50011f`）+ GitHub Release（非 draft）+ 手工源码包 `http-semantics-mcp-0.1.0.tar.gz`（231914 字节，sha256 `8cc8892c…`）+ `SHA256SUMS`；附件 sha256 只进 Release 正文与 tag 后的留档，不进 tag 树。
+- **复验**：真下载 → `sha256sum -c` OK → `cmp` 与本地构建件 identical → 下载件解包树 vs `git archive v0.1.0` 解包树 `diff -r` 无差异（284 文件）；`--no-local` 干净 clone + 新 venv 按 README 逐条跑通（退出码全 0，`pytest` 379 passed）。
+- **发布终态门**：`scripts/check_release.py --pre-tag` 7 PASS / 0 FAIL / 3 SKIP；`--online` 结论见 `plan/RELEASE-M6.md`「`--online` 复核」。
+- **脱敏四步**：单一 noreply 邮箱、annotated tag tagger 邮箱脱敏、树内零本机路径（`absolute-paths` 门）、产物扫描无残留。
 
 ### M5（2026-10-18）已完成
 
@@ -153,10 +165,10 @@
   - 双解释器 pytest：`py -3.8` 129 passed / `py -3.12` 129 passed。
   - `tools/run_gates.py`：purity / absolute-paths / crlf 三门前绿，扫描 48 个文件。
   - `scripts/check_release.py --pre-tag`：5 PASS / 1 FAIL（工作树未提交，预期）/ 4 SKIP。
-- **M5 后仍未建立**：tag / GitHub Release / 发布附件（M6）。五个 tool 的正式 schema 文件、`schema properties == 实跑输出键集合` 门、确定性全量 sha256 扫描、WPT 全量映射对账均已在 M5 落地。`tools/list` 返回五个已实现的 tool，这是当前正确行为。
+- **M6 后已建立**：tag `v0.1.0` / GitHub Release / 发布附件（M6）。五个 tool 的正式 schema 文件、`schema properties == 实跑输出键集合` 门、确定性全量 sha256 扫描、WPT 全量映射对账均已在 M5 落地。`tools/list` 返回五个已实现的 tool，这是当前正确行为。
 
 ### 诚实口径
 
-- **未推送远端**：本项目的 CI 从未运行过。任何"CI 绿"的说法在此刻都不成立；M0–M5 的等价证据只有本地实跑项（双解释器 / 真实子进程 / 静态门 / 生成物复算 / 变异验证）。README 的指标段只写本地实测值，并保留"本地等价校验（未接远端，CI 待首推验证）"措辞。
-- M6 首推后据实补记 run id 与首跑结果；历史文档保留"本地等价校验"原措辞，补记是追加事实。
+- **M0–M5 时点**（历史原措辞，保留不改）：未推送远端，本项目的 CI 从未运行过；彼时任何"CI 绿"的说法都不成立，M0–M5 的等价证据只有本地实跑项（双解释器 / 真实子进程 / 静态门 / 生成物复算 / 变异验证）。README 的指标段当时只写本地实测值，并保留"本地等价校验（未接远端，CI 待首推验证）"措辞。
+- **M6 追加事实**（2026-10-18）：远端已建立（`yuluo554/http-semantics-mcp`，public），CI 已运行且全绿。push 事件 2 = run 2（`main` run `39141511111`、`v0.1.0` tag run `39141686281`），四矩阵 `{ubuntu,windows} × {3.8,3.12}` 全绿；README 状态行已转正为 Released，指标段的"未接远端"措辞已据实替换为两对 run 链接（历史文档保留原措辞，补记是追加事实）。
 - `tools/list` 在 M0/M1 返回空列表是**正确行为**，README 已如实写明；M2 起返回两个 CORS tool，M3 起再返回 `cache_evaluate` 共三个，M4 起返回全部五个；五个 tool 的正式 schema（`inputSchema` + `outputSchema`）与"schema 键集合 == 输出键集合"门已在 M5 落地（字段集合由 `data/README.md` §4.10 冻结，D50）。

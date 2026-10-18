@@ -68,17 +68,30 @@ printf '%s\n' \
 
 | 项 | 值 |
 | --- | --- |
-| tag 提交（`v0.1.0` 指向） | 待回填 |
-| tag 对象 / tagger | 待回填 |
-| 首推事件与 run 数对账 | 待回填（push 数 = run 数，按事件） |
-| CI 四矩阵 run id 与结论 | 待回填（`{ubuntu,windows} × {3.8,3.12}`） |
-| GitHub Release URL | 待回填 |
-| 附件清单 | 待回填（手工源码包 + `SHA256SUMS`） |
-| 附件 sha256 | 待回填（正文与下方 digest 行） |
-| 真下载复验 | 待回填（`sha256sum -c` / `cmp` / `diff -r` / 中立目录三命令） |
-| 干净 clone 复验 | 待回填（`--no-local` + 新 venv + README 逐条退出码） |
-| `check_release.py --online` | 待回填 |
-| 脱敏四步 | 待回填 |
+| tag 提交（`v0.1.0` 指向） | `d50011f9800e9ed4f1531d63accf5a08b595731b` |
+| tag 对象 | `d20ba5fe625b4b2251573a3e9ca1c93b4b823784`（annotated；本地 == 远端 `refs/tags/v0.1.0`） |
+| tagger | `yuluo554 <282769740+yuluo554@users.noreply.github.com>`（已脱敏） |
+| 首推事件与 run 数对账 | **push 事件 2 → run 2**（`main` 1 + `v0.1.0` 1），`run_attempt` 均为 1；据事件对账成立 |
+| CI 四矩阵 run id 与结论 | `main` push → run [`39141511111`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111) success：jobs `117716738734`(ubuntu-3.8) / `117716738838`(windows-3.8) / `117716738893`(windows-3.12) / `117716738894`(ubuntu-3.12)，四腿全 success |
+| CI tag run | `v0.1.0` push → run [`39141686281`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281) success：jobs `117717244536`(windows-3.12) / `117717244651`(windows-3.8) / `117717244708`(ubuntu-3.12) / `117717244911`(ubuntu-3.8)，四腿全 success |
+| GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0（`isDraft=false`、`isPrerelease=false`） |
+| 附件清单 | `http-semantics-mcp-0.1.0.tar.gz`（231914 字节，`git archive v0.1.0 \| gzip -9n`）+ `SHA256SUMS`（98 字节）；两者 `state=uploaded` |
+| 附件 sha256 | 下方两行（GitHub Release 正文亦载同一组值） |
+| 真下载复验 | `gh release download v0.1.0` → `sha256sum -c SHA256SUMS` OK → `cmp` 下载件 vs 本地构建件 **identical** → 下载件解包树 vs `git archive v0.1.0` 解包树 `diff -r` **无差异**（284 文件）→ 中立 venv `pip install -e .` + `--version` / `--selftest` / stdio 握手，退出码全 0 |
+| 干净 clone 复验 | `git clone --no-local <local>` rc=0；`git clone https://github.com/yuluo554/http-semantics-mcp.git` rc=0；新 venv → `python -m pip install -e ".[dev]"` rc=0（构建隔离自动取 `setuptools`，无需手工前置）→ `--version` rc=0 / `--selftest` 6 passed 0 failed rc=0 / 控制台脚本 `--version`·`--selftest` rc=0 / stdio 握手 rc=0（2 响应、5 tool ASCII 升序）→ `python -m pytest -q` **379 passed** rc=0；`tools/run_gates.py` 8 门 0 失败；三个 `gen_* --check` 全 OK |
+| `check_release.py --online` | 见下方「`--online` 复核」小节 |
+| 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 `282769740+yuluo554@users.noreply.github.com`；②annotated tag tagger 邮箱同上（noreply）；③树内零本机路径（`absolute-paths` 门在 tag 树 283 文件项 0 findings）；④产物扫描：解包树 284 文件，无 `.venv` / `__pycache__` / `.pyc`，`absolute-paths` 门在解包树上 288 文件项 0 findings |
+
+### 附件摘要（`sha256sum -c` 兼容格式）
+
+```
+sha256: 8cc8892c20f1d37f175c8005a0cdd41993b90b58b6aaeef357bda2e647cef8b2  http-semantics-mcp-0.1.0.tar.gz
+sha256: 3fa920e376b4870f34975db75f45dd4fef15609eca5d4ff977128eaeb8fab805  SHA256SUMS
+```
+
+### `--online` 复核
+
+待回填（下一次仅文档面提交）。
 
 <!--
 注册行格式（check_release._registered_digests 逐字解析，tag 后回填时保持此形态）：

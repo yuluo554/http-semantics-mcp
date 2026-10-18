@@ -2,16 +2,18 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: M5 (schema, contract gate and determinism sweep).** The server starts,
-completes the MCP handshake and reports **five tools** — `cache_evaluate`,
-`conditional_evaluate`, `cors_evaluate`, `cors_simulate_fetch` and
-`vary_match`. Each one now ships a JSON Schema descriptor (input **and** output)
-under `src/http_semantics_mcp/schemas/tools/`, mirrored byte-identically to
+**Status: released — v0.1.0.** The server starts, completes the MCP handshake and
+reports **five tools** — `cache_evaluate`, `conditional_evaluate`,
+`cors_evaluate`, `cors_simulate_fetch` and `vary_match`. Each one ships a JSON
+Schema descriptor (input **and** output) under
+`src/http_semantics_mcp/schemas/tools/`, mirrored byte-identically to
 `schemas/tools/`. All five are judged against frozen golden cases
 (18 + 19 + 24 + 10 + 9) and produce byte-identical output; a contract gate
 proves the published output schema equals each tool's real key set and value
 shapes across every case, and a determinism gate proves same-input /
-same-sha256 across all of them. The public release is M6. See
+same-sha256 across all of them. Tagged
+[`v0.1.0`](https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0),
+and the four-leg CI matrix is green. See
 [`plan/05-里程碑.md`](plan/05-里程碑.md).
 
 ---
@@ -296,9 +298,12 @@ Nothing is guessed at, and no test body is copied into this repository.
 
 ### Measured on this build
 
-Every number below comes from the local double-interpreter run, not from CI.
-This repository has no remote yet, so all CI statements are **local equivalent
-checks (no remote wired up; CI to be verified on first push)**.
+Every number below comes from the local double-interpreter run. CI is now wired
+up: the four-leg matrix `{ubuntu, windows} × {3.8, 3.12}` is green on both the
+`main` push (run
+[39141511111](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111))
+and the `v0.1.0` tag push (run
+[39141686281](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281)).
 
 | Metric | Value |
 | --- | --- |
