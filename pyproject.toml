@@ -1,22 +1,20 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "http-semantics-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "Deterministic HTTP semantics judgement MCP server (CORS, cache freshness, conditional requests, Vary)."
 readme = "README.md"
-requires-python = ">=3.8"
-license = { text = "MIT" }
+requires-python = ">=3.12"
+license = "MIT"
 authors = [{ name = "yuluo554" }]
 keywords = ["mcp", "http", "cors", "cache", "rfc9111", "rfc9110", "fetch-standard"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.12",
     "Topic :: Internet :: WWW/HTTP",
     "Typing :: Typed",

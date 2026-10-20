@@ -80,7 +80,11 @@ bytes, on any machine, at any time.
 
 ## Install
 
-Requires Python 3.8 or newer. The runtime has **no third-party dependencies**.
+Requires Python 3.12 or newer. The runtime has **no third-party dependencies**.
+
+The floor is 3.12 because every interpreter below it is end-of-life (3.8 reached
+EOL on 2024-10-07) and because the build metadata needs `setuptools>=77` for an
+SPDX license expression. The CI matrix is `{ubuntu-latest, windows-latest} × {3.12}`.
 
 ```bash
 git clone https://github.com/yuluo554/http-semantics-mcp.git
@@ -298,9 +302,10 @@ Nothing is guessed at, and no test body is copied into this repository.
 
 ### Measured on this build
 
-Every number below comes from the local double-interpreter run. CI is now wired
-up: the four-leg matrix `{ubuntu, windows} × {3.8, 3.12}` is green on both the
-`main` push (run
+Every number below comes from a local run on a clean interpreter — no state from
+a development checkout. CI runs the matrix `{ubuntu-latest, windows-latest} × {3.12}`;
+the last green run before the floor moved to 3.12 was the four-leg
+`{ubuntu, windows} × {3.8, 3.12}` matrix on the `main` push (run
 [39141511111](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111))
 and the `v0.1.0` tag push (run
 [39141686281](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281)).
@@ -313,7 +318,7 @@ and the `v0.1.0` tag push (run
 | Tool descriptors (input + output schema per tool) | 5 |
 | Static gates | 8 |
 | Mutations that must turn a gate red | 43 / 43 |
-| Collected tests | 379 (Python 3.8) / 379 (Python 3.12) |
+| Collected tests | 389 (Python 3.12) |
 
 The three generated artefacts are recomputed and compared byte for byte on
 every run (`gen_codes --check`, `gen_golden --check`, `gen_schemas --check`),

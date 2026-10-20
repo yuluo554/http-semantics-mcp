@@ -6,12 +6,18 @@ locally and assert structure.
 """
 
 import os
+import sys
 
 import pytest
 import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WORKFLOW = os.path.join(ROOT, ".github", "workflows", "ci.yml")
+TOOLS = os.path.join(ROOT, "tools")
+if TOOLS not in sys.path:
+    sys.path.insert(0, TOOLS)
+
+import toml_lite  # noqa: E402
 
 
 def _workflow():
@@ -19,11 +25,17 @@ def _workflow():
         return yaml.safe_load(handle)
 
 
+def _requires_python():
+    """The floor as a bare version, e.g. ``>=3.12`` -> ``3.12``."""
+    declared = toml_lite.load(os.path.join(ROOT, "pyproject.toml"))["project"]["requires-python"]
+    return declared.lstrip("=>= ").strip()
+
+
 def test_workflow_parses():
     assert isinstance(_workflow(), dict)
 
 
-def test_workflow_has_one_test_job_with_four_matrix_legs():
+def test_workflow_has_one_test_job_across_both_operating_systems():
     data = _workflow()
     jobs = data["jobs"]
     assert list(jobs) == ["test"]
@@ -31,8 +43,18 @@ def test_workflow_has_one_test_job_with_four_matrix_legs():
     job = jobs["test"]
     matrix = job["strategy"]["matrix"]
     assert set(matrix["os"]) == {"ubuntu-latest", "windows-latest"}
-    assert set(matrix["python"]) == {"3.8", "3.12"}
     assert job["strategy"]["fail-fast"] is False
+
+
+def test_the_matrix_python_floor_matches_requires_python():
+    """Two places state the supported interpreter; they must not drift.
+
+    A matrix leg older than ``requires-python`` cannot install the package, and
+    a floor newer than every leg means CI never exercises the declared range.
+    """
+    matrix = set(_workflow()["jobs"]["test"]["strategy"]["matrix"]["python"])
+    floor = _requires_python()
+    assert matrix == {floor}, "matrix " + str(sorted(matrix)) + " != floor " + floor
 
 
 def test_every_step_has_a_name():
