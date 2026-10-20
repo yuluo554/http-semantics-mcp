@@ -337,7 +337,7 @@ and the `v0.1.0` tag push (run
 | Tool descriptors (input + output schema per tool) | 5 |
 | Static gates | 8 |
 | Mutations that must turn a gate red | 43 / 43 |
-| Collected tests | 395 (Python 3.12) |
+| Collected tests | 397 (Python 3.12) |
 
 The three generated artefacts are recomputed and compared byte for byte on
 every run (`gen_codes --check`, `gen_golden --check`, `gen_schemas --check`),

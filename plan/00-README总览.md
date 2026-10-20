@@ -4,6 +4,7 @@
 - **性质**：不参赛项目题（模拟项目），发布 GitHub **公开仓库**，署名 `yuluo554`
 - **版本**：v1（2026-10-17 定稿；检索基准日 2026-10-17，实测窗口 2026-10-18 10:33–11:05 UTC）
 - **当前里程碑**：M6 发布 ✅（2026-10-18：定版 0.1.0；公开仓库 `yuluo554/http-semantics-mcp` 首推；四矩阵 CI 全绿；annotated tag `v0.1.0` + GitHub Release + 手工源码包附件 + `plan/RELEASE-M6.md`）。**M0–M6 全部完成**
+- **最新发布**：**M6-2 二次迭代 ✅（2026-10-20：`v0.2.0`）**——协议版本追加 `2025-11-25`（D51）、`tools/call` 补 `structuredContent`（D52）、floor 3.8→3.12 + SPDX license（D53）、附件门真比 sha256（D54）、v0.1.0 的 tag/Release 保持不动（D55）。判定逻辑与 87 条 golden 零改动。诊断与执行见 `update/`。
 - **交付形态**：**MCP Server（stdio 传输）**，唯一形态，不设备选
 - **一句话定位**：把 Fetch Standard 的 CORS 协议算法与 RFC 9111 缓存新鲜度算法编译成可调用的 oracle——给一组请求/响应头，返回 `allow|block`、违反的规则编号 + 规范条款、以及该改哪个 header。**不联网、不抓包、不做安全打分。**
 
@@ -17,7 +18,7 @@
 | `plan/03-模块详设.md` | T1–T5 判定算法、规则编号表、`spec_ref` 生成方式 | ✅ M0 定稿 |
 | `plan/04-数据计划.md` | golden case 组织、WPT 映射台账、假时钟用例、oracle 独立性 | ✅ M0 定稿；M1 已按实况补记（不降级、递归覆盖） |
 | `plan/05-里程碑.md` | M0–M6 DoD 与状态 | ✅ M0 定稿；M1–M6 逐棒回写实测 |
-| `plan/06-交付对标与决策记录.md` | 评分对标、决策细化（D19–D50）、待定决策回写 | ✅ M0 定稿；M1 增补 D35–D40；M2 增补 D41–D43；M3 增补 D44–D46；M4 增补 D47–D49；M5 增补 D50 |
+| `plan/06-交付对标与决策记录.md` | 评分对标、决策细化（D19–D55）、待定决策回写 | ✅ M0 定稿；M1 增补 D35–D40；M2 增补 D41–D43；M3 增补 D44–D46；M4 增补 D47–D49；M5 增补 D50；M6-2 增补 D51–D55 |
 | `plan/RELEASE-M6.md` | 发布留档（tag 时点事实 / tag 后追加事实两栏；附件 sha256 只在此处 tag 后栏与 Release 正文） | ✅ M6 |
 | `plan/WRAPUP-M6.md` | 收官档（一句话结论 + 交付物 + DoD→证据索引 + 从零复现 + 边界与后续） | ✅ M6 |
 | `data/README.md` | 依据查证记录（三态）、数据源可获取性、合成数据纪律、**数值口径（唯一出处）** | ✅ M1 §4 定稿（条款全核对、输出键集合登记） |
@@ -97,6 +98,18 @@
 - **复验**：真下载 → `sha256sum -c` OK → `cmp` 与本地构建件 identical → 下载件解包树 vs `git archive v0.1.0` 解包树 `diff -r` 无差异（284 文件）；`--no-local` 干净 clone + 新 venv 按 README 逐条跑通（退出码全 0，`pytest` 379 passed）。
 - **发布终态门**：`scripts/check_release.py --pre-tag` 7 PASS / 0 FAIL / 3 SKIP；tag 后 `--online` **10 PASS / 0 FAIL / 0 SKIP**（tag 指向、Release 非 draft、2 附件集合、逐附件 sha256，见 `plan/RELEASE-M6.md`）。
 - **脱敏四步**：单一 noreply 邮箱、annotated tag tagger 邮箱脱敏、树内零本机路径（`absolute-paths` 门）、产物扫描无残留。
+
+### M6-2 二次迭代（2026-10-20）已完成 → 发布 v0.2.0
+
+- **性质**：只做「增量合规与外部漂移」。判定逻辑、87 条 golden、31 个 code、`codes.json` / `rules.py` / `schemas/tools/*.json` 的字节**零改动**。
+- **协议面**：`SUPPORTED_PROTOCOL_VERSIONS` 追加 `2025-11-25`（`DEFAULT_PROTOCOL_VERSION` 仍 `2025-06-18`，D51）；README「Protocol surface」写明**只支持 legacy 握手**，modern 客户端（无 `initialize`、每请求 `_meta`）得 `-32002`、`server/discover` 得 `-32601`。
+- **工具面**：`toolface.render()` 增加 `structuredContent`（与 `content[0].text` 反序列化后同值，错误分支为 `{"error": {...}}`，D52）；`json.dumps` 仍只在 `canonical.py`。
+- **工程面**：`requires-python >=3.12`、CI 矩阵 `{ubuntu-latest, windows-latest} × {3.12}`、`license = "MIT"`（SPDX）+ `setuptools>=77`、版本 `0.2.0`、actions `checkout@v7` / `setup-python@v7`（D53）。
+- **发布门**：`check_attachment_digests` 改为逐名比对 `gh release view --json assets` 的 `digest` 值；旧 `gh` 无该字段 → `EnvironmentMissing`（exit 3），不静默 PASS（D54）。负控实测：登记摘要改一位 → `attachments FAIL digest mismatch`，退出 1。
+- **留档**：`plan/RELEASE-M6.md` 增加 v0.2.0 的 tag 时点栏；v0.1.0 的 tag 树内 README 仍是 M5 版这一差异登记在「tag 后追加事实」（D55），tag/Release 未动。
+- **测试**：379 → **397 collected / 397 passed**（3.12）。新增守门：`update/` 与门禁共存 ×2、附件摘要 ×5、`structuredContent` 三面一致 ×2、确定性显式覆盖 ×1、README 计数自指 ×3、矩阵 == floor ×1、tag 从版本派生 ×2。
+- **门与变异**：8 门 0 failing（736 文件项）；43/43 变异变红；三个 `gen_* --check` 逐字节 OK；覆盖率 31/31/0/0。
+- **发布**：annotated tag `v0.2.0` + GitHub Release + `http-semantics-mcp-0.2.0.tar.gz` + `SHA256SUMS`（sha256 只进 Release 正文与 tag 后留档）。
 
 ### M5（2026-10-18）已完成
 

@@ -1,123 +1,128 @@
-# RELEASE-M6（v0.1.0 发布留档）
+# RELEASE-M6（发布留档：v0.1.0 → v0.2.0）
 
 > 本文件在 **tag 之前**入库，因此它是 tag 树的一部分，也会出现在发布附件
-> `http-semantics-mcp-0.1.0.tar.gz` 里。
+> `http-semantics-mcp-0.2.0.tar.gz` 里。
 >
 > 它只有两栏：`tag 时点事实`（tag 之前写定、不再改动）与 `tag 后追加事实`
 > （tag 之后才知道的事实，只回填在后一栏）。两栏分离不是排版偏好：发布附件的
 > sha256 一旦写进 tag 树，就会改变它所描述的那份字节，自指失效（D28/D29）。
 > 附件从 **tag 树**构建，所以 tag 树内的本文件里没有任何 sha256；sha256 只出现在
 > ①GitHub Release 正文 ②tag 之后 `main` 上的本文件「tag 后追加事实」栏。
+>
+> **文件名为什么仍叫 M6**：这里的 `M6` 是 `plan/05` 的**发布里程碑编号**，不是
+> 语义版本号。`v0.2.0` 属于同一条发布里程碑，因此沿用同一个留档文件、同一个
+> `tag 后追加事实` 栏追加，而不是新开 `RELEASE-M2.md` 之类的名字。
 
 ---
 
-## tag 时点事实
+## 一、v0.1.0 的 tag 时点事实（历史，2026-10-18）
 
-写定于 tag 之前。数值全部来自本机双解释器实跑，不是 CI。
+保留原值不改，便于追溯第一次发布的字节与结论。
+
+| 项 | 值 |
+| --- | --- |
+| 版本 | `0.1.0`（`__init__.py` 与 `pyproject.toml` 一致） |
+| tag | annotated `v0.1.0`，tag 对象 `d20ba5fe625b4b2251573a3e9ca1c93b4b823784`，指向 `d50011f9800e9ed4f1531d63accf5a08b595731b` |
+| 双解释器全量测试 | Python 3.8 → **379 passed / 379 collected**；Python 3.12 → **379 passed / 379 collected** |
+| 静态门 | **8 gate(s), 0 failing**，合计扫描 732 文件项 |
+| 变异验证 | **43 mutation(s), 0 gate(s) failed to notice** |
+| 冻结 golden | **87 / 87**（cors 24 / sim 10 / cache 18 / cond 19 / vary 9 / _time 7） |
+| 规则码覆盖 | **31 declared / 31 covered / 0 uncovered / 0 unknown** |
+| WPT `cors/` 台账 | 45 = 15 mapped + 30 unmappable |
+| 附件 | `http-semantics-mcp-0.1.0.tar.gz` 231914 B、`SHA256SUMS` 98 B |
+
+## 二、v0.2.0 的 tag 时点事实（2026-10-20）
+
+写定于 tag 之前。数值全部来自本机（Python 3.12.10）实跑，不是 CI。
 
 | 项 | 值 |
 | --- | --- |
 | 分发名（distribution） | `http-semantics-mcp` |
-| 版本 | `0.1.0`（`src/http_semantics_mcp/__init__.py:__version__` 与 `pyproject.toml` 一致，`selfcheck._check_version_parity` PASS） |
+| 版本 | `0.2.0`（`src/http_semantics_mcp/__init__.py:__version__` 与 `pyproject.toml` 一致，`selfcheck._check_version_parity` PASS） |
 | 公开仓库 | `yuluo554/http-semantics-mcp`（public） |
-| tag | `v0.1.0`（annotated；tagger 邮箱已脱敏为 GitHub noreply） |
-| tag 目标 | `main` 上本文件所在提交（提交哈希见「tag 后追加事实」栏——tag 树内无法写自身哈希，自指） |
-| 版本定版前置提交 | `c1f566f`（`0.1.0.dev0 → 0.1.0` 两处同步 + README 克隆地址改为 `http-semantics-mcp`） |
-| 双解释器全量测试 | Python 3.8 → **379 passed / 379 collected**；Python 3.12 → **379 passed / 379 collected** |
-| 静态门 | `tools/run_gates.py` → **8 gate(s), 0 failing**，合计扫描 **732** 文件项 |
-| 变异验证 | `tools/mutate_check.py` → **43 mutation(s), 0 gate(s) failed to notice**（43/43 使门或测试变红） |
-| 冻结 golden | **87 / 87** 与生产输出逐字节一致（cors 24 / sim 10 / cache 18 / cond 19 / vary 9 / _time 7） |
-| 规则码覆盖 | **31 declared / 31 covered / 0 uncovered / 0 unknown**（双向集合等式） |
-| WPT `cors/` 台账 | 45 = **15 mapped** + **30 unmappable**（逐条有 `reason`）；15/15 mapped 行实跑与生产输出逐字节一致 |
-| tool 描述符 | **5** 个（`inputSchema` + `outputSchema`）；4129 / 3022 / 4297 / 6373 / 3384 字节 |
-| 生成物复算 | `gen_codes --check`（codes.json 9468 字节 ×2 + rules.py 16772 字节）、`gen_golden --check`（87 case）、`gen_schemas --check`（5 tool）→ 全部 OK |
-| `dist-mirrors` | 6 文件逐字节相等（`references/codes.json` 1 + `schemas/tools/*.json` 5） |
+| tag | `v0.2.0`（annotated；tagger 邮箱脱敏为 GitHub noreply） |
+| tag 目标 | `main` 上本文件所在提交（提交哈希见「tag 后追加事实」栏——tag 树内写自身哈希是自指） |
+| 版本定版前置提交 | 见 `git log --oneline` 的 `B3` 批（`0.1.0 → 0.2.0`，pyproject 与 `__init__` 两处同步） |
+| 全量测试 | Python **3.12.10** → **397 passed / 397 collected** |
+| 静态门 | `tools/run_gates.py` → **8 gate(s), 0 failing**，合计扫描 **736** 文件项 |
+| 变异验证 | `tools/mutate_check.py` → **43 mutation(s), 0 gate(s) failed to notice** |
+| 冻结 golden | **87 / 87** 与生产输出逐字节一致（与 0.1.0 字节相同） |
+| 规则码覆盖 | **31 declared / 31 covered / 0 uncovered / 0 unknown** |
+| WPT `cors/` 台账 | 45 = **15 mapped** + **30 unmappable**（逐条有 `reason`） |
+| tool 描述符 | **5** 个（`inputSchema` + `outputSchema`），字节与 0.1.0 相同 |
+| 生成物复算 | `gen_codes --check`（codes.json 9468 B ×2 + rules.py 16772 B）、`gen_golden --check`（87 case）、`gen_schemas --check`（5 tool）→ 全部 OK |
+| `dist-mirrors` | 6 文件逐字节相等 |
+| 运行时依赖 | **0**（`dependencies = []`）；`Requires-Dist` 只有 dev extra 的 `pytest` / `PyYAML` |
+| requires-python | `>=3.12`（D53：3.8 于 2024-10-07 EOL；SPDX license 需 `setuptools>=77`） |
+| CI 矩阵 | `{ubuntu-latest, windows-latest} × {3.12}` |
+| license 元数据 | `License-Expression: MIT`、`License-File: LICENSE`（SPDX，无弃用告警） |
+| 协议版本 | `2025-11-25` / `2025-06-18` / `2025-03-26` / `2024-11-05`；**DEFAULT 仍 `2025-06-18`**（D51） |
+| `structuredContent` | 五个 tool 的 `tools/call` 均返回；与 `content[0].text` 反序列化后同值（D52） |
 | 发布终态门 | `scripts/check_release.py --pre-tag`（干净树、提交后）→ **7 PASS / 0 FAIL / 3 SKIP**，退出 0 |
 | 剩余 3 项 SKIP | `tag` / `release` / `attachments`——tag 之后由 `--online` 复核 |
-| CI | **本地等价校验（未接远端，CI 待首推验证）** |
+| CI | **本地等价校验（未接远端这次改动）**：0.2.0 的提交尚未推送，因此没有任何 0.2.0 的 CI run |
 
-> 诚实口径：发版时点本机 `git remote -v` 曾为空，本项目 CI 从未运行过。上表
-> 所有"绿"均为**本地等价校验**；首推后的 run id 与首跑结论回填在下一栏。
+### 本轮相对 v0.1.0 的改动面（逐条对 `plan/06` 的 D51–D55）
+
+| 决策 | 改了什么 | 不变量 |
+| --- | --- | --- |
+| D51 | `SUPPORTED_PROTOCOL_VERSIONS` 追加 `2025-11-25`，DEFAULT 不变 | 握手仍是 legacy；modern 客户端仍得 `-32002` |
+| D52 | `toolface.render()` 加 `structuredContent`（同一 payload 对象） | `content[0].text` 字节不变；87 条 golden 不变；`json.dumps` 仍只在 `canonical.py` |
+| D53 | floor → `>=3.12`、矩阵 `× {3.12}`、license SPDX、`setuptools>=77`、版本 0.2.0 | `dependencies = []`；判定逻辑零改动 |
+| D54 | `check_attachment_digests` 逐名比对 `digest` 值 | 旧 `gh` 无该字段 → exit 3，不静默 PASS |
+| D55 | v0.1.0 的 tag/Release 不动（tag 树内 README 是 M5 版） | v0.1.0 的字节与 sha256 原样 |
 
 ### 本文件的复验路径（包内只写方法，不写 sha256）
 
-拿到附件后，读者可自行复算、无需信任本文：
-
 ```bash
-# 1. 校验附件完整性（sha256 见 GitHub Release 正文）
-sha256sum -c <(printf '%s  %s\n' '<release 正文中的 sha256>' http-semantics-mcp-0.1.0.tar.gz)
+# 1. 校验附件完整性（sha256 见 GitHub Release 正文与 .sha256 文件）
+sha256sum -c SHA256SUMS
 
 # 2. 解包并逐条复跑（运行时零第三方依赖）
-tar -xzf http-semantics-mcp-0.1.0.tar.gz
-cd http-semantics-mcp-0.1.0
-python -m http_semantics_mcp --version     # 期望 0.1.0，退出 0
-python -m http_semantics_mcp --selftest    # 期望 summary: 6 passed, 0 failed，退出 0
-printf '%s\n' \
-  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}' \
-  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
-  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-  | python -m http_semantics_mcp            # 期望一行 serverInfo + 一行五 tool 列表
+python -m http_semantics_mcp --version          # 期望 0.2.0
+python -m http_semantics_mcp --selftest         # 期望 6 passed / 0 failed
+python tools/run_gates.py                       # 期望 8 gate(s), 0 failing
+python -m pytest -q                             # 期望 397 passed
 ```
 
 ---
 
-## tag 后追加事实
+## 三、tag 后追加事实
 
 写定于 tag 之后。以下各行在 **tag 树里为空**——它们是 tag 之后才存在的事实，
 只回填在 `main` 上。
+
+### v0.1.0（2026-10-18，历史）
 
 | 项 | 值 |
 | --- | --- |
 | tag 提交（`v0.1.0` 指向） | `d50011f9800e9ed4f1531d63accf5a08b595731b` |
 | tag 对象 | `d20ba5fe625b4b2251573a3e9ca1c93b4b823784`（annotated；本地 == 远端 `refs/tags/v0.1.0`） |
 | tagger | `yuluo554 <282769740+yuluo554@users.noreply.github.com>`（已脱敏） |
-| 首推事件与 run 数对账 | **push 事件 2 → run 2**（`main` 1 + `v0.1.0` 1），`run_attempt` 均为 1；据事件对账成立 |
-| 回写提交的事件对账 | 截至 `ada0965`：`main` push 共 2 次（`d50011f` 首推、`ada0965` 回写）+ tag push 1 次 = **push 事件 3 → run 3**，全绿（回写提交的 run = `39142585779`）。此后每个文档面提交仍是 **1 push = 1 run** 一一对应（本留档自身所在的文档提交亦然），可在仓库 Actions 页按事件核对 |
-| CI 四矩阵 run id 与结论 | `main` push → run [`39141511111`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111) success：jobs `117716738734`(ubuntu-3.8) / `117716738838`(windows-3.8) / `117716738893`(windows-3.12) / `117716738894`(ubuntu-3.12)，四腿全 success |
-| CI tag run | `v0.1.0` push → run [`39141686281`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281) success：jobs `117717244536`(windows-3.12) / `117717244651`(windows-3.8) / `117717244708`(ubuntu-3.12) / `117717244911`(ubuntu-3.8)，四腿全 success |
-| GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0（`isDraft=false`、`isPrerelease=false`） |
-| 附件清单 | `http-semantics-mcp-0.1.0.tar.gz`（231914 字节，`git archive v0.1.0 \| gzip -9n`）+ `SHA256SUMS`（98 字节）；两者 `state=uploaded` |
+| 首推事件与 run 数对账 | **push 事件 2 → run 2**（`main` 1 + `v0.1.0` 1），`run_attempt` 均为 1 |
+| CI 四矩阵 run id | `main` push → run [`39141511111`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141511111) success（四腿） |
+| CI tag run | `v0.1.0` push → run [`39141686281`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39141686281) success（四腿） |
+| GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0 |
+| 附件 | `http-semantics-mcp-0.1.0.tar.gz`（231914 B）+ `SHA256SUMS`（98 B），均 `uploaded` |
+| 真下载复验 | `sha256sum -c` OK → `cmp` identical → 解包树 vs `git archive v0.1.0` 解包树 `diff -r` 无差异（284 文件） |
+| 脱敏四步 | 单一 noreply 邮箱；tagger 同上；树内 `absolute-paths` 门 0 findings；解包树无 `.venv` / `__pycache__` / `.pyc` |
+| **tag 树内 README 是旧版（已知差异，D55）** | `v0.1.0` 的 tag 树（也就是附件里那份）`README.md` 第 5 行仍是 `**Status: M5 …**`，第 299–301 行仍写 "This repository has no remote yet"。原因：README 转正提交 `9563d7b` 发生在 tag `d50011f` **之后**。**处理：tag 与 Release 一律不动**（移动 tag 会违反 D28/D29 自证链，且该附件已有外部下载记录），修复由本次 `v0.2.0` 发版承接 |
+
+### v0.2.0（2026-10-20）
+
+| 项 | 值 |
+| --- | --- |
+| tag 提交（`v0.2.0` 指向） | 见 `git rev-parse v0.2.0^{commit}`（tag 之后回填，tag 树内无法写自身哈希） |
+| tag 对象 | 见 `git for-each-ref refs/tags/v0.2.0`（annotated；本地 == 远端） |
+| tagger | `yuluo554 <282769740+yuluo554@users.noreply.github.com>` |
+| CI run id | 见下方「`--online` 复核」与仓库 Actions 页（`main` push 与 `v0.2.0` tag push 各一） |
+| GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.2.0 |
+| 附件 | `http-semantics-mcp-0.2.0.tar.gz` + `SHA256SUMS`；均 `uploaded` |
 | 附件 sha256 | 下方两行（GitHub Release 正文亦载同一组值） |
-| 真下载复验 | `gh release download v0.1.0` → `sha256sum -c SHA256SUMS` OK → `cmp` 下载件 vs 本地构建件 **identical** → 下载件解包树 vs `git archive v0.1.0` 解包树 `diff -r` **无差异**（284 文件）→ 中立 venv `pip install -e .` + `--version` / `--selftest` / stdio 握手，退出码全 0 |
-| 干净 clone 复验 | `git clone --no-local <local>` rc=0；`git clone https://github.com/yuluo554/http-semantics-mcp.git` rc=0；新 venv → `python -m pip install -e ".[dev]"` rc=0（构建隔离自动取 `setuptools`，无需手工前置）→ `--version` rc=0 / `--selftest` 6 passed 0 failed rc=0 / 控制台脚本 `--version`·`--selftest` rc=0 / stdio 握手 rc=0（2 响应、5 tool ASCII 升序）→ `python -m pytest -q` **379 passed** rc=0；`tools/run_gates.py` 8 门 0 失败；三个 `gen_* --check` 全 OK |
+| 真下载复验 | `gh release download v0.2.0` → `sha256sum -c SHA256SUMS` OK → `cmp` 与本地构建件 identical → 解包树 vs `git archive v0.2.0` 解包树 `diff -r` 无差异 |
+| 干净 clone 复验 | 见下方「干净 clone」小节 |
 | `check_release.py --online` | 见下方「`--online` 复核」小节 |
-| 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 `282769740+yuluo554@users.noreply.github.com`；②annotated tag tagger 邮箱同上（noreply）；③树内零本机路径（`absolute-paths` 门在 tag 树 283 文件项 0 findings）；④产物扫描：解包树 284 文件，无 `.venv` / `__pycache__` / `.pyc`，`absolute-paths` 门在解包树上 288 文件项 0 findings |
-| **tag 树内 README 是旧版（已知差异，D55）** | `v0.1.0` 的 tag 树（也就是附件里那份）`README.md` 第 5 行仍是 `**Status: M5 (schema, contract gate and determinism sweep).**`，第 299–301 行仍写 "This repository has no remote yet, so all CI statements are local equivalent checks"。原因：README 转正提交 `9563d7b` 发生在 tag `d50011f` **之后**（全是文档面）。**处理：tag 与 Release 一律不动**（移动 tag 会违反 D28/D29 自证链，且该附件已有外部下载记录），修复留到下一次发版。即：读 `v0.1.0` 附件的人会看到过期的自述，以 `main` 与本文件为准 |
-
-### 附件摘要（`sha256sum -c` 兼容格式）
-
-```
-sha256: 8cc8892c20f1d37f175c8005a0cdd41993b90b58b6aaeef357bda2e647cef8b2  http-semantics-mcp-0.1.0.tar.gz
-sha256: 3fa920e376b4870f34975db75f45dd4fef15609eca5d4ff977128eaeb8fab805  SHA256SUMS
-```
-
-### `--online` 复核
-
-在 tag 后、回写提交之后实跑（干净树）：
-
-```
-version-parity  PASS  pyproject and package agree on 0.1.0
-license-file    PASS  LICENSE present
-readme          PASS  README present
-repo-gates      PASS  8 gates green, 734 files scanned
-dist-mirrors    PASS  6 mirror file(s) byte-identical
-release-note    PASS  release note has both columns
-git-clean       PASS  working tree clean
-tag             PASS  tag v0.1.0 exists
-release         PASS  2 asset(s) uploaded
-attachments     PASS  2 registered digest(s) match published asset names
-summary: 10 passed, 0 failed, 0 skipped (10 checks)
-```
-
-退出码 `0`。即：`v0.1.0` 指向的 tag 对象与远端一致、Release 非 draft、附件集合完整
-（2 个，均 `uploaded`）、上表登记的两个摘要行与已发布附件名一一对应。
-
-> **后记（二次迭代 2026-10-20，D54）**：上面这份是 `v0.1.0` 当时的原样输出，保留不改。
-> 那次实际只比了**附件名**——`8cc8892c…` 被改成 64 个 `0` 后仍是 10 PASS 退出 0。
-> `scripts/check_release.py` 的 `check_attachment_digests` 现已改为逐名比对
-> `gh release view --json assets` 的 `digest` 值，输出措辞变成
-> `2 digest(s) verified against published assets`；同一摘要在改错一位时实测 FAIL
-> （`digest mismatch: …`，退出 1）。因此本表第 8 行「逐附件 sha256」自本轮起名副其实。
+| 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 noreply；②annotated tag tagger 同上；③树内零本机路径；④解包树无构建杂质 |
 
 <!--
 注册行格式（check_release._registered_digests 逐字解析，tag 后回填时保持此形态）：

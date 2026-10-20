@@ -39,9 +39,47 @@ PASS = "PASS"
 FAIL = "FAIL"
 SKIP = "SKIP"
 
-RELEASE_DOC = os.path.join("plan", "RELEASE-M6.md")
-TAG = "v0.1.0"
 DISTRIBUTION = "http-semantics-mcp"
+
+
+def _declared_version():
+    """The version this checkout claims, read without importing the package.
+
+    ``pyproject.toml`` is the single declaration, so the tag name, the release
+    note name and the expected asset names all derive from it. Hard-coding
+    them (the v0.1.0 shape) is how a later release ships a gate that checks the
+    *previous* tag.
+    """
+    import importlib.util
+
+    reader = os.path.join(ROOT, "tools", "toml_lite.py")
+    spec = importlib.util.spec_from_file_location("_release_toml_version", reader)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    version = module.load(os.path.join(ROOT, "pyproject.toml")).get("project", {}).get("version")
+    if not version:
+        raise EnvironmentMissing("pyproject.toml declares no version")
+    return version
+
+
+def _tag():
+    """``0.2.0`` -> ``v0.2.0``.
+
+    Derived rather than frozen: a hard-coded tag is how a later release ships a
+    gate that keeps happily checking the *previous* one.
+    """
+    return "v" + _declared_version()
+
+
+# The release note name carries the *milestone* number (plan/05 numbering:
+# M6 is the release milestone), which is independent of the semantic version.
+# ``_release_doc()`` therefore takes the number as an argument and the caller
+# passes this constant, instead of string-slicing the version into a wrong name.
+RELEASE_MILESTONE = "M6"
+
+
+def _release_doc(milestone=RELEASE_MILESTONE):
+    return os.path.join("plan", "RELEASE-" + milestone + ".md")
 
 
 class NotAchieved(Exception):
@@ -139,16 +177,17 @@ def check_gates():
 
 
 def check_release_doc(pre_tag):
-    path = os.path.join(ROOT, RELEASE_DOC)
+    note = _release_doc()
+    path = os.path.join(ROOT, note)
     if not os.path.isfile(path):
         if pre_tag:
             raise _Skip("release note is written before the tag (expected pre-tag)")
-        raise NotAchieved(RELEASE_DOC + " is missing")
+        raise NotAchieved(note + " is missing")
     with open(path, "r", encoding="utf-8") as handle:
         text = handle.read()
     for heading in ("tag 时点事实", "tag 后追加事实"):
         if heading not in text:
-            raise NotAchieved(RELEASE_DOC + " lacks the '" + heading + "' column")
+            raise NotAchieved(note + " lacks the '" + heading + "' column")
     return "release note has both columns"
 
 
@@ -226,15 +265,17 @@ def check_gh_available():
 
 
 def check_tag_exists():
-    tags = _run(["git", "tag", "--list", TAG]).strip()
+    tag = _tag()
+    tags = _run(["git", "tag", "--list", tag]).strip()
     if not tags:
-        raise NotAchieved("tag " + TAG + " does not exist locally")
-    return "tag " + TAG + " exists"
+        raise NotAchieved("tag " + tag + " does not exist locally")
+    return "tag " + tag + " exists"
 
 
 def check_remote_tag_matches():
-    local = _run(["git", "rev-parse", TAG]).strip()
-    remote = _run(["gh", "api", "repos/yuluo554/" + DISTRIBUTION + "/git/ref/tags/" + TAG, "--jq", ".object.sha"]).strip()
+    tag = _tag()
+    local = _run(["git", "rev-parse", tag]).strip()
+    remote = _run(["gh", "api", "repos/yuluo554/" + DISTRIBUTION + "/git/ref/tags/" + tag, "--jq", ".object.sha"]).strip()
     if local != remote:
         raise NotAchieved("local tag object " + local + " != remote " + remote)
     return "tag object hashes match"
@@ -242,7 +283,7 @@ def check_remote_tag_matches():
 
 def check_release_published():
     raw = _run([
-        "gh", "release", "view", TAG,
+        "gh", "release", "view", _tag(),
         "--repo", "yuluo554/" + DISTRIBUTION,
         "--json", "isDraft,tagName,assets",
     ])
@@ -271,7 +312,7 @@ def check_attachment_digests():
     if not expected:
         raise NotAchieved("no sha256 digests registered in the release note")
     raw = _run([
-        "gh", "release", "view", TAG,
+        "gh", "release", "view", _tag(),
         "--repo", "yuluo554/" + DISTRIBUTION,
         "--json", "assets",
     ])
@@ -301,7 +342,7 @@ _DIGEST_LINE = re.compile(r"^sha256:\s*([0-9a-f]{64})\s+(\S+)\s*$", re.MULTILINE
 
 
 def _registered_digests():
-    path = os.path.join(ROOT, RELEASE_DOC)
+    path = os.path.join(ROOT, _release_doc())
     if not os.path.isfile(path):
         return {}
     with open(path, "r", encoding="utf-8") as handle:

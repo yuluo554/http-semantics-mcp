@@ -81,3 +81,26 @@ python -m http_semantics_mcp --selftest
 
 - 仓库 description / topics 可在 GitHub 侧补充（已设 description；topics 未设）。
 - 若 MCP 协议版本集合演进，按 `protocol.SUPPORTED_PROTOCOL_VERSIONS` 常量集中更新（P1）。
+
+---
+
+## 追加：v0.2.0 二次迭代发布（2026-10-20）
+
+第二轮迭代只做「增量合规与外部漂移」，判定逻辑与冻结数据零改动，交付 `v0.2.0`。
+
+| 项 | v0.1.0 | v0.2.0 |
+| --- | --- | --- |
+| 版本 | `0.1.0` | `0.2.0` |
+| Python floor / CI 矩阵 | `>=3.8`，`{ubuntu, windows} × {3.8, 3.12}` | `>=3.12`，`{ubuntu-latest, windows-latest} × {3.12}`（D53） |
+| 协议版本集合 | `2025-06-18` / `2025-03-26` / `2024-11-05` | 追加 `2025-11-25`（DEFAULT 不变，D51） |
+| `tools/call` 信封 | `content` + `isError` | 再加 `structuredContent`（与 text 同值，D52） |
+| `--online` 的 attachments | 只比附件名 | 真比 `digest` 值；旧 gh 无字段 → exit 3（D54） |
+| license 元数据 | `{ text = "MIT" }` + classifier | SPDX `License-Expression: MIT`（无弃用告警） |
+| 测试 | 379 | **397** |
+| 冻结数据 | 87 golden / 31 code | **完全不变** |
+
+留档：`plan/RELEASE-M6.md` 的 v0.2.0 两栏、`plan/06` 的 D51–D55、
+`update/00-诊断报告.md` / `01-迭代路线.md` / `03-执行记录.md`（本地交接目录，不入库）。
+
+`v0.1.0` 的 tag 与 Release **保持不动**（D55）：它的附件里 README 仍是 M5 版，
+这一差异已登记在 `plan/RELEASE-M6.md`「tag 后追加事实」栏。

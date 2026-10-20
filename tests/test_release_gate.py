@@ -137,6 +137,18 @@ def test_registered_digest_parser_reads_the_documented_line_form():
     assert found == [("a" * 64, "http-semantics-mcp-0.1.0.tar.gz")]
 
 
+def test_the_tag_name_is_derived_from_the_declared_version():
+    """A frozen tag constant makes later releases check the previous tag."""
+    assert check_release._tag() == "v" + check_release._declared_version()
+    assert check_release._tag() != "v0.1.0" or check_release._declared_version() == "0.1.0"
+
+
+def test_the_release_note_path_points_at_a_file_that_exists():
+    path = check_release._release_doc()
+    assert path == os.path.join("plan", "RELEASE-" + check_release.RELEASE_MILESTONE + ".md")
+    assert os.path.isfile(os.path.join(ROOT, path)), path
+
+
 # -- attachment digests: matching names is not enough ---------------------
 
 TARBALL = "http-semantics-mcp-0.1.0.tar.gz"
