@@ -2,19 +2,20 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: unreleased `0.2.0` in `main`; latest published release is `v0.1.0`.**
-The server starts, completes the MCP handshake and reports **five tools** —
-`cache_evaluate`, `conditional_evaluate`, `cors_evaluate`,
-`cors_simulate_fetch` and `vary_match`. Each one ships a JSON Schema descriptor
-(input **and** output) under `src/http_semantics_mcp/schemas/tools/`, mirrored
-byte-identically to `schemas/tools/`, and every `tools/call` result returns the
-judgement in `structuredContent` as well as in `content[0].text`. All five are
-judged against frozen golden cases (18 + 19 + 24 + 10 + 9) and produce
-byte-identical output; a contract gate proves the published output schema equals
-each tool's real key set and value shapes across every case, and a determinism
-gate proves same-input / same-sha256 across all of them. The last published tag is
-[`v0.1.0`](https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0)
-(its attachment predates the 0.2.0 work — see `plan/RELEASE-M6.md`); CI runs
+**Status: released — v0.2.0.** The server starts, completes the MCP handshake and
+reports **five tools** — `cache_evaluate`, `conditional_evaluate`,
+`cors_evaluate`, `cors_simulate_fetch` and `vary_match`. Each one ships a JSON
+Schema descriptor (input **and** output) under
+`src/http_semantics_mcp/schemas/tools/`, mirrored byte-identically to
+`schemas/tools/`, and every `tools/call` result returns the judgement in
+`structuredContent` as well as in `content[0].text`. All five are judged against
+frozen golden cases (18 + 19 + 24 + 10 + 9) and produce byte-identical output; a
+contract gate proves the published output schema equals each tool's real key set
+and value shapes across every case, and a determinism gate proves same-input /
+same-sha256 across all of them. Released as
+[`v0.2.0`](https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.2.0)
+(previous release: [`v0.1.0`](https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0),
+whose attachment predates the 0.2.0 work — see `plan/RELEASE-M6.md`). CI runs
 `{ubuntu-latest, windows-latest} × {3.12}`. See
 [`plan/05-里程碑.md`](plan/05-里程碑.md) and the decision log in
 [`plan/06-交付对标与决策记录.md`](plan/06-交付对标与决策记录.md).
