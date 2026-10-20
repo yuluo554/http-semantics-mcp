@@ -82,6 +82,7 @@ printf '%s\n' \
 | 干净 clone 复验 | `git clone --no-local <local>` rc=0；`git clone https://github.com/yuluo554/http-semantics-mcp.git` rc=0；新 venv → `python -m pip install -e ".[dev]"` rc=0（构建隔离自动取 `setuptools`，无需手工前置）→ `--version` rc=0 / `--selftest` 6 passed 0 failed rc=0 / 控制台脚本 `--version`·`--selftest` rc=0 / stdio 握手 rc=0（2 响应、5 tool ASCII 升序）→ `python -m pytest -q` **379 passed** rc=0；`tools/run_gates.py` 8 门 0 失败；三个 `gen_* --check` 全 OK |
 | `check_release.py --online` | 见下方「`--online` 复核」小节 |
 | 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 `282769740+yuluo554@users.noreply.github.com`；②annotated tag tagger 邮箱同上（noreply）；③树内零本机路径（`absolute-paths` 门在 tag 树 283 文件项 0 findings）；④产物扫描：解包树 284 文件，无 `.venv` / `__pycache__` / `.pyc`，`absolute-paths` 门在解包树上 288 文件项 0 findings |
+| **tag 树内 README 是旧版（已知差异，D55）** | `v0.1.0` 的 tag 树（也就是附件里那份）`README.md` 第 5 行仍是 `**Status: M5 (schema, contract gate and determinism sweep).**`，第 299–301 行仍写 "This repository has no remote yet, so all CI statements are local equivalent checks"。原因：README 转正提交 `9563d7b` 发生在 tag `d50011f` **之后**（全是文档面）。**处理：tag 与 Release 一律不动**（移动 tag 会违反 D28/D29 自证链，且该附件已有外部下载记录），修复留到下一次发版。即：读 `v0.1.0` 附件的人会看到过期的自述，以 `main` 与本文件为准 |
 
 ### 附件摘要（`sha256sum -c` 兼容格式）
 
@@ -110,6 +111,13 @@ summary: 10 passed, 0 failed, 0 skipped (10 checks)
 
 退出码 `0`。即：`v0.1.0` 指向的 tag 对象与远端一致、Release 非 draft、附件集合完整
 （2 个，均 `uploaded`）、上表登记的两个摘要行与已发布附件名一一对应。
+
+> **后记（二次迭代 2026-10-20，D54）**：上面这份是 `v0.1.0` 当时的原样输出，保留不改。
+> 那次实际只比了**附件名**——`8cc8892c…` 被改成 64 个 `0` 后仍是 10 PASS 退出 0。
+> `scripts/check_release.py` 的 `check_attachment_digests` 现已改为逐名比对
+> `gh release view --json assets` 的 `digest` 值，输出措辞变成
+> `2 digest(s) verified against published assets`；同一摘要在改错一位时实测 FAIL
+> （`digest mismatch: …`，退出 1）。因此本表第 8 行「逐附件 sha256」自本轮起名副其实。
 
 <!--
 注册行格式（check_release._registered_digests 逐字解析，tag 后回填时保持此形态）：

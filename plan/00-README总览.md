@@ -95,7 +95,7 @@
 - **远端**：`yuluo554/http-semantics-mcp`（public）建仓并首推 `main`；push 事件 2 = run 2，四矩阵 `{ubuntu,windows} × {3.8,3.12}` 全绿（`main` run `39141511111`；tag run `39141686281`）。
 - **发布三件套**：annotated tag `v0.1.0`（tagger 邮箱脱敏；tag 对象 `d20ba5fe`，指向提交 `d50011f`）+ GitHub Release（非 draft）+ 手工源码包 `http-semantics-mcp-0.1.0.tar.gz`（231914 字节，sha256 `8cc8892c…`）+ `SHA256SUMS`；附件 sha256 只进 Release 正文与 tag 后的留档，不进 tag 树。
 - **复验**：真下载 → `sha256sum -c` OK → `cmp` 与本地构建件 identical → 下载件解包树 vs `git archive v0.1.0` 解包树 `diff -r` 无差异（284 文件）；`--no-local` 干净 clone + 新 venv 按 README 逐条跑通（退出码全 0，`pytest` 379 passed）。
-- **发布终态门**：`scripts/check_release.py --pre-tag` 7 PASS / 0 FAIL / 3 SKIP；tag 后 `--online` **10 PASS / 0 FAIL / 0 SKIP**（tag 指向、Release 非 draft、2 附件集合、逐附件摘要名，见 `plan/RELEASE-M6.md`）。
+- **发布终态门**：`scripts/check_release.py --pre-tag` 7 PASS / 0 FAIL / 3 SKIP；tag 后 `--online` **10 PASS / 0 FAIL / 0 SKIP**（tag 指向、Release 非 draft、2 附件集合、逐附件 sha256，见 `plan/RELEASE-M6.md`）。
 - **脱敏四步**：单一 noreply 邮箱、annotated tag tagger 邮箱脱敏、树内零本机路径（`absolute-paths` 门）、产物扫描无残留。
 
 ### M5（2026-10-18）已完成
@@ -108,7 +108,7 @@
 - **端到端**：`tests/test_stdio_end_to_end.py`（2 项）——真实子进程 + 真实 stdio：`initialize` → `notifications/initialized` → `tools/list`（五个 tool、ASCII 升序）→ 五 tool 各成功调用一次（用服务器自己发布的 `outputSchema` 校对键集合）→ 未知 tool 走 JSON-RPC `-32602`；并验证跨进程边界的双跑字节一致。
 - **门与变异**：8 道静态门全绿（合计扫 730 文件项）；`tools/mutate_check.py` 43/43 变异变红（新增 5 条：schema 少一个 property、`additionalProperties` 改 `true`、顶层镜像改一字节、§4.10 掉一个字段、tool face 注入 volatile 键）。
 - **生成物复算**：`gen_codes --check`（9468 字节 + 镜像 + `rules.py` 16772 字节）、`gen_golden --check`（87 case / 0 problem）、`gen_schemas --check`（5 tool / 0 problem）逐字节一致；覆盖率 31/31/0/0；双解释器收集数一致（379 / 379）。
-- **stdout 指标段**：README 新增"Measured on this build"（golden 87/87、WPT 15/45 + 30/45、5 描述符、8 门、43 变异、378/378 测试），并保留"本地等价校验（未接远端，CI 待首推验证）"措辞。
+- **stdout 指标段**：README 新增"Measured on this build"（golden 87/87、WPT 15/45 + 30/45、5 描述符、8 门、43 变异、379/379 测试），并保留"本地等价校验（未接远端，CI 待首推验证）"措辞。
 - **决策**：D50（schema 真相源路线 A：包内 JSON 为唯一可编辑真相、registry 读它、gen_schemas 只镜像+校验；附带澄清 `additionalProperties: false` 只落在带 `properties` 的对象上）。
 
 ### M4（2026-10-18）已完成

@@ -2,19 +2,22 @@
 
 Deterministic HTTP semantics judgement, delivered as an MCP server over stdio.
 
-**Status: released — v0.1.0.** The server starts, completes the MCP handshake and
-reports **five tools** — `cache_evaluate`, `conditional_evaluate`,
-`cors_evaluate`, `cors_simulate_fetch` and `vary_match`. Each one ships a JSON
-Schema descriptor (input **and** output) under
-`src/http_semantics_mcp/schemas/tools/`, mirrored byte-identically to
-`schemas/tools/`. All five are judged against frozen golden cases
-(18 + 19 + 24 + 10 + 9) and produce byte-identical output; a contract gate
-proves the published output schema equals each tool's real key set and value
-shapes across every case, and a determinism gate proves same-input /
-same-sha256 across all of them. Tagged
-[`v0.1.0`](https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0),
-and the four-leg CI matrix is green. See
-[`plan/05-里程碑.md`](plan/05-里程碑.md).
+**Status: unreleased `0.2.0` in `main`; latest published release is `v0.1.0`.**
+The server starts, completes the MCP handshake and reports **five tools** —
+`cache_evaluate`, `conditional_evaluate`, `cors_evaluate`,
+`cors_simulate_fetch` and `vary_match`. Each one ships a JSON Schema descriptor
+(input **and** output) under `src/http_semantics_mcp/schemas/tools/`, mirrored
+byte-identically to `schemas/tools/`, and every `tools/call` result returns the
+judgement in `structuredContent` as well as in `content[0].text`. All five are
+judged against frozen golden cases (18 + 19 + 24 + 10 + 9) and produce
+byte-identical output; a contract gate proves the published output schema equals
+each tool's real key set and value shapes across every case, and a determinism
+gate proves same-input / same-sha256 across all of them. The last published tag is
+[`v0.1.0`](https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.1.0)
+(its attachment predates the 0.2.0 work — see `plan/RELEASE-M6.md`); CI runs
+`{ubuntu-latest, windows-latest} × {3.12}`. See
+[`plan/05-里程碑.md`](plan/05-里程碑.md) and the decision log in
+[`plan/06-交付对标与决策记录.md`](plan/06-交付对标与决策记录.md).
 
 ---
 
@@ -159,9 +162,18 @@ read one JSON object per line.
 | `tools/call` | tool result, or a JSON-RPC error for an unknown tool |
 | anything else | `-32601` |
 
-Supported protocol versions: `2025-06-18`, `2025-03-26`, `2024-11-05`.
-An unrecognised version is answered with `2025-06-18`, which the specification
-permits; the client decides whether to continue.
+Supported protocol versions: `2025-11-25`, `2025-06-18`, `2025-03-26`,
+`2024-11-05`. An unrecognised version is answered with `2025-06-18`, which the
+specification permits; the client decides whether to continue.
+
+**This server speaks the legacy handshake only.** That means a client must
+send `initialize` (and `notifications/initialized`) before anything else. A
+*modern* client as defined by the `2026-07-28` revision — one that skips
+`initialize` and carries the version in each request's
+`params._meta["io.modelcontextprotocol/protocolVersion"]` — is **not**
+supported: every such request is answered with `-32002 Server not initialized`,
+and `server/discover` is answered with `-32601`. Nothing here silently
+misparses; the client gets a defined error and can fall back.
 
 Error codes: `-32700` parse error, `-32600` invalid request, `-32601` unknown
 method, `-32602` invalid params, `-32002` not initialized, `-32603` internal
@@ -190,11 +202,18 @@ printf '%s\n' \
   | python -m http_semantics_mcp
 ```
 
-The verdict arrives as one JSON string inside `content[0].text`:
+The verdict arrives twice in the same result: as one JSON string inside
+`content[0].text`, and as the object itself in `structuredContent`. Both carry
+the same value, byte for byte in the serialised form — a test asserts it.
 
 ```json
 {"decision":"block","missing_headers":["access-control-allow-origin"],"notes":{"allow_credentials_null_origin":false,"max_age_capped_by_client":false,"wildcard_with_credentials":false},"recommended_headers":{"access-control-allow-origin":"https://app.example.com"},"violations":[{"code":"CORS_MISSING_ALLOW_ORIGIN","detail":"response has no Access-Control-Allow-Origin (origin=https://app.example.com)","spec_ref":["Fetch §CORS check"]}]}
 ```
+
+`structuredContent` is there because every tool publishes an `outputSchema`, and
+the specification says a server that does so **MUST** return structured results
+conforming to it. On an error result the same key holds
+`{"error": {"code", "field", "detail"}}`.
 
 `decision: "block"` is a successful judgement, so `isError` stays `false`. Only
 a malformed *request* sets `isError: true`, and it still answers with a payload
@@ -318,7 +337,7 @@ and the `v0.1.0` tag push (run
 | Tool descriptors (input + output schema per tool) | 5 |
 | Static gates | 8 |
 | Mutations that must turn a gate red | 43 / 43 |
-| Collected tests | 389 (Python 3.12) |
+| Collected tests | 395 (Python 3.12) |
 
 The three generated artefacts are recomputed and compared byte for byte on
 every run (`gen_codes --check`, `gen_golden --check`, `gen_schemas --check`),
