@@ -259,6 +259,14 @@ def check_release_published():
 
 
 def check_attachment_digests():
+    """Compare the registered sha256 digests against the published assets.
+
+    Comparing names only would let a wrong digest sit in the release note
+    unnoticed (this is exactly the D2 gap), so the ``digest`` field that
+    ``gh release view --json assets`` reports is compared value by value.
+    A ``gh`` too old to report digests is an environment gap (exit 3), never
+    a silent pass.
+    """
     expected = _registered_digests()
     if not expected:
         raise NotAchieved("no sha256 digests registered in the release note")
@@ -267,11 +275,26 @@ def check_attachment_digests():
         "--repo", "yuluo554/" + DISTRIBUTION,
         "--json", "assets",
     ])
-    names = {asset["name"] for asset in json.loads(raw).get("assets", [])}
-    missing = sorted(set(expected) - names)
+    published = {}
+    for asset in json.loads(raw).get("assets", []):
+        published[asset.get("name")] = asset
+    missing = sorted(set(expected) - set(published))
     if missing:
         raise NotAchieved("registered assets not published: " + ", ".join(missing))
-    return "{0} registered digest(s) match published asset names".format(len(expected))
+
+    mismatched = []
+    for name in sorted(expected):
+        reported = published[name].get("digest")
+        if not reported:
+            raise EnvironmentMissing(
+                "gh reported no digest for " + name + "; upgrade gh to a version that supports --json assets digest"
+            )
+        algorithm, _, value = reported.partition(":")
+        if algorithm != "sha256" or value != expected[name]:
+            mismatched.append(name + " (" + reported + " != sha256:" + expected[name] + ")")
+    if mismatched:
+        raise NotAchieved("digest mismatch: " + ", ".join(mismatched))
+    return "{0} digest(s) verified against published assets".format(len(expected))
 
 
 _DIGEST_LINE = re.compile(r"^sha256:\s*([0-9a-f]{64})\s+(\S+)\s*$", re.MULTILINE)

@@ -12,6 +12,7 @@ every normal commit red. What is asserted is the gate's contract:
 """
 
 import io
+import json
 import os
 import sys
 
@@ -134,3 +135,88 @@ def test_registered_digest_parser_reads_the_documented_line_form():
     sample = "sha256: " + "a" * 64 + "  http-semantics-mcp-0.1.0.tar.gz\n"
     found = check_release._DIGEST_LINE.findall(sample)
     assert found == [("a" * 64, "http-semantics-mcp-0.1.0.tar.gz")]
+
+
+# -- attachment digests: matching names is not enough ---------------------
+
+TARBALL = "http-semantics-mcp-0.1.0.tar.gz"
+SUMS = "SHA256SUMS"
+TARBALL_DIGEST = "8cc8892c20f1d37f175c8005a0cdd41993b90b58b6aaeef357bda2e647cef8b2"
+SUMS_DIGEST = "3fa920e376b4870f34975db75f45dd4fef15609eca5d4ff977128eaeb8fab805"
+
+
+def _assets_payload(digests, omit_digest_for=()):
+    assets = []
+    for name, digest in sorted(digests.items()):
+        asset = {"name": name, "state": "uploaded", "digest": "sha256:" + digest}
+        if name in omit_digest_for:
+            del asset["digest"]
+        assets.append(asset)
+    return json.dumps({"assets": assets})
+
+
+def _stub_published(monkeypatch, registered, published, omit_digest_for=()):
+    monkeypatch.setattr(check_release, "_registered_digests", lambda: dict(registered))
+    monkeypatch.setattr(
+        check_release,
+        "_run",
+        lambda command: _assets_payload(published, omit_digest_for),
+    )
+
+
+def test_attachment_check_verifies_digest_values(monkeypatch):
+    published = {TARBALL: TARBALL_DIGEST, SUMS: SUMS_DIGEST}
+    _stub_published(monkeypatch, published, published)
+
+    detail = check_release.check_attachment_digests()
+    assert detail == "2 digest(s) verified against published assets"
+
+
+def test_attachment_check_fails_when_one_registered_digest_is_wrong(monkeypatch):
+    """The D2 negative control: one changed character must turn the check red."""
+    published = {TARBALL: TARBALL_DIGEST, SUMS: SUMS_DIGEST}
+    tampered = dict(published)
+    tampered[TARBALL] = ("0" if TARBALL_DIGEST[0] != "0" else "1") + TARBALL_DIGEST[1:]
+    _stub_published(monkeypatch, tampered, published)
+
+    with pytest.raises(check_release.NotAchieved) as caught:
+        check_release.check_attachment_digests()
+    assert "digest mismatch" in str(caught.value)
+    assert TARBALL in str(caught.value)
+
+
+def test_attachment_check_still_reports_a_missing_asset(monkeypatch):
+    _stub_published(
+        monkeypatch, {TARBALL: TARBALL_DIGEST, SUMS: SUMS_DIGEST}, {TARBALL: TARBALL_DIGEST}
+    )
+
+    with pytest.raises(check_release.NotAchieved) as caught:
+        check_release.check_attachment_digests()
+    assert "not published" in str(caught.value)
+
+
+def test_attachment_check_treats_a_missing_digest_field_as_environment(monkeypatch):
+    """An old gh that reports no digest must be exit 3, not a silent PASS."""
+    published = {TARBALL: TARBALL_DIGEST}
+    _stub_published(monkeypatch, published, published, omit_digest_for=(TARBALL,))
+
+    with pytest.raises(check_release.EnvironmentMissing):
+        check_release.check_attachment_digests()
+
+
+def test_attachment_check_rejects_a_non_sha256_digest(monkeypatch):
+    monkeypatch.setattr(check_release, "_registered_digests", lambda: {TARBALL: TARBALL_DIGEST})
+    monkeypatch.setattr(
+        check_release,
+        "_run",
+        lambda command: json.dumps(
+            {
+                "assets": [
+                    {"name": TARBALL, "state": "uploaded", "digest": "md5:" + TARBALL_DIGEST}
+                ]
+            }
+        ),
+    )
+
+    with pytest.raises(check_release.NotAchieved):
+        check_release.check_attachment_digests()
