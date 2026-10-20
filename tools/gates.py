@@ -54,6 +54,10 @@ SKIP_DIRS = (
     "build",
     "dist",
     ".eggs",
+    # Secondary-iteration handover notes. They quote machine-specific paths on
+    # purpose, and they are gitignored, so scanning them would only produce
+    # false positives. Kept in step with .gitignore.
+    "update",
 )
 
 # Modules the judgement layer must never import (plan/02 section 2).

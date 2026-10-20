@@ -149,6 +149,37 @@ def test_absolute_path_gate_catches_a_unc_share(tmp_path):
     assert not gates.absolute_paths(root).ok
 
 
+def test_update_notes_are_exempt_in_both_places():
+    """``.gitignore`` and ``SKIP_DIRS`` are a pair: one alone still goes red."""
+    assert "update" in gates.SKIP_DIRS
+    with open(os.path.join(ROOT, ".gitignore"), "r", encoding="utf-8") as handle:
+        ignored = [line.strip() for line in handle]
+    assert "update/" in ignored
+
+
+def test_absolute_path_gate_skips_handover_notes_but_only_via_skip_dirs(tmp_path, monkeypatch):
+    """Handover notes quote machine paths on purpose; the skip must be why."""
+    root = _copy_repo(tmp_path)
+    updates = os.path.join(root, "update")
+    os.makedirs(updates)
+    probe = "C:" + "\\" + "ProgramData" + "\\" + "zcode" + "\\" + "notes.md"
+    with open(os.path.join(updates, "handover.md"), "w", encoding="utf-8", newline="\n") as handle:
+        handle.write("see " + probe + "\n")
+
+    # Shipped behaviour: the directory is invisible to the gate.
+    report = gates.absolute_paths(root)
+    assert report.ok, report.findings
+
+    # Take "update" out of the effective default and the same tree must go red.
+    # (scan_tree binds its defaults at definition time, so patching the module
+    # attribute would not reach the call; patch the defaults instead.)
+    suffixes, _ = gates.scan_tree.__defaults__
+    without_update = tuple(name for name in gates.SKIP_DIRS if name != "update")
+    monkeypatch.setattr(gates.scan_tree, "__defaults__", (suffixes, without_update))
+
+    assert not gates.absolute_paths(root).ok
+
+
 # -- line endings ---------------------------------------------------------
 
 

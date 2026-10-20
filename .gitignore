@@ -40,6 +40,9 @@ htmlcov/
 .coverage.*
 coverage.xml
 
+# 二次迭代交接物（含本机路径，不入版本库；与 tools/gates.py 的 SKIP_DIRS 成对）
+update/
+
 # 构建打包
 build_dist/
 *.spec
