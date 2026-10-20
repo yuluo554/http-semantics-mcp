@@ -112,17 +112,28 @@ python -m pytest -q                             # 期望 397 passed
 
 | 项 | 值 |
 | --- | --- |
-| tag 提交（`v0.2.0` 指向） | 见 `git rev-parse v0.2.0^{commit}`（tag 之后回填，tag 树内无法写自身哈希） |
-| tag 对象 | 见 `git for-each-ref refs/tags/v0.2.0`（annotated；本地 == 远端） |
-| tagger | `yuluo554 <282769740+yuluo554@users.noreply.github.com>` |
-| CI run id | 见下方「`--online` 复核」与仓库 Actions 页（`main` push 与 `v0.2.0` tag push 各一） |
-| GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.2.0 |
-| 附件 | `http-semantics-mcp-0.2.0.tar.gz` + `SHA256SUMS`；均 `uploaded` |
+| tag 提交（`v0.2.0` 指向） | `0bb3add9546206e629fb0d7205eb0b84edc7f7de` |
+| tag 对象 | `b96562a026734032171e3dfac9324bedf4d258db`（annotated；本地 == 远端 `refs/tags/v0.2.0`） |
+| tagger | `yuluo554 <282769740+yuluo554@users.noreply.github.com>`（已脱敏） |
+| CI run（`main` push） | run [`39426515196`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39426515196) success：`test (ubuntu-latest, py3.12)` + `test (windows-latest, py3.12)` 两腿均 success；注解只剩 `ubuntu-latest` 迁移 Ubuntu 26 的信息性提示（Node.js 20 弃用注解已随 actions v7 消失） |
+| CI run（`v0.2.0` tag push） | run [`39426524638`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39426524638) success：两腿均 success |
+| 首次推送的 CI（无 tag） | run [`39426113619`](https://github.com/yuluo554/http-semantics-mcp/actions/runs/39426113619) success（`e8d64c9`，两腿）——发布准备提交本身也过一次 CI |
+| GitHub Release URL | https://github.com/yuluo554/http-semantics-mcp/releases/tag/v0.2.0（`isDraft=false`、`isPrerelease=false`） |
+| 附件 | `http-semantics-mcp-0.2.0.tar.gz`（248434 字节，`git archive v0.2.0 \| gzip -9n`）+ `SHA256SUMS`（98 字节）；两者 `state=uploaded` |
 | 附件 sha256 | 下方两行（GitHub Release 正文亦载同一组值） |
-| 真下载复验 | `gh release download v0.2.0` → `sha256sum -c SHA256SUMS` OK → `cmp` 与本地构建件 identical → 解包树 vs `git archive v0.2.0` 解包树 `diff -r` 无差异 |
+| 真下载复验 | `gh release download v0.2.0` → `sha256sum -c SHA256SUMS` → `http-semantics-mcp-0.2.0.tar.gz: OK`（rc=0）→ `cmp` 与本地由 tag 构建件 **identical** → 解包树 vs `git archive v0.2.0` 解包树 `diff -r` **无差异**（286 文件） |
+| 发布物本体实测 | 解包树：`tools/run_gates.py` → `8 gate(s), 0 failing`；`pytest` → **397 passed**；`gen_codes`/`gen_golden`/`gen_schemas --check` 全 OK；覆盖率 `31/31/0/0`；`absolute-paths` 285 文件 0 findings；无 `__pycache__` / `.pyc` / `.venv` / `build` / `*.egg-info` |
 | 干净 clone 复验 | 见下方「干净 clone」小节 |
 | `check_release.py --online` | 见下方「`--online` 复核」小节 |
-| 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 noreply；②annotated tag tagger 同上；③树内零本机路径；④解包树无构建杂质 |
+| 脱敏四步 | ①`git log --format='%ae%n%ce'` 去重 = 单一 `282769740+yuluo554@users.noreply.github.com`；②annotated tag tagger 同上（noreply）；③树内零本机路径（`absolute-paths` 门在解包树 285 文件项 0 findings）；④解包树 286 文件，无 `.venv` / `__pycache__` / `.pyc` / `build` / `*.egg-info` |
+| **tag 树内 README 已是转正版** | 与 v0.1.0 不同：`v0.2.0` 的 tag 树内 `README.md` 第 5 行是 `**Status: released — v0.2.0.**`。第一次打 tag 时写的是「unreleased 0.2.0」——那正是 D55 那类会随时间变假的措辞；因 tag 尚未推送，改措辞后**重打**了 tag（`a173488 → b96562a0`，旧对象从未推送，不构成移动已发布 tag） |
+
+### 附件摘要（`sha256sum -c` 兼容格式）
+
+```
+sha256: ce2531bd8f28603477816ef313195c4537ba6c35308d9ed9e837dd66425898e2  http-semantics-mcp-0.2.0.tar.gz
+sha256: 58b8f6e2d0d4fbf6f3b4829576db7504ff1357058af1c73b27e58a503422452a  SHA256SUMS
+```
 
 <!--
 注册行格式（check_release._registered_digests 逐字解析，tag 后回填时保持此形态）：
