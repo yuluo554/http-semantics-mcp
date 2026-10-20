@@ -28,8 +28,11 @@ __all__ = [
 ]
 
 # Frozen constant. Changing it is a protocol-behaviour change and must be
-# recorded in plan/06 (D22).
-SUPPORTED_PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
+# recorded in plan/06 (D22). Latest addition: "2025-11-25" -- same legacy
+# handshake, one more accepted version string. The default stays
+# "2025-06-18" so a client that sends nothing keeps receiving the version
+# this server has always answered with.
+SUPPORTED_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 DEFAULT_PROTOCOL_VERSION = "2025-06-18"
 
 # Upper bound for a single newline-delimited message (D31).

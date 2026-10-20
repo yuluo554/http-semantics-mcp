@@ -39,11 +39,24 @@ def test_capabilities_declare_only_tools():
     assert set(_initialize(_session())["capabilities"]) == {"tools"}
 
 
-@pytest.mark.parametrize("requested", ["2025-06-18", "2025-03-26", "2024-11-05"])
+@pytest.mark.parametrize("requested", ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"])
 def test_supported_versions_are_echoed(requested):
     session = _session()
     result = session.handle(_request("initialize", {"protocolVersion": requested}))[0]["result"]
     assert result["protocolVersion"] == requested
+
+
+def test_every_declared_version_is_echoed():
+    """Driven off the constant, so adding a version cannot quietly skip a test."""
+    assert protocol.SUPPORTED_PROTOCOL_VERSIONS
+    for requested in protocol.SUPPORTED_PROTOCOL_VERSIONS:
+        session = _session()
+        result = session.handle(_request("initialize", {"protocolVersion": requested}))[0]["result"]
+        assert result["protocolVersion"] == requested, requested
+
+
+def test_the_default_version_is_one_of_the_supported_ones():
+    assert protocol.DEFAULT_PROTOCOL_VERSION in protocol.SUPPORTED_PROTOCOL_VERSIONS
 
 
 def test_unknown_version_falls_back_to_default():
