@@ -18,6 +18,10 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
+if SRC not in sys.path:
+    sys.path.insert(0, SRC)
+
+from http_semantics_mcp import canonical  # noqa: E402
 
 TOOL_NAMES = [
     "cache_evaluate",
@@ -135,10 +139,39 @@ def test_a_client_can_list_and_call_every_tool_then_hits_the_unknown_tool_error(
         payload = json.loads(result["content"][0]["text"])
         # The server's own published schema is the expected key set.
         assert set(payload) == set(schemas[name]["properties"]), name
+        # Publishing an outputSchema obliges the server to also send
+        # structuredContent (specification: "Servers MUST provide structured
+        # results that conform to this schema").
+        structured = result["structuredContent"]
+        assert set(structured) == set(schemas[name]["properties"]), name
+        assert set(schemas[name]["required"]) <= set(structured), name
+        # ... and the two faces must carry the same value, byte for byte.
+        assert canonical.dumps(structured) == result["content"][0]["text"], name
+        assert structured == payload, name
 
     unknown = messages[2 + len(TOOL_NAMES)]
     assert "error" in unknown, unknown
     assert unknown["error"]["code"] == -32602
+
+
+def test_an_error_result_also_carries_structured_content():
+    """``isError: true`` keeps the same envelope; the payload is the error object."""
+    requests = [
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+        {"jsonrpc": "2.0", "method": "notifications/initialized"},
+        {
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "tools/call",
+            "params": {"name": "vary_match", "arguments": {}},
+        },
+    ]
+    messages = _run(requests)
+    result = messages[1]["result"]
+    assert result["isError"] is True
+    assert set(result["structuredContent"]) == {"error"}
+    assert result["structuredContent"]["error"]["code"] == "INVALID_INPUT"
+    assert canonical.dumps(result["structuredContent"]) == result["content"][0]["text"]
 
 
 def test_the_same_call_returns_the_same_bytes_over_the_wire():

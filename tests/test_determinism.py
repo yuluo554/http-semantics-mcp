@@ -68,6 +68,24 @@ def test_two_runs_serialise_to_the_same_sha256():
         assert per_tool.get(tool, 0) > 0, "no case exercised " + tool
 
 
+def test_structured_content_is_deterministic_too():
+    """The structured face gets its own digest check, not a text proxy.
+
+    Comparing only ``content[0].text`` would keep passing if ``render`` ever
+    started building ``structuredContent`` from a different object than the
+    one it serialises.
+    """
+    for tool, case_id, case in _cases():
+        registered = build_registry().get(tool)
+        assert registered is not None, tool
+        first = registered.handler(case["input"])["structuredContent"]
+        second = registered.handler(case["input"])["structuredContent"]
+        assert first == second, case_id
+        first_digest = hashlib.sha256(canonical.dumps(first).encode("utf-8")).hexdigest()
+        second_digest = hashlib.sha256(canonical.dumps(second).encode("utf-8")).hexdigest()
+        assert first_digest == second_digest, case_id
+
+
 def test_output_carries_no_machine_specific_path():
     patterns = [(label, re.compile(pattern)) for label, pattern in gates._path_patterns()]
     for tool, case_id, case in _cases():

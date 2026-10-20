@@ -36,9 +36,24 @@ FUNCTIONS = {
 
 
 def render(payload, is_error=False):
-    """Wrap a judgement object (or an error payload) as an MCP tool result."""
+    """Wrap a judgement object (or an error payload) as an MCP tool result.
+
+    The same object is handed over twice: serialised once as the compatibility
+    ``text`` part, and once as ``structuredContent``. Every published tool
+    carries an ``outputSchema``, and the specification says a server that
+    publishes one **MUST** also return structured results conforming to it.
+
+    Reusing ``payload`` (not a copy, and certainly not a second
+    ``json.dumps``) keeps one serialiser in the package and makes "the text
+    and the structured value never drift" true by construction; the test suite
+    still asserts the byte equality.
+
+    On the error branch ``payload`` is already ``{"error": {...}}``, which is
+    what ``isError: true`` clients expect; the schema does not apply there.
+    """
     return {
         "content": [{"type": "text", "text": canonical.dumps(payload)}],
+        "structuredContent": payload,
         "isError": is_error,
     }
 
